@@ -15,6 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
+use \phalanx\events as events;
 use \phalanx\events\EventPump;
 
 require_once 'PHPUnit/Framework.php';
@@ -33,14 +34,39 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 		$this->assertSame(EventPump::pump(), $test);
 	}
 	
+	public function testRaiseWithoutContext()
+	{
+		try
+		{
+			EventPump::pump()->raise(new TestEvent());
+			$this->fail('\phalanx\events\EventPumpException expected');
+		}
+		catch (\Exception $e)
+		{
+			$this->assertThat($e, $this->isInstanceOf('\phalanx\events\EventPumpException'));
+		}
+	}
+	
+	public function testSetContext()
+	{
+		$context = new events\Context();
+		
+		$this->assertEquals(EventPump::pump()->context(), null, 'Event pump has a context.');
+		
+		EventPump::pump()->set_context($context);
+		$this->assertSame($context, EventPump::pump()->context());
+	}
+	
 	public function testGetLastEvent()
 	{
 		$this->assertEquals(EventPump::pump()->getLastEvent(), null);
 		
-		$event = new TestEvent();
+		$event1 = new TestEvent();
+		EventPump::pump()->raise($event1);
+		$this->assertSame($event1, EventPump::pump()->getLastEvent());
 		
-		EventPump::pump()->raise($event);
-		
-		$this->assertSame($event, EventPump::pump()->getLastEvent());
+		$event2 = new TestEvent();
+		EventPump::pump()->raise($event2);
+		$this->assertSame($event2, EventPump::pump()->getLastEvent());
 	}
 }

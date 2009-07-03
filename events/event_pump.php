@@ -44,8 +44,11 @@ class EventPump
 	// Adds an event to the pump. Checks to see if the event can be handled
 	// and, if so, runs the handler.
 	public function raise(Event $event)
-	{		
-		if (!$event::canRunInContext($context))
+	{
+		if (!$this->context)
+			throw new EventPumpException('No valid \phalanx\events\Context present.');
+		
+		if (!$event::canRunInContext($this->context))
 			return;
 		
 		array_push($this->events, $event);
@@ -59,6 +62,8 @@ class EventPump
 	}
 	
 	// Getters and setters.
+	public function set_context(Context $context) { $this->context = $context; }
+	public function context() { return $this->context; }
 	
 	// Returns the shared EventPump.
 	public function pump()
@@ -68,4 +73,8 @@ class EventPump
 		return self::$pump;
 	}
 	public static function set_pump(EventPump $pump) { self::$pump = $pump; }
+}
+
+class EventPumpException extends \Exception
+{
 }
