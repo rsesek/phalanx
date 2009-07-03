@@ -21,6 +21,21 @@ require_once 'PHPUnit/Framework.php';
 
 class EventTest extends \PHPUnit_Framework_TestCase
 {
+	public function testTime()
+	{
+		$before = new \DateTime();
+		sleep(1);
+		$event = new TestEvent();
+		sleep(1);
+		$after = new \DateTime();
+		
+		$time = $event->time();
+		$this->assertNotNull($time);
+		
+		$this->assertLessThan($time->getTimestamp(), $before->getTimestamp());
+		$this->assertGreaterThan($time->getTimestamp(), $after->getTimestamp());
+	}
+	
 	public function testSetContext()
 	{
 		$context = new Context();
