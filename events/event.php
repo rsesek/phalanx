@@ -33,10 +33,7 @@ abstract class Event
 	
 	// Does precondition checks and returns a bool indicating if the event can be
 	// handled in the given |context|.
-	public static function canRunInContext(Context $context)
-	{
-		return true;
-	}
+	public static function canRunInContext(Context $context) { return true; }
 	
 	// Performs setup tasks for event handling. |$this->context| is present at
 	// this time. This is a good place to do permission checks.
