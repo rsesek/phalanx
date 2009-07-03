@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\events\Event;
+use \phalanx\events as events;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -38,7 +38,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
 	
 	public function testSetContext()
 	{
-		$context = new Context();
+		$context = new events\Context();
 		$context->identifier = 'foo';
 		
 		$event = new TestEvent();
@@ -47,12 +47,12 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$event->set_context($context);
 		$this->assertSame($context, $event->context());
 		
-		$event = new Event($context);
+		$event = new TestEvent($context);
 		$this->assertSame($context, $event->context());
 	}
 }
 
-class TestEvent extends Event
+class TestEvent extends events\Event
 {
 	public function handle()
 	{

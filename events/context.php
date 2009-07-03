@@ -14,25 +14,11 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\test;
+namespace phalanx\events;
 
-require_once 'PHPUnit/Framework.php';
-
-// Common includes.
-require PHALANX_ROOT . '/events/context.php';
-require PHALANX_ROOT . '/events/event.php';
-require PHALANX_ROOT . '/events/event_pump.php';
-
-class EventsSuite
+// A context object is used to store information about state and the HTTP
+// request (GPC variables). Events are handleded within a specific context.
+class Context
 {
-	public static function suite()
-	{
-		$suite = new \PHPUnit_Framework_TestSuite('Events');
-		
-		$suite->addTestFile(TEST_ROOT . '/tests/events/context_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/events/event_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
-		
-		return $suite;
-	}
+	
 }

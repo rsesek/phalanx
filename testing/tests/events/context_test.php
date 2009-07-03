@@ -15,24 +15,10 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
+use \phalanx\events as events;
 
 require_once 'PHPUnit/Framework.php';
 
-// Common includes.
-require PHALANX_ROOT . '/events/context.php';
-require PHALANX_ROOT . '/events/event.php';
-require PHALANX_ROOT . '/events/event_pump.php';
-
-class EventsSuite
+class ContextTest extends \PHPUnit_Framework_TestCase
 {
-	public static function suite()
-	{
-		$suite = new \PHPUnit_Framework_TestSuite('Events');
-		
-		$suite->addTestFile(TEST_ROOT . '/tests/events/context_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/events/event_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
-		
-		return $suite;
-	}
 }
