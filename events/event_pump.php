@@ -32,6 +32,9 @@ class EventPump
 	// symmetrically with |$this->events|.
 	protected $events_output;
 	
+	// The current Context that events take place in.
+	protected $context;
+	
 	public function __construct()
 	{
 		$this->events = array();
@@ -41,7 +44,12 @@ class EventPump
 	// Adds an event to the pump. Checks to see if the event can be handled
 	// and, if so, runs the handler.
 	public function raise(Event $event)
-	{
+	{		
+		if (!$event::canRunInContext($context))
+			return;
+		
+		array_push($this->events, $event);
+		array_push($this->events_output, '');
 	}
 	
 	// Returns the last-raised Event.
