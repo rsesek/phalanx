@@ -41,7 +41,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$context = new events\Context();
 		
 		$event = new TestEvent();
-		$this->assertEquals($event->context(), null, 'Event created with a Context');
+		$this->assertNull($event->context(), 'Event created with a Context');
 		
 		$event->set_context($context);
 		$this->assertSame($context, $event->context());

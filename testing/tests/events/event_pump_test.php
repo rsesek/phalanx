@@ -36,22 +36,15 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 	
 	public function testRaiseWithoutContext()
 	{
-		try
-		{
-			EventPump::pump()->raise(new TestEvent());
-			$this->fail('\phalanx\events\EventPumpException expected');
-		}
-		catch (\Exception $e)
-		{
-			$this->assertThat($e, $this->isInstanceOf('\phalanx\events\EventPumpException'));
-		}
+		$this->setExpectedException('\phalanx\events\EventPumpException');
+		EventPump::pump()->raise(new TestEvent());
 	}
 	
 	public function testSetContext()
 	{
 		$context = new events\Context();
 		
-		$this->assertEquals(EventPump::pump()->context(), null, 'Event pump has a context.');
+		$this->assertNull(EventPump::pump()->context(), 'Event pump has a context when it should not.');
 		
 		EventPump::pump()->set_context($context);
 		$this->assertSame($context, EventPump::pump()->context());
@@ -59,7 +52,7 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 	
 	public function testGetLastEvent()
 	{
-		$this->assertEquals(EventPump::pump()->getLastEvent(), null);
+		$this->assertNull(EventPump::pump()->getLastEvent());
 		
 		$event1 = new TestEvent();
 		EventPump::pump()->raise($event1);
