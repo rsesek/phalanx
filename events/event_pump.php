@@ -49,7 +49,7 @@ class EventPump
 	public function raise(Event $event)
 	{
 		if (!$this->context)
-			throw new EventPumpException('No valid \phalanx\events\Context present.');
+			throw new EventPumpException('No valid phalanx\events\Context present.');
 		
 		if (!$event::canRunInContext($this->context))
 			return;

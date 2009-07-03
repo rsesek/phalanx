@@ -22,9 +22,11 @@ require_once 'PHPUnit/Framework.php';
 
 class EventPumpTest extends \PHPUnit_Framework_TestCase
 {
+	public $pump;
+	
 	public function setUp()
 	{
-		EventPump::set_pump(new EventPump());
+		$this->pump = new EventPump();
 	}
 	
 	public function testSharedPump()
@@ -32,54 +34,52 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 		// Reset.
 		EventPump::T_set_pump(null);
 		
-		$test = new EventPump();
-		
 		$this->assertNotNull(EventPump::pump(), 'Did not create shared pump.');
-		$this->assertFalse(EventPump::pump() === $test);
+		$this->assertNotSame($this->pump, EventPump::pump());
 		
-		EventPump::set_pump($test);
-		$this->assertSame(EventPump::pump(), $test);
+		EventPump::set_pump($this->pump);
+		$this->assertSame($this->pump, EventPump::pump());
 	}
 	
 	public function testRaiseWithoutContext()
 	{
 		$this->setExpectedException('\phalanx\events\EventPumpException');
-		EventPump::pump()->raise(new TestEvent());
+		$this->pump->raise(new TestEvent());
 	}
 	
 	public function testSetContext()
 	{
 		$context = new events\Context();
 		
-		$this->assertNull(EventPump::pump()->context(), 'Event pump has a context when it should not.');
+		$this->assertNull($this->pump->context(), 'Event pump has a context when it should not.');
 		
-		EventPump::pump()->set_context($context);
-		$this->assertSame($context, EventPump::pump()->context());
+		$this->pump->set_context($context);
+		$this->assertSame($context, $this->pump->context());
 	}
 	
 	public function testGetLastEvent()
 	{
-		$this->assertNull(EventPump::pump()->getLastEvent());
+		$this->assertNull($this->pump->getLastEvent());
 		
-		EventPump::pump()->set_context(new events\Context());
+		$this->pump->set_context(new events\Context());
 		
 		$event1 = new TestEvent();
-		EventPump::pump()->raise($event1);
-		$this->assertSame($event1, EventPump::pump()->getLastEvent());
+		$this->pump->raise($event1);
+		$this->assertSame($event1, $this->pump->getLastEvent());
 		$this->assertTrue($event1->did_init);
 		$this->assertTrue($event1->did_handle);
 		$this->assertTrue($event1->did_end);
 		
 		$event2 = new InitOnlyEvent();
-		EventPump::pump()->raise($event2);
-		$this->assertSame($event2, EventPump::pump()->getLastEvent());
+		$this->pump->raise($event2);
+		$this->assertSame($event2, $this->pump->getLastEvent());
 		$this->assertTrue($event2->did_init);
 		$this->assertFalse($event2->did_handle);
 		$this->assertTrue($event2->did_end);
 		
 		$event3 = new TestEvent();
-		EventPump::pump()->raise($event3);
-		$this->assertSame($event3, EventPump::pump()->getLastEvent());
+		$this->pump->raise($event3);
+		$this->assertSame($event3, $this->pump->getLastEvent());
 		$this->assertTrue($event1->did_init);
 		$this->assertTrue($event1->did_handle);
 		$this->assertTrue($event1->did_end);
@@ -87,18 +87,18 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 	
 	public function testGetCurrentEvent()
 	{
-		EventPump::pump()->set_context(new events\Context());
+		$this->pump->set_context(new events\Context());
 		
 		$event1 = new TestEvent();
-		EventPump::pump()->raise($event1);
-		$this->assertSame($event1, EventPump::pump()->getCurrentEvent());
+		$this->pump->raise($event1);
+		$this->assertSame($event1, $this->pump->getCurrentEvent());
 		
 		$event2 = new InitOnlyEvent();
-		EventPump::pump()->raise($event2);
-		$this->assertSame($event1, EventPump::pump()->getCurrentEvent());
+		$this->pump->raise($event2);
+		$this->assertSame($event1, $this->pump->getCurrentEvent());
 		
 		$event3 = new TestEvent();
-		EventPump::pump()->raise($event3);
-		$this->assertSame($event3, EventPump::pump()->getCurrentEvent());
+		$this->pump->raise($event3);
+		$this->assertSame($event3, $this->pump->getCurrentEvent());
 	}
 }
