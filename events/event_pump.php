@@ -58,7 +58,7 @@ class EventPump
 	// Returns the last-raised Event.
 	public function getLastEvent()
 	{
-		return $this->events[0];
+		return $this->events[sizeof($this->events) - 1];
 	}
 	
 	// Getters and setters.
