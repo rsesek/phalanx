@@ -15,6 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
+use \phalanx\events as events;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -36,3 +37,39 @@ class EventsSuite
 		return $suite;
 	}
 }
+
+// Common fixtures.
+
+class TestEvent extends events\Event
+{
+	public $did_init = false;
+	public $did_handle = false;
+	public $did_end = false;
+	public $is_cancelled = false;
+	
+	public static function canRunInContext(events\Context $c)
+	{
+		return !($c instanceof BadContext);
+	}
+	
+	public function init()
+	{
+		$this->did_init = true;
+	}
+	
+	public function handle()
+	{
+		$this->did_handle = true;
+	}
+	
+	public function end($is_cancelled)
+	{
+		$this->is_cancelled = $is_cancelled;
+		$this->did_end = true;
+	}
+}
+
+class BadContext extends events\Context
+{
+}
+

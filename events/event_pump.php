@@ -73,6 +73,9 @@ class EventPump
 		return self::$pump;
 	}
 	public static function set_pump(EventPump $pump) { self::$pump = $pump; }
+	
+	// Testing methods. These are not for public consumption.
+	public static function T_set_pump($pump) { self::$pump = $pump; }
 }
 
 class EventPumpException extends \Exception

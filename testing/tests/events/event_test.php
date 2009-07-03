@@ -62,20 +62,3 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(events\Event::canRunInContext($context2));
 	}
 }
-
-class TestEvent extends events\Event
-{
-	public static function canRunInContext(events\Context $c)
-	{
-		return !($c instanceof BadContext);
-	}
-	
-	public function handle()
-	{
-		// Do nothing.
-	}
-}
-
-class BadContext extends events\Context
-{
-}
