@@ -61,4 +61,12 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(events\Event::canRunInContext($context1));
 		$this->assertTrue(events\Event::canRunInContext($context2));
 	}
+	
+	public function testCancel()
+	{
+		$event = new TestEvent();
+		$this->assertFalse($event->is_cancelled());
+		$event->cancel();
+		$this->assertTrue($event->is_cancelled());
+	}
 }

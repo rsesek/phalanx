@@ -24,6 +24,9 @@ class EventPump
 	// The shared event pump object.
 	private static $pump;
 	
+	// Index of the current event.
+	protected $current_event = -1;
+	
 	// An array of all the events that have been registered with the pump. This
 	// is a stack.
 	protected $events;
@@ -53,6 +56,15 @@ class EventPump
 		
 		array_push($this->events, $event);
 		array_push($this->events_output, '');
+		
+		$event->set_context($this->context);
+		$event->init();
+		
+		$this->current_event++;
+		
+		$event->handle();
+		
+		$event->end();
 	}
 	
 	// Returns the last-raised Event.
@@ -61,7 +73,15 @@ class EventPump
 		return $this->events[sizeof($this->events) - 1];
 	}
 	
+	// Returns the Event that is currently being handled. This is different from
+	// the last-raised Event in that events can be cancelled in the init() stage.
+	public function getCurrentEvent()
+	{
+		return $this->events[$this->current_event];
+	}
+	
 	// Getters and setters.
+	// --------------------------------------------------------------------------
 	public function set_context(Context $context) { $this->context = $context; }
 	public function context() { return $this->context; }
 	

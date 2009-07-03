@@ -71,4 +71,15 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 		EventPump::pump()->raise($event2);
 		$this->assertSame($event2, EventPump::pump()->getLastEvent());
 	}
+	
+	public function testGetCurrentEvent()
+	{
+		EventPump::pump()->set_context(new events\Context());
+		
+		$event1 = new TestEvent();
+		EventPump::pump()->raise($event1);
+		$this->assertSame($event1, EventPump::pump()->getCurrentEvent());
+		
+		
+	}
 }

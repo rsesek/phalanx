@@ -25,6 +25,9 @@ abstract class Event
 	// The Context in which the event is being handled.
 	protected $context;
 	
+	// Whether or not the event is cancelled.
+	protected $cancelled = false;
+	
 	public function __construct(Context $context = null)
 	{
 		$this->time = new \DateTime();
@@ -42,14 +45,20 @@ abstract class Event
 	// The actual event handling code. All output is buffered.
 	abstract public function handle();
 	
-	// Events perform clean up tasks here. If |$is_cancelled| is true, then the
+	// Events perform clean up tasks here. If |is_cancelled()| is true, then the
 	// event handle()ing code was interuppted either internally (the event raised
 	// an event) or was prevented from handle()ing due to precondition failures.
-	public function end($is_cancelled) {}
+	public function end() {}
 	
-	// Getters and setters.	
+	// Getters and setters.
+	// --------------------------------------------------------------------------
 	public function time() { return $this->time; }
-		
+	
 	public function set_context(Context $context) { $this->context = $context; }
 	public function context() { return $this->context; }
+	
+	// Marks the event as cancelled. Do not overload this, but rather perform
+	// cleanup in end().
+	public function cancel() { $this->cancelled = true; }
+	public function is_cancelled() { return $this->cancelled; }
 }

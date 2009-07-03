@@ -45,7 +45,6 @@ class TestEvent extends events\Event
 	public $did_init = false;
 	public $did_handle = false;
 	public $did_end = false;
-	public $is_cancelled = false;
 	
 	public static function canRunInContext(events\Context $c)
 	{
@@ -62,9 +61,8 @@ class TestEvent extends events\Event
 		$this->did_handle = true;
 	}
 	
-	public function end($is_cancelled)
+	public function end()
 	{
-		$this->is_cancelled = $is_cancelled;
 		$this->did_end = true;
 	}
 }
