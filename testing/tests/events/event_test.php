@@ -23,6 +23,24 @@ class EventTest extends \PHPUnit_Framework_TestCase
 {
 	public function testSetContext()
 	{
-		$this->assertEquals(4, 5, 'Failed to create morning coffee');
+		$context = new Context();
+		$context->identifier = 'foo';
+		
+		$event = new TestEvent();
+		$this->assertEquals($event->context(), null, 'Event created with a Context');
+		
+		$event->set_context($context);
+		$this->assertSame($context, $event->context());
+		
+		$event = new Event($context);
+		$this->assertSame($context, $event->context());
+	}
+}
+
+class TestEvent extends Event
+{
+	public function handle()
+	{
+		// Do nothing.
 	}
 }

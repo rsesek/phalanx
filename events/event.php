@@ -27,17 +27,20 @@ abstract class Event
 	
 	public function __construct(Context $context = null)
 	{
-		$this->time = new DateTime();
+		$this->time = new \DateTime();
 		$this->context = $context;
 	}
 	
 	// Does precondition checks and returns a bool indicating if the event can be
 	// handled in the given |context|.
-	abstract public static function canRunInContext(Context $context);
+	public static function canRunInContext(Context $context)
+	{
+		return true;
+	}
 	
 	// Performs setup tasks for event handling. |$this->context| is present at
 	// this time. This is a good place to do permission checks.
-	abstract public function init();
+	public function init() {}
 	
 	// The actual event handling code. All output is buffered.
 	abstract public function handle();
@@ -45,7 +48,7 @@ abstract class Event
 	// Events perform clean up tasks here. If |$is_cancelled| is true, then the
 	// event handle()ing code was interuppted either internally (the event raised
 	// an event) or was prevented from handle()ing due to precondition failures.
-	abstract public function end($is_cancelled);
+	public function end($is_cancelled) {}
 	
 	// Getters and setters.	
 	public function time() { return $this->time; }
