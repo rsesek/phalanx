@@ -24,7 +24,8 @@ class EventPump
 	// The shared event pump object.
 	private static $pump;
 	
-	// An array of all the events that have been registered with the pump.
+	// An array of all the events that have been registered with the pump. This
+	// is a stack.
 	protected $events;
 	
 	// An array of output from the different events. This is indexed
@@ -41,6 +42,12 @@ class EventPump
 	// and, if so, runs the handler.
 	public function raise(Event $event)
 	{
+	}
+	
+	// Returns the last-raised Event.
+	public function getLastEvent()
+	{
+		return $this->events[0];
 	}
 	
 	// Getters and setters.

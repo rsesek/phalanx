@@ -21,15 +21,26 @@ require_once 'PHPUnit/Framework.php';
 
 class EventPumpTest extends \PHPUnit_Framework_TestCase
 {
+	// This test must be first.
 	public function testSharedPump()
 	{
 		$test = new EventPump();
-		$test->extra_prop = 'foobar';
 		
 		$this->assertNotNull(EventPump::pump(), 'Did not create shared pump.');
 		$this->assertFalse(EventPump::pump() === $test);
 		
 		EventPump::set_pump($test);
 		$this->assertSame(EventPump::pump(), $test);
+	}
+	
+	public function testGetLastEvent()
+	{
+		$this->assertEquals(EventPump::pump()->getLastEvent(), null);
+		
+		$event = new TestEvent();
+		
+		EventPump::pump()->raise($event);
+		
+		$this->assertSame($event, EventPump::pump()->getLastEvent());
 	}
 }

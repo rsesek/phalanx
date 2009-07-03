@@ -39,7 +39,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
 	public function testSetContext()
 	{
 		$context = new events\Context();
-		$context->identifier = 'foo';
 		
 		$event = new TestEvent();
 		$this->assertEquals($event->context(), null, 'Event created with a Context');
@@ -50,12 +49,33 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$event = new TestEvent($context);
 		$this->assertSame($context, $event->context());
 	}
+	
+	public function testCanRunInContext()
+	{
+		$context1 = new events\Context();
+		$context2 = new BadContext();
+		
+		$this->assertTrue(TestEvent::canRunInContext($context1));
+		$this->assertFalse(TestEvent::canRunInContext($context2));
+		
+		$this->assertTrue(events\Event::canRunInContext($context1));
+		$this->assertTrue(events\Event::canRunInContext($context2));
+	}
 }
 
 class TestEvent extends events\Event
 {
+	public static function canRunInContext(events\Context $c)
+	{
+		return !($c instanceof BadContext);
+	}
+	
 	public function handle()
 	{
 		// Do nothing.
 	}
+}
+
+class BadContext extends events\Context
+{
 }
