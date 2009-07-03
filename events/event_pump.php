@@ -54,16 +54,20 @@ class EventPump
 		if (!$event::canRunInContext($this->context))
 			return;
 		
-		array_push($this->events, $event);
+		$idx = array_push($this->events, $event);
 		array_push($this->events_output, '');
 		
 		$event->set_context($this->context);
 		$event->init();
 		
-		$this->current_event++;
+		// See if the event got cancelled during the init.
+		if ($event->is_cancelled())
+			goto cleanup;
 		
+		$this->current_event = $idx - 1;		
 		$event->handle();
-		
+
+cleanup:
 		$event->end();
 	}
 	

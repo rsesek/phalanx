@@ -66,10 +66,23 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 		$event1 = new TestEvent();
 		EventPump::pump()->raise($event1);
 		$this->assertSame($event1, EventPump::pump()->getLastEvent());
+		$this->assertTrue($event1->did_init);
+		$this->assertTrue($event1->did_handle);
+		$this->assertTrue($event1->did_end);
 		
-		$event2 = new TestEvent();
+		$event2 = new InitOnlyEvent();
 		EventPump::pump()->raise($event2);
 		$this->assertSame($event2, EventPump::pump()->getLastEvent());
+		$this->assertTrue($event2->did_init);
+		$this->assertFalse($event2->did_handle);
+		$this->assertTrue($event2->did_end);
+		
+		$event3 = new TestEvent();
+		EventPump::pump()->raise($event3);
+		$this->assertSame($event3, EventPump::pump()->getLastEvent());
+		$this->assertTrue($event1->did_init);
+		$this->assertTrue($event1->did_handle);
+		$this->assertTrue($event1->did_end);
 	}
 	
 	public function testGetCurrentEvent()
@@ -80,6 +93,12 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 		EventPump::pump()->raise($event1);
 		$this->assertSame($event1, EventPump::pump()->getCurrentEvent());
 		
+		$event2 = new InitOnlyEvent();
+		EventPump::pump()->raise($event2);
+		$this->assertSame($event1, EventPump::pump()->getCurrentEvent());
 		
+		$event3 = new TestEvent();
+		EventPump::pump()->raise($event3);
+		$this->assertSame($event3, EventPump::pump()->getCurrentEvent());
 	}
 }

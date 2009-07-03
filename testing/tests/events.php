@@ -71,3 +71,12 @@ class BadContext extends events\Context
 {
 }
 
+class InitOnlyEvent extends TestEvent
+{
+	public function init()
+	{
+		parent::init();
+		$this->cancel();
+	}
+}
+
