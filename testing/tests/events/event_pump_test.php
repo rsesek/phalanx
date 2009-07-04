@@ -80,9 +80,9 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 		$event3 = new TestEvent();
 		$this->pump->raise($event3);
 		$this->assertSame($event3, $this->pump->getLastEvent());
-		$this->assertTrue($event1->did_init);
-		$this->assertTrue($event1->did_handle);
-		$this->assertTrue($event1->did_end);
+		$this->assertTrue($event3->did_init);
+		$this->assertTrue($event3->did_handle);
+		$this->assertTrue($event3->did_end);
 	}
 	
 	public function testGetCurrentEvent()
