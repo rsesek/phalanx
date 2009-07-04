@@ -78,14 +78,14 @@ cleanup:
 	}
 	
 	// Returns the Event that is currently being handled. This is different from
-	// the last-raised Event in that events can be cancelled in the init() stage.
+	// the last-raised Event in that events can be cancelled in init().
 	public function getCurrentEvent()
 	{
 		return $this->events[$this->current_event];
 	}
 	
 	// Getters and setters.
-	// --------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	public function set_context(Context $context) { $this->context = $context; }
 	public function context() { return $this->context; }
 	
