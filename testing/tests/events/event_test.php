@@ -80,12 +80,12 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($this->event->output(), '');
 		
 		$this->event->append_output('Append.');
-		$this->assertEquals($this->event->output(), 'Append.');
+		$this->assertEquals('Append.', $this->event->output());
 		
 		$this->event->set_output('Reset.');
-		$this->assertEquals($this->event->output(), 'Reset.');
+		$this->assertEquals('Reset.', $this->event->output());
 		
 		$this->event->append_output('Append.');
-		$this->assertEquals($this->event->output(), 'Reset.Append.');
+		$this->assertEquals('Reset.Append.', $this->event->output());
 	}
 }
