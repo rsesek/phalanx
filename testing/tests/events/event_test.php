@@ -21,6 +21,11 @@ require_once 'PHPUnit/Framework.php';
 
 class EventTest extends \PHPUnit_Framework_TestCase
 {
+	public function setUp()
+	{
+		$this->event = new TestEvent();
+	}
+	
 	public function testTime()
 	{
 		$before = new \DateTime();
@@ -68,5 +73,19 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($event->is_cancelled());
 		$event->cancel();
 		$this->assertTrue($event->is_cancelled());
+	}
+	
+	public function testSetAndAppendOutput()
+	{
+		$this->assertEquals($this->event->output(), '');
+		
+		$this->event->append_output('Append.');
+		$this->assertEquals($this->event->output(), 'Append.');
+		
+		$this->event->set_output('Reset.');
+		$this->assertEquals($this->event->output(), 'Reset.');
+		
+		$this->event->append_output('Append.');
+		$this->assertEquals($this->event->output(), 'Reset.Append.');
 	}
 }

@@ -31,17 +31,12 @@ class EventPump
 	// is a stack.
 	protected $events;
 	
-	// An array of output from the different events. This is indexed
-	// symmetrically with |$this->events|.
-	protected $events_output;
-	
 	// The current Context that events take place in.
 	protected $context;
 	
 	public function __construct()
 	{
 		$this->events = array();
-		$this->events_output = array();
 	}
 	
 	// Adds an event to the pump. Checks to see if the event can be handled
@@ -49,13 +44,12 @@ class EventPump
 	public function raise(Event $event)
 	{
 		if (!$this->context)
-			throw new EventPumpException('No valid phalanx\events\Context present.');
+			throw new EventPumpException('EventPump::$context is NULL');
 		
 		if (!$event::canRunInContext($this->context))
 			return;
 		
 		$idx = array_push($this->events, $event);
-		array_push($this->events_output, '');
 		
 		$event->set_context($this->context);
 		$event->init();
