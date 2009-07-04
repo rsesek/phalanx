@@ -51,6 +51,9 @@ class EventPump
 		
 		$idx = array_push($this->events, $event);
 		
+		if (!ob_start())
+			throw new EventPumpException('Could not start output buffer.');
+		
 		$event->set_context($this->context);
 		$event->init();
 		
@@ -63,6 +66,10 @@ class EventPump
 
 cleanup:
 		$event->end();
+		
+		$event->set_output(ob_get_contents());
+		if (!ob_end_clean())
+			throw new EventPumpException('Could not end output buffer.');
 	}
 	
 	// Returns the last-raised Event.

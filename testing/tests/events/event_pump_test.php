@@ -101,4 +101,18 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 		$this->pump->raise($event3);
 		$this->assertSame($event3, $this->pump->getCurrentEvent());
 	}
+	
+	public function testRaiseEventOutputBuffering()
+	{
+		$event = new PrintEvent();
+		$this->pump->set_context(new events\Context());
+		
+		ob_start();
+		$this->pump->raise($event);
+		$buffer = ob_get_contents();
+		ob_end_clean();
+		
+		$this->assertEquals('init().handle().end().', $event->output());
+		$this->assertEquals('', $buffer);
+	}
 }

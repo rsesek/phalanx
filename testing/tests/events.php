@@ -80,3 +80,20 @@ class InitOnlyEvent extends TestEvent
 	}
 }
 
+class PrintEvent extends events\Event
+{
+	public function init()
+	{
+		echo 'init().';
+	}
+	
+	public function handle()
+	{
+		echo 'handle().';
+	}
+	
+	public function end()
+	{
+		echo 'end().';
+	}
+}
