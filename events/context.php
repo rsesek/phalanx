@@ -20,5 +20,26 @@ namespace phalanx\events;
 // request (GPC variables). Events are handleded within a specific context.
 class Context
 {
+	// GPC variables. By default these are unsanitized. On construction, the
+	// variable arrays are copied from their respective superglobals.
+	protected $gpc = array(
+		'g' => array(),
+		'p' => array(),
+		'c' => array()
+	);
 	
+	public function __construct()
+	{
+		$this->gpc['g'] = $_GET;
+		$this->gpc['p'] = $_POST;
+		$this->gpc['c'] = $_COOKIE;
+	}
+	
+	// Testing methods. Not for public consumption.
+	// -------------------------------------------------------------------------
+	public function T_gpc() { return $this->gpc; }
+	public function T_set_gpc_var($gpc, $key, $value)
+	{
+		$this->gpc[$gpc][$key] = $value;
+	}
 }

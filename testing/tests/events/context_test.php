@@ -21,4 +21,33 @@ require_once 'PHPUnit/Framework.php';
 
 class ContextTest extends \PHPUnit_Framework_TestCase
 {
+	public $gpc_originals = array(
+		'g' => array(),
+		'p' => array(),
+		'c' => array()
+	);
+	public $context;
+	
+	public function setUp()
+	{
+		$this->context = new events\Context();
+		$this->gpc_originals['g'] = $_GET;
+		$this->gpc_originals['p'] = $_POST;
+		$this->gpc_originals['c'] = $_COOKIE;
+	}
+	
+	public function tearDown()
+	{
+		$_GET = $this->gpc_originals['g'];
+		$_POST = $this->gpc_originals['p'];
+		$_COOKIE = $this->gpc_originals['c'];
+	}
+	
+	public function testGPCInit()
+	{
+		$this->context->T_set_gpc_var('p', 'foo', 'bar');
+		$_POST['foo'] = 'moo';
+		$gpc = $this->context->T_gpc();
+		$this->assertEquals('bar', $gpc['p']['foo']);
+	}
 }
