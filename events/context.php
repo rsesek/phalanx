@@ -35,6 +35,12 @@ class Context
 		$this->gpc['c'] = $_COOKIE;
 	}
 	
+	// Called by the EventPump when an event in this context has been handled
+	// successfully and is ready for context-specific handling.
+	public function onEventHandled(Event $event)
+	{
+	}
+	
 	// Testing methods. Not for public consumption.
 	// -------------------------------------------------------------------------
 	public function T_gpc() { return $this->gpc; }

@@ -49,6 +49,8 @@ class EventPump
 		if (!$event::canRunInContext($this->context))
 			return;
 		
+		$handled = false; // Will be true if all handling is successful.
+		
 		$idx = array_push($this->events, $event);
 		
 		if (!ob_start())
@@ -63,6 +65,7 @@ class EventPump
 		
 		$this->current_event = $idx - 1;		
 		$event->handle();
+		$handled = true;
 
 cleanup:
 		$event->end();
@@ -70,6 +73,9 @@ cleanup:
 		$event->set_output(ob_get_contents());
 		if (!ob_end_clean())
 			throw new EventPumpException('Could not end output buffer.');
+		
+		if ($handled)
+			$this->context->onEventHandled($event);
 	}
 	
 	// Returns the last-raised Event.

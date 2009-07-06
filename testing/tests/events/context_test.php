@@ -30,7 +30,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 	
 	public function setUp()
 	{
-		$this->context = new events\Context();
+		$this->context = new TestContext();
 		$this->gpc_originals['g'] = $_GET;
 		$this->gpc_originals['p'] = $_POST;
 		$this->gpc_originals['c'] = $_COOKIE;
@@ -49,5 +49,14 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 		$_POST['foo'] = 'moo';
 		$gpc = $this->context->T_gpc();
 		$this->assertEquals('bar', $gpc['p']['foo']);
+	}
+	
+	public function testEventWasHandled()
+	{
+		$pump = new events\EventPump();
+		$context = new TestContext();
+		$pump->set_context($context);
+		$pump->raise(new TestEvent());
+		$this->assertTrue($context->did_event_handled);
 	}
 }

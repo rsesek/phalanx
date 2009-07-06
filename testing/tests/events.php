@@ -97,3 +97,14 @@ class PrintEvent extends events\Event
 		echo 'end().';
 	}
 }
+
+class TestContext extends events\Context
+{
+	public $did_event_handled = false;
+	
+	public function onEventHandled(events\Event $event)
+	{
+		parent::onEventHandled($event);
+		$this->did_event_handled = true;
+	}
+}
