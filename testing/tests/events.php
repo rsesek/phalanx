@@ -107,4 +107,12 @@ class TestContext extends events\Context
 		parent::onEventHandled($event);
 		$this->did_event_handled = true;
 	}
+	
+	// Getter and setters.
+	// -------------------------------------------------------------------------
+	public function T_gpc() { return $this->gpc; }
+	public function T_set_gpc_var($gpc, $key, $value)
+	{
+		$this->gpc[$gpc][$key] = $value;
+	}
 }

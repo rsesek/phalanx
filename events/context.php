@@ -40,12 +40,4 @@ class Context
 	public function onEventHandled(Event $event)
 	{
 	}
-	
-	// Testing methods. Not for public consumption.
-	// -------------------------------------------------------------------------
-	public function T_gpc() { return $this->gpc; }
-	public function T_set_gpc_var($gpc, $key, $value)
-	{
-		$this->gpc[$gpc][$key] = $value;
-	}
 }
