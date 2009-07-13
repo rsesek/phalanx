@@ -15,24 +15,19 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
+use \phalanx\input as input;
 
 require_once 'PHPUnit/Framework.php';
 
-define('PHALANX_ROOT', dirname(dirname(__FILE__)));
-define('TEST_ROOT', dirname(__FILE__));
-
-class AllTests
+class ArrayCleanerTest extends \PHPUnit_Framework_TestCase
 {
-	public static function suite()
+	public function testConstructWithRef()
 	{
-		$suite = new \PHPUnit_Framework_TestSuite('Phalanx');
+		$array = array('foo' => 'bar');
+		$cleaner = new input\ArrayCleaner($array);
+		$array['foo'] = 'moo';
 		
-		require TEST_ROOT . '/tests/events.php';
-		$suite->addTestSuite(EventsSuite::suite());
-		
-		require TEST_ROOT . '/tests/input.php';
-		$suite->addTestSuite(InputSuite::suite());
-		
-		return $suite;
+		$test = $cleaner->array_ref();
+		$this->assertEquals('moo', $test['foo']);
 	}
 }
