@@ -15,26 +15,20 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
+use \phalanx\base as base;
 
 require_once 'PHPUnit/Framework.php';
 
-define('PHALANX_ROOT', dirname(dirname(__FILE__)));
-define('TEST_ROOT', dirname(__FILE__));
+// Common includes.
+require PHALANX_ROOT . '/base/key_descender.php';
 
-class AllTests
+class BaseSuite
 {
 	public static function suite()
 	{
-		$suite = new \PHPUnit_Framework_TestSuite('Phalanx');
+		$suite = new \PHPUnit_Framework_TestSuite('Base');
 		
-		require TEST_ROOT . '/tests/base.php';
-		$suite->addTestSuite(BaseSuite::suite());
-		
-		require TEST_ROOT . '/tests/events.php';
-		$suite->addTestSuite(EventsSuite::suite());
-		
-		require TEST_ROOT . '/tests/input.php';
-		$suite->addTestSuite(InputSuite::suite());
+		$suite->addTestFile(TEST_ROOT . '/tests/base/key_descender_test.php');
 		
 		return $suite;
 	}
