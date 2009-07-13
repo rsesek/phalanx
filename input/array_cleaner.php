@@ -29,17 +29,17 @@ class ArrayCleaner
 {
 	// A ref to the array this cleaner manages. Operations performed on this
 	// object will affect this array.
-	protected $array;
+	protected $ref;
 	
 	// Creates a new cleaner, setting a ref to the array.
 	public function __construct(Array& $array)
 	{
-		$this->array = &$array;
+		$this->ref = new \phalanx\base\KeyDescender($array);
 	}
 	
 	
 	
 	// Getters and setters.
 	// -------------------------------------------------------------------------
-	public function & array_ref() { return $this->array; }
+	public function & ref() { return $this->ref->root(); }
 }

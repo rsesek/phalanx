@@ -67,7 +67,7 @@ class KeyDescender
 	}
 	
 	// Returns a value from a given key in a descendable.
-	protected function & _get($descendable, $single_key)
+	protected function & _get(& $descendable, $single_key)
 	{
 		if (is_array($descendable))
 		{

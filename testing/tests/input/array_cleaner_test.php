@@ -27,7 +27,7 @@ class ArrayCleanerTest extends \PHPUnit_Framework_TestCase
 		$cleaner = new input\ArrayCleaner($array);
 		$array['foo'] = 'moo';
 		
-		$test = $cleaner->array_ref();
+		$test = $cleaner->ref();
 		$this->assertEquals('moo', $test['foo']);
 	}
 }
