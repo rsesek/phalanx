@@ -52,7 +52,7 @@ class KeyDescender
 		{
 			try
 			{
-				$current = $this->_get($current, $stack[$i]);
+				$current = &$this->_get($current, $stack[$i]);
 			}
 			// Catch subkey exceptions and re-throw them as main key ones.
 			catch (UndefinedKeyException $e)
@@ -66,6 +66,39 @@ class KeyDescender
 		return $current;
 	}
 	
+	// Sets a value for a given key.
+	public function set($key, $value)
+	{
+		// Get the parent of the key we're inserting.
+		$stack = explode('.', $key);
+		
+		// Remove the subkey that we will be creating (the last one).
+		$single_key = array_pop($stack);
+		
+		$parent = null;
+		// Attach to root.
+		if (sizeof($stack) < 1)
+		{
+			$parent = &$this->root;
+		}
+		// Find proper super-key.
+		else
+		{
+			$parent_key = implode('.', $stack);
+			$parent = &$this->get($parent_key);
+		}
+		
+		if ($parent == null)
+			throw new UndefinedKeyException("Cannot insert '$key' because it has a non-existent super-key");
+		
+		if (is_object($parent))
+			$parent->$single_key = $value;
+		else if (is_array($parent))
+			$parent[$single_key] = $value;
+		else
+			throw new KeyDescenderException("Cannot insert '$key' because it has a non-descendable super-key");
+	}
+	
 	// Returns a value from a given key in a descendable.
 	protected function & _get(& $descendable, $single_key)
 	{
@@ -74,14 +107,14 @@ class KeyDescender
 			if (isset($descendable[$single_key]))
 				return $descendable[$single_key];
 			else
-				throw new UndefinedKeyException("Undefined key '$key' on $descendable");
+				throw new UndefinedKeyException("Undefined key '$single_key' on $descendable");
 		}
 		else if (is_object($descendable))
 		{
 			if (isset($descendable->$single_key))
 				return $descendable->$single_key;
 			else
-				throw new UndefinedKeyException("Undefined '$key' on $descendable");
+				throw new UndefinedKeyException("Undefined '$single_key' on $descendable");
 		}
 		else
 		{

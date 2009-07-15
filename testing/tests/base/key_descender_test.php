@@ -98,4 +98,43 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 		$this->assertFalse($desc->throw_undefined_errors());
 		$this->assertNull($desc->get('undefined.key'));
 	}
+	
+	public function testSetSingleLevelArray()
+	{
+		$array = array('foo' => 'bar');
+		$desc = new KeyDescender($array);
+		$desc->set('moo', 'cow');
+		$this->assertEquals('cow', $desc->get('moo'));
+	}
+	
+	public function testSetSingleLevelObject()
+	{
+		$obj = new \stdClass();
+		$obj->foo = 'bar';
+		$desc = new KeyDescender($obj);
+		$desc->set('moo', 'cow');
+		$this->assertEquals('cow', $desc->get('moo'));
+	}
+	
+	public function testSetTwoLevelArray()
+	{
+		$array = array(
+			'foo' => array(
+				'bar' => 'moo'
+			)
+		);
+		$desc = new KeyDescender($array);
+		$desc->set('foo.red', 'blue');
+		$this->assertEquals('blue', $desc->get('foo.red'));
+	}
+	
+	public function testSetTwoLevelObject()
+	{
+		$obj = new \stdClass();
+		$obj->foo = new \stdClass();
+		$obj->foo->bar = 'moo';
+		$desc = new KeyDescender($obj);
+		$desc->set('foo.red', 'blue');
+		$this->assertEquals('blue', $desc->get('foo.red'));
+	}
 }
