@@ -16,23 +16,21 @@
 
 namespace phalanx\input;
 
-// An ArrayCleaner manages a reference to an array. When clean operations are
-// performed on an instance of this class, the cleaning operation happens on
-// they specified key of the array. Example:
+// A KeyedCleaner manages a reference to a base\KeyedDescender. When clean
+// operations are performed on an instance of this class, the cleaning operation
+// happens onthey specified key of the array. Example:
 //
-// 	$cleaner = new ArrayCleaner($context->gpc);
-// 	$cleaner->cleanHTML('p.some_key');
+// 	$cleaner = new KeyedCleaner($context->gpc);
+// 	$cleaner->getHTML('p.some_key');
 // 	print $context->gpc['p']['some_key'];
-//
-// Note that cleaning calls use the base\KeyDescender to access values.
-class ArrayCleaner
+class KeyedCleaner
 {
 	// A ref to the array this cleaner manages. Operations performed on this
 	// object will affect this array.
 	protected $ref;
 	
 	// Creates a new cleaner, setting a ref to the array.
-	public function __construct(Array& $array)
+	public function __construct(/* Array|Object */ & $array)
 	{
 		$this->ref = new \phalanx\base\KeyDescender($array);
 	}

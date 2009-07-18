@@ -19,7 +19,7 @@ use \phalanx\input as input;
 
 require_once 'PHPUnit/Framework.php';
 
-class ArrayCleanerTest extends \PHPUnit_Framework_TestCase
+class KeyedCleanerTest extends \PHPUnit_Framework_TestCase
 {
 	public $cleaner;
 	
@@ -42,7 +42,7 @@ class ArrayCleanerTest extends \PHPUnit_Framework_TestCase
 			'boolN'	=> 'no',
 			'entity' => 'red, green, & blue'
 		);
-		$this->cleaner = new input\ArrayCleaner($array);
+		$this->cleaner = new input\KeyedCleaner($array);
 	}
 	
 	public function testConstructWithRef()

@@ -21,7 +21,7 @@ require_once 'PHPUnit/Framework.php';
 
 // Common includes.
 require PHALANX_ROOT . '/input/cleaner.php';
-require PHALANX_ROOT . '/input/array_cleaner.php';
+require PHALANX_ROOT . '/input/keyed_cleaner.php';
 
 class InputSuite
 {
@@ -30,7 +30,7 @@ class InputSuite
 		$suite = new \PHPUnit_Framework_TestSuite('Input');
 		
 		$suite->addTestFile(TEST_ROOT . '/tests/input/cleaner_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/input/array_cleaner_test.php');
+		$suite->addTestFile(TEST_ROOT . '/tests/input/keyed_cleaner_test.php');
 		
 		return $suite;
 	}
