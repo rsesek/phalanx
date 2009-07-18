@@ -37,7 +37,35 @@ class ArrayCleaner
 		$this->ref = new \phalanx\base\KeyDescender($array);
 	}
 	
+	public function getString($key)
+	{
+		return Cleaner::string($this->ref->get($key));
+	}
 	
+	public function getTrimmedString($key)
+	{
+		return Cleaner::trimmed_string($this->ref->get($key));
+	}
+	
+	public function getHTML($key)
+	{
+		return Cleaner::html($this->ref->get($key));
+	}
+	
+	public function getInt($key)
+	{
+		return Cleaner::int($this->ref->get($key));
+	}
+	
+	public function getFloat($key)
+	{
+		return Cleaner::float($this->ref->get($key));
+	}
+	
+	public function getBool($key)
+	{
+		return Cleaner::bool($this->ref->get($key));
+	}
 	
 	// Getters and setters.
 	// -------------------------------------------------------------------------
