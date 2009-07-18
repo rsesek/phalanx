@@ -27,45 +27,58 @@ class KeyedCleaner
 {
 	// A ref to the array this cleaner manages. Operations performed on this
 	// object will affect this array.
-	protected $ref;
+	protected $keyer;
 	
 	// Creates a new cleaner, setting a ref to the array.
 	public function __construct(/* Array|Object */ & $array)
 	{
-		$this->ref = new \phalanx\base\KeyDescender($array);
+		$this->keyer = new \phalanx\base\KeyDescender($array);
 	}
 	
 	public function getString($key)
 	{
-		return Cleaner::string($this->ref->get($key));
+		$val = Cleaner::string($this->keyer->get($key));
+		$this->keyer->set($key, $val);
+		return $val;
 	}
 	
 	public function getTrimmedString($key)
 	{
-		return Cleaner::trimmed_string($this->ref->get($key));
+		$val = Cleaner::trimmed_string($this->keyer->get($key));
+		$this->keyer->set($key, $val);
+		return $val;
 	}
 	
 	public function getHTML($key)
 	{
-		return Cleaner::html($this->ref->get($key));
+		$val = Cleaner::html($this->keyer->get($key));
+		$this->keyer->set($key, $val);
+		return $val;
 	}
 	
 	public function getInt($key)
 	{
-		return Cleaner::int($this->ref->get($key));
+		$val = Cleaner::int($this->keyer->get($key));
+		$this->keyer->set($key, $val);
+		return $val;
 	}
 	
 	public function getFloat($key)
 	{
-		return Cleaner::float($this->ref->get($key));
+		$val = Cleaner::float($this->keyer->get($key));
+		$this->keyer->set($key, $val);
+		return $val;
 	}
 	
 	public function getBool($key)
 	{
-		return Cleaner::bool($this->ref->get($key));
+		$val = Cleaner::bool($this->keyer->get($key));
+		$this->keyer->set($key, $val);
+		return $val;
 	}
 	
 	// Getters and setters.
 	// -------------------------------------------------------------------------
-	public function & ref() { return $this->ref->root(); }
+	public function keyer() { return $this->keyer; }
+	public function & ref() { return $this->keyer->root(); }
 }

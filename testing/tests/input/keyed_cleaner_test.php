@@ -53,53 +53,103 @@ class KeyedCleanerTest extends \PHPUnit_Framework_TestCase
 	
 	public function testCleanString()
 	{
-		$this->assertEquals('string', $this->cleaner->getString('str'));
-		$this->assertEquals(' trimmed string	', $this->cleaner->getString('tstr'));
-		$this->assertEquals('<strong>html</strong>', $this->cleaner->getString('html'));
-		$this->assertEquals('"double quoted string"', $this->cleaner->getString('dqstr'));
-		$this->assertEquals("'single quoted string'", $this->cleaner->getString('sqstr'));
-		$this->assertEquals('<strong>html with "double quotes"</strong>', $this->cleaner->getString('dqhtml'));
-		$this->assertEquals('red, green, & blue', $this->cleaner->getString('entity'));
+		$this->cleaner->getString('str');
+		$this->assertEquals('string', $this->cleaner->keyer()->get('str'));
+
+		$this->cleaner->getString('tstr');
+		$this->assertEquals(' trimmed string	', $this->cleaner->keyer()->get('tstr'));
+
+		$this->cleaner->getString('html');
+		$this->assertEquals('<strong>html</strong>', $this->cleaner->keyer()->get('html'));
+
+		$this->cleaner->getString('dqstr');
+		$this->assertEquals('"double quoted string"', $this->cleaner->keyer()->get('dqstr'));
+
+		$this->cleaner->getString('sqstr');
+		$this->assertEquals("'single quoted string'", $this->cleaner->keyer()->get('sqstr'));
+
+		$this->cleaner->getString('dqhtml');
+		$this->assertEquals('<strong>html with "double quotes"</strong>', $this->cleaner->keyer()->get('dqhtml'));
+
+		$this->cleaner->getString('entity');
+		$this->assertEquals('red, green, & blue', $this->cleaner->keyer()->get('entity'));
 	}
 	
 	public function testCleanTrimmedStr()
 	{
-		$this->assertEquals('string', $this->cleaner->getTrimmedString('str'));
-		$this->assertEquals('trimmed string', $this->cleaner->getTrimmedString('tstr'));
+		$this->cleaner->getTrimmedString('str');
+		$this->assertEquals('string', $this->cleaner->keyer()->get('str'));
+
+		$this->cleaner->getTrimmedString('tstr');
+		$this->assertEquals('trimmed string', $this->cleaner->keyer()->get('tstr'));
 	}
 	
 	public function testCleanHTML()
 	{
-		$this->assertEquals('string', $this->cleaner->getHTML('str'));
-		$this->assertEquals('&lt;strong&gt;html&lt;/strong&gt;', $this->cleaner->getHTML('html'));
-		$this->assertEquals('&quo;double quoted string&quo;', $this->cleaner->getHTML('dqstr'));
-		$this->assertEquals("'single quoted string'", $this->cleaner->getHTML('sqstr'));
-		$this->assertEquals('&lt;strong&gt;html with &quo;double quotes&quo;&lt;/strong&gt;', $this->cleaner->getHTML('dqhtml'));
-		$this->assertEquals('red, green, & blue', $this->cleaner->getHTML('entity'));
+		$this->cleaner->getHTML('str');
+		$this->assertEquals('string', $this->cleaner->keyer()->get('str'));
+
+		$this->cleaner->getHTML('html');
+		$this->assertEquals('&lt;strong&gt;html&lt;/strong&gt;', $this->cleaner->keyer()->get('html'));
+
+		$this->cleaner->getHTML('dqstr');
+		$this->assertEquals('&quo;double quoted string&quo;', $this->cleaner->keyer()->get('dqstr'));
+
+		$this->cleaner->getHTML('sqstr');
+		$this->assertEquals("'single quoted string'", $this->cleaner->keyer()->get('sqstr'));
+
+		$this->cleaner->getHTML('dqhtml');
+		$this->assertEquals('&lt;strong&gt;html with &quo;double quotes&quo;&lt;/strong&gt;', $this->cleaner->keyer()->get('dqhtml'));
+
+		$this->cleaner->getHTML('entity');
+		$this->assertEquals('red, green, & blue', $this->cleaner->keyer()->get('entity'));
 	}
 	
 	public function testCleanInt()
 	{
-		$this->assertEquals(0, $this->cleaner->getInt('str'));
-		$this->assertEquals(42, $this->cleaner->getInt('int'));
-		$this->assertEquals(3, $this->cleaner->getInt('float'));
-		$this->assertEquals(1, $this->cleaner->getInt('bool1'));
+		$this->cleaner->getInt('str');
+		$this->assertEquals(0, $this->cleaner->keyer()->get('str'));
+
+		$this->cleaner->getInt('int');
+		$this->assertEquals(42, $this->cleaner->keyer()->get('int'));
+
+		$this->cleaner->getInt('float');
+		$this->assertEquals(3, $this->cleaner->keyer()->get('float'));
+
+		$this->cleaner->getInt('bool1');
+		$this->assertEquals(1, $this->cleaner->keyer()->get('bool1'));
 	}
 	
 	public function testCleanFloat()
 	{
-		$this->assertEquals(0.0, $this->cleaner->getFloat('str'));
-		$this->assertEquals(42.0, $this->cleaner->getFloat('int'));
-		$this->assertEquals(3.14159, $this->cleaner->getFloat('float'));
+		$this->cleaner->getFloat('str');
+		$this->assertEquals(0.0, $this->cleaner->keyer()->get('str'));
+
+		$this->cleaner->getFloat('int');
+		$this->assertEquals(42.0, $this->cleaner->keyer()->get('int'));
+
+		$this->cleaner->getFloat('float');
+		$this->assertEquals(3.14159, $this->cleaner->keyer()->get('float'));
 	}
 	
 	public function testCleanBool()
 	{
-		$this->assertEquals(true, $this->cleaner->getBool('bool1'));
-		$this->assertEquals(true, $this->cleaner->getBool('boolT'));
-		$this->assertEquals(true, $this->cleaner->getBool('boolY'));
-		$this->assertEquals(false, $this->cleaner->getBool('bool0'));
-		$this->assertEquals(false, $this->cleaner->getBool('boolF'));
-		$this->assertEquals(false, $this->cleaner->getBool('boolN'));
+		$this->cleaner->getBool('bool1');
+		$this->assertEquals(true, $this->cleaner->keyer()->get('bool1'));
+
+		$this->cleaner->getBool('boolT');
+		$this->assertEquals(true, $this->cleaner->keyer()->get('boolT'));
+
+		$this->cleaner->getBool('boolY');
+		$this->assertEquals(true, $this->cleaner->keyer()->get('boolY'));
+
+		$this->cleaner->getBool('bool0');
+		$this->assertEquals(false, $this->cleaner->keyer()->get('bool0'));
+
+		$this->cleaner->getBool('boolF');
+		$this->assertEquals(false, $this->cleaner->keyer()->get('boolF'));
+
+		$this->cleaner->getBool('boolN');
+		$this->assertEquals(false, $this->cleaner->keyer()->get('boolN'));
 	}
 }
