@@ -88,7 +88,7 @@ class KeyDescender
 			$parent = &$this->get($parent_key);
 		}
 		
-		if ($parent == null)
+		if ($parent === null)
 			throw new UndefinedKeyException("Cannot insert '$key' because it has a non-existent super-key");
 		
 		if (is_object($parent))

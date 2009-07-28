@@ -22,17 +22,16 @@ class Context
 {
 	// GPC variables. By default these are unsanitized. On construction, the
 	// variable arrays are copied from their respective superglobals.
-	protected $gpc = array(
-		'g' => array(),
-		'p' => array(),
-		'c' => array()
-	);
+	protected $gpc = null;
 	
 	public function __construct()
 	{
-		$this->gpc['g'] = $_GET;
-		$this->gpc['p'] = $_POST;
-		$this->gpc['c'] = $_COOKIE;
+		$gpc = array(
+			'g' => (array)$_GET,
+			'p' => (array)$_POST,
+			'c' => (array)$_COOKIE
+		);
+		$this->gpc = new \phalanx\base\KeyDescender($gpc);
 	}
 	
 	// Called by the EventPump when an event in this context has been handled

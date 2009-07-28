@@ -137,4 +137,15 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 		$desc->set('foo.red', 'blue');
 		$this->assertEquals('blue', $desc->get('foo.red'));
 	}
+	
+	public function testSetInEmptyArray()
+	{
+		$array = array(
+			'foo' => array(
+			)
+		);
+		$desc = new KeyDescender($array);
+		$desc->set('foo.test', 'abc');
+		$this->assertEquals('abc', $desc->get('foo.test'));
+	}
 }

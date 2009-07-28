@@ -30,6 +30,13 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 	
 	public function setUp()
 	{
+		if (!is_array($_GET))
+			$_GET = array();
+		if (!is_array($_POST))
+			$_POST = array();
+		if (!is_array($_COOKIE))
+			$_COOKIE = array();
+		
 		$this->context = new TestContext();
 		$this->gpc_originals['g'] = $_GET;
 		$this->gpc_originals['p'] = $_POST;
@@ -45,10 +52,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 	
 	public function testGPCInit()
 	{
-		$this->context->T_set_gpc_var('p', 'foo', 'bar');
+		$this->context->T_gpc()->set('p.foo', 'bar');
 		$_POST['foo'] = 'moo';
 		$gpc = $this->context->T_gpc();
-		$this->assertEquals('bar', $gpc['p']['foo']);
+		$this->assertEquals('bar', $gpc->get('p.foo'));
 	}
 	
 	public function testEventWasHandled()
