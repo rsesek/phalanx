@@ -21,6 +21,7 @@ require_once 'PHPUnit/Framework.php';
 
 // Common includes.
 require PHALANX_ROOT . '/input/cleaner.php';
+require PHALANX_ROOT . '/input/form_key.php';
 require PHALANX_ROOT . '/input/keyed_cleaner.php';
 
 class InputSuite
@@ -30,8 +31,36 @@ class InputSuite
 		$suite = new \PHPUnit_Framework_TestSuite('Input');
 		
 		$suite->addTestFile(TEST_ROOT . '/tests/input/cleaner_test.php');
+		$suite->addTestFile(TEST_ROOT . '/tests/input/form_key_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/input/keyed_cleaner_test.php');
 		
 		return $suite;
+	}
+}
+
+class TestFormKeyManagerDelegate implements input\FormKeyManagerDelegate
+{
+	public $did_get = false;
+	public $did_save = false;
+	public $did_delete = false;
+	
+	public $key_storage = array();
+	
+	public function getFormKey($key)
+	{
+		$this->did_get = true;
+		return $this->key_storage[$key];
+	}
+	
+	public function saveFormKey(\stdClass $form_key)
+	{
+		$this->did_save = true;
+		$this->key_storage[$form_key->key] = $form_key;
+	}
+	
+	public function deleteKey($key)
+	{
+		$this->did_delete = true;
+		unset($this->key_storage[$key]);
 	}
 }
