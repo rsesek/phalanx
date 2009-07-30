@@ -15,6 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\input;
+use \phalanx\base\PropertyBag as PropertyBag;
 
 // This class is used to generate unique form keys, so that POST requests
 // cannot be forged easily. This uses a delegate for cross-session storage of
@@ -50,7 +51,7 @@ class FormKeyManager
 	{
 		$key = sha1(rand() . microtime() . rand());
 		
-		$form_key = new \stdClass();
+		$form_key = new PropertyBag();
 		$form_key->key = $key;
 		$form_key->timestamp = time();
 		$this->delegate->saveFormKey($form_key);
@@ -105,7 +106,7 @@ class FormKeyManager
 interface FormKeyManagerDelegate
 {
 	public function getFormKey($key);
-	public function saveFormKey(\stdClass $form_key);
+	public function saveFormKey(PropertyBag $form_key);
 	public function deleteKey($key);
 }
 

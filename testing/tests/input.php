@@ -52,7 +52,7 @@ class TestFormKeyManagerDelegate implements input\FormKeyManagerDelegate
 		return $this->key_storage[$key];
 	}
 	
-	public function saveFormKey(\stdClass $form_key)
+	public function saveFormKey(\phalanx\base\PropertyBag $form_key)
 	{
 		$this->did_save = true;
 		$this->key_storage[$form_key->key] = $form_key;
