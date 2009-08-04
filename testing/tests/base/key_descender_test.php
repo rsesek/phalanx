@@ -163,4 +163,20 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 		$desc->set('foo.test', 'abc');
 		$this->assertEquals('abc', $desc->get('foo.test'));
 	}
+	
+	public function testMagicGetter()
+	{
+		$array = array('foo' => array('moo' => 'boo'));
+		$desc = new KeyDescender($array);
+		$this->assertEquals('boo', $desc->{"foo.moo"});
+		$this->assertSame($array['foo'], $desc->foo);
+	}
+	
+	public function testMagicSetter()
+	{
+		$array = array('foo' => array('moo' => 'boo'));
+		$desc = new KeyDescender($array);
+		$desc->{"foo.moo"} = 'abc123';
+		$this->assertEquals('abc123', $desc->get('foo.moo'));
+	}
 }

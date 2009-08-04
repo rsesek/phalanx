@@ -136,6 +136,11 @@ class KeyDescender
 		}
 	}
 	
+	// Wrappers for get() and set() so we can do magical property access, which
+	// will even apply to arrays.
+	public function __get($key) { return $this->get($key); }
+	public function __set($key, $value) { $this->set($key, $value); }
+	
 	// Getters and setters.
 	// -------------------------------------------------------------------------
 	public function & root() { return $this->root; }
