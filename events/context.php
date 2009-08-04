@@ -39,4 +39,8 @@ class Context
 	public function onEventHandled(Event $event)
 	{
 	}
+	
+	// Setters and getters.
+	// -------------------------------------------------------------------------
+	public function gpc() { return $this->gpc; }
 }

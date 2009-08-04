@@ -19,6 +19,9 @@ use \phalanx\input as input;
 
 require_once 'PHPUnit/Framework.php';
 
+require_once TEST_ROOT . '/tests/input.php';
+require_once TEST_ROOT . '/tests/events/context_test.php';
+
 class FormKeyTest extends \PHPUnit_Framework_TestCase
 {
 	public $manager = null;
@@ -120,5 +123,60 @@ class FormKeyTest extends \PHPUnit_Framework_TestCase
 		$this->manager->invalidate($key);
 		$this->assertTrue($this->delegate->did_delete);
 		$this->assertNull($this->delegate->key_storage[$key]);
+	}
+}
+
+// We inherit from ContextTest to get the GPC variable array resetting in
+// setUp() and tearDown().
+class FormKeyEventTest extends ContextTest
+{
+	public $event;
+	public $pump;
+	public $context;
+	public $form_key;
+	
+	public function setUp()
+	{
+		parent::setUp();
+		$this->pump = new \phalanx\events\EventPump();
+		$this->context = new TestContext();
+		$this->pump->set_context($this->context);
+		$this->form_key = new input\FormKeyManager(new TestFormKeyManagerDelegate());
+		$this->event = new input\ValidateFormKeyEvent($this->form_key, 'form_key');
+	}
+	
+	public function testCtor()
+	{
+		$this->assertAttributeSame($this->form_key, 'manager', $this->event);
+		$this->assertAttributeSame('form_key', 'post_variable', $this->event);
+	}
+	
+	public function testNoInput()
+	{
+		$this->pump->raise($this->event);
+		$this->assertTrue($this->event->is_cancelled());
+	}
+	
+	public function testGETKey()
+	{
+		$_GET['form_key'] = 'foo';
+		$this->pump->raise($this->event);
+		$this->assertTrue($this->event->is_cancelled());
+	}
+	
+	public function testInvalidPOST()
+	{
+		$_POST['form_key'] = 'foo';
+		$this->context = new TestContext();
+		$this->pump->set_context($this->context);
+		try
+		{
+			$this->pump->raise($this->event);
+			$this->fail('expected \phalanx\input\FormKeyException exception');
+		}
+		catch (input\FormKeyException $e)
+		{}
+		$this->assertFalse($this->event->is_cancelled());
+		$this->assertTrue($this->form_key->delegate()->did_get);
 	}
 }

@@ -116,8 +116,16 @@ interface FormKeyManagerDelegate
 // throw an exception.
 class ValidateFormKeyEvent extends \phalanx\events\Event
 {
+	// The form key manager.
+	protected $manager;
+	
+	// The string to look in Context.gpc.p(ost) for.
+	protected $post_variable;
+	
 	public function __construct(FormKeyManager $manager, $post_variable)
 	{
+		$this->manager = $manager;
+		$this->post_variable = $post_variable;
 	}
 	
 	public function init()
@@ -129,11 +137,23 @@ class ValidateFormKeyEvent extends \phalanx\events\Event
 	
 	public function handle()
 	{
-		$key = $this->context()->gpc()->get($this->post_variable);
-		if (!$this->manager->validate($key))
+		$valid = true;
+		$key = '';
+		
+		try
 		{
-			throw new FormKeyException('Form key "' . $key . '" did not validate.');
+			$key = $this->context()->gpc()->get($this->post_variable);
 		}
+		catch (\phalanx\base\UndefinedKeyException $e)
+		{
+			$valid = false;
+		}
+		
+		if (!$this->manager->validate($key))
+			$valid = false;
+		
+		if (!$valid)
+			throw new FormKeyException('Form key "' . $key . '" did not validate.');
 	}
 }
 
