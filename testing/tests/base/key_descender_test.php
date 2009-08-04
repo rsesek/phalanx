@@ -99,6 +99,21 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 		$this->assertNull($desc->get('undefined.key'));
 	}
 	
+	public function testGetSilent()
+	{
+		$array = array();
+		$desc = new KeyDescender($array);
+		$desc->set_throw_undefined_errors(true);
+		try
+		{
+			$this->assertNull($desc->getSilent('undefined_key'));
+		}
+		catch (\phalanx\base\UndefinedKeyException $e)
+		{
+			$this->fail('unexpected \phalanx\base\UndefinedKeyException');
+		}
+	}
+	
 	public function testSetSingleLevelArray()
 	{
 		$array = array('foo' => 'bar');

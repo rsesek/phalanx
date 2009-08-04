@@ -137,22 +137,8 @@ class ValidateFormKeyEvent extends \phalanx\events\Event
 	
 	public function handle()
 	{
-		$valid = true;
-		$key = '';
-		
-		try
-		{
-			$key = $this->context()->gpc()->get($this->post_variable);
-		}
-		catch (\phalanx\base\UndefinedKeyException $e)
-		{
-			$valid = false;
-		}
-		
-		if (!$this->manager->validate($key))
-			$valid = false;
-		
-		if (!$valid)
+		$key = $this->context()->gpc()->getSilent('p.' . $this->post_variable);
+		if (!$key || !$this->manager->validate($key))
 			throw new FormKeyException('Form key "' . $key . '" did not validate.');
 	}
 }

@@ -66,6 +66,20 @@ class KeyDescender
 		return $current;
 	}
 	
+	// Returns a key, ignoring the |$this->throw_undefined_errors| setting and
+	// returning NULL if not found.
+	public function getSilent($key)
+	{
+		$value = null;
+		try
+		{
+			$value = $this->get($key);
+		}
+		catch (UndefinedKeyException $e)
+		{}
+		return $value;
+	}
+
 	// Sets a value for a given key.
 	public function set($key, $value)
 	{
