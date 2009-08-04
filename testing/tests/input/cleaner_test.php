@@ -92,5 +92,7 @@ class CleanerTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals(false, Cleaner::bool($this->fixture['bool0']));
 		$this->assertEquals(false, Cleaner::bool($this->fixture['boolF']));
 		$this->assertEquals(false, Cleaner::bool($this->fixture['boolN']));
+		$this->assertEquals(true, Cleaner::bool('    true	'));
+		$this->assertEquals(false, Cleaner::bool('	no       '));
 	}
 }
