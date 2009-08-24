@@ -25,20 +25,13 @@ class EventTest extends \PHPUnit_Framework_TestCase
 	{
 		$this->event = new TestEvent();
 	}
-	
-	public function testTime()
+		
+	public function testArguments()
 	{
-		$before = new \DateTime();
-		sleep(1);
-		$event = new TestEvent();
-		sleep(1);
-		$after = new \DateTime();
-		
-		$time = $event->time();
-		$this->assertNotNull($time);
-		
-		$this->assertLessThan($time->getTimestamp(), $before->getTimestamp());
-		$this->assertGreaterThan($time->getTimestamp(), $after->getTimestamp());
+		$args = new \phalanx\base\PropertyBag();
+		$args->test = 'foo';
+		$this->event = new TestEvent($args);
+		$this->assertSame($args, $this->event->arguments());
 	}
 	
 	public function testSetContext()
@@ -49,9 +42,6 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$this->assertNull($event->context(), 'Event created with a Context');
 		
 		$event->set_context($context);
-		$this->assertSame($context, $event->context());
-		
-		$event = new TestEvent($context);
 		$this->assertSame($context, $event->context());
 	}
 	

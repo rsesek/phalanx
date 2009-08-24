@@ -21,19 +21,18 @@ namespace phalanx\events;
 // the view system.
 abstract class Event
 {
-	// The DateTime that the event occurred at.
-	protected $time;
-	
 	// The Context in which the event is being handled.
 	protected $context;
+	
+	// The arguments passed to the event upon creation.
+	protected $arguments = null;
 	
 	// Whether or not the event is cancelled.
 	protected $cancelled = false;
 	
-	public function __construct(Context $context = null)
+	public function __construct(\phalanx\base\PropertyBag $arguments = null)
 	{
-		$this->time = new \DateTime();
-		$this->context = $context;
+		$this->arguments = $arguments;
 	}
 	
 	// Does precondition checks and returns a bool indicating if the event can be
@@ -54,7 +53,7 @@ abstract class Event
 	
 	// Getters and setters.
 	// --------------------------------------------------------------------------
-	public function time() { return $this->time; }
+	public function arguments() { return $this->arguments; }
 	
 	public function set_context(Context $context) { $this->context = $context; }
 	public function context() { return $this->context; }
