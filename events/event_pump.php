@@ -17,8 +17,8 @@
 namespace phalanx\events;
 
 // User interaction and other functions produce events, which are raised and
-// registered with the EventPump. It buffers output and determines the final
-// output to render based on the event stack.
+// registered with the EventPump. The pump executes events as they come in, and
+// the last non-cancelled event is usually the one whose output is rendered.
 class EventPump
 {
 	// The shared event pump object.
@@ -53,26 +53,18 @@ class EventPump
 		
 		$idx = array_push($this->events, $event);
 		
-		if (!ob_start())
-			throw new EventPumpException('Could not start output buffer.');
-		
 		$event->set_context($this->context);
 		$event->init();
 		
 		// See if the event got cancelled during the init.
-		if ($event->is_cancelled())
-			goto cleanup;
+		if (!$event->is_cancelled())
+		{
+			$this->current_event = $idx - 1;		
+			$event->handle();
+			$handled = true;
+		}
 		
-		$this->current_event = $idx - 1;		
-		$event->handle();
-		$handled = true;
-
-cleanup:
 		$event->end();
-		
-		$event->set_output(ob_get_contents());
-		if (!ob_end_clean())
-			throw new EventPumpException('Could not end output buffer.');
 		
 		if ($handled)
 			$this->context->onEventHandled($event);

@@ -74,18 +74,4 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$event->cancel();
 		$this->assertTrue($event->is_cancelled());
 	}
-	
-	public function testSetAndAppendOutput()
-	{
-		$this->assertEquals($this->event->output(), '');
-		
-		$this->event->append_output('Append.');
-		$this->assertEquals('Append.', $this->event->output());
-		
-		$this->event->set_output('Reset.');
-		$this->assertEquals('Reset.', $this->event->output());
-		
-		$this->event->append_output('Append.');
-		$this->assertEquals('Reset.Append.', $this->event->output());
-	}
 }

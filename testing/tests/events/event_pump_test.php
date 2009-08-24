@@ -112,7 +112,6 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 		$buffer = ob_get_contents();
 		ob_end_clean();
 		
-		$this->assertEquals('init().handle().end().', $event->output());
-		$this->assertEquals('', $buffer);
+		$this->assertEquals('init().handle().end().', $buffer);
 	}
 }

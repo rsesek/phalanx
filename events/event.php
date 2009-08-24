@@ -16,7 +16,9 @@
 
 namespace phalanx\events;
 
-// A base representation of an event.
+// A base representation of an event. Events should not generate any output,
+// rather they should store data in member variables, which can then be used by
+// the view system.
 abstract class Event
 {
 	// The DateTime that the event occurred at.
@@ -27,13 +29,6 @@ abstract class Event
 	
 	// Whether or not the event is cancelled.
 	protected $cancelled = false;
-	
-	// Any output that the Event generates. The EventPump will buffer all the
-	// output that is generated when it is raised with the pump and store it
-	// here. Implementations should either print()/echo() or store output in
-	// this variable -- but choose only one! Using both methods could lead to
-	// unexpected results.
-	protected $output = '';
 	
 	public function __construct(Context $context = null)
 	{
@@ -68,8 +63,4 @@ abstract class Event
 	// cleanup in end().
 	public function cancel() { $this->cancelled = true; }
 	public function is_cancelled() { return $this->cancelled; }
-	
-	public function set_output($output) { $this->output = $output; }
-	public function append_output($output) { $this->output .= $output; }
-	public function output() { return $this->output; }
 }
