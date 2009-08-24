@@ -20,6 +20,7 @@ use \phalanx\base as base;
 require_once 'PHPUnit/Framework.php';
 
 // Common includes.
+require PHALANX_ROOT . '/base/functions.php';
 require PHALANX_ROOT . '/base/key_descender.php';
 require PHALANX_ROOT . '/base/property_bag.php';
 
@@ -29,6 +30,7 @@ class BaseSuite
 	{
 		$suite = new \PHPUnit_Framework_TestSuite('Base');
 		
+		$suite->addTestFile(TEST_ROOT . '/tests/base/functions_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/base/key_descender_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/base/property_bag_test.php');
 		
