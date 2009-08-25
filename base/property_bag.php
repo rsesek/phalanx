@@ -19,21 +19,31 @@ namespace phalanx\base;
 // A property bag can be used instead of an array to store key-value pairs in
 // an object. While \stdClass can be used for this, too, PropertyBag provides
 // additional methods to make working with it slightly easier.
-class PropertyBag
+//
+// PropertyBag is also a KeyDescender, except when it is created with an
+// object, the contents are copied rather than referenced.
+class PropertyBag extends KeyDescender
 {
 	// We override __set() and __get() and put the data in here.
 	protected $properties = array();
 	
+	public function __construct($properties = array())
+	{
+		if (self::isDescendable($properties))
+			$this->properties = $properties;
+		$this->root = &$this->properties;
+	}
+	
 	// Sets a key-value pair.
 	public function __set($key, $value)
 	{
-		$this->properties[$key] = $value;
+		parent::__set($key, $value);
 	}
 	
 	// Returns the value for a given key.
 	public function __get($key)
 	{
-		return $this->properties[$key];
+		return $this->getSilent($key);
 	}
 	
 	// Returns an array containing all the keys in the property bag.
