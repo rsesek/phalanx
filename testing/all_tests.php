@@ -21,6 +21,8 @@ require_once 'PHPUnit/Framework.php';
 define('PHALANX_ROOT', dirname(dirname(__FILE__)));
 define('TEST_ROOT', dirname(__FILE__));
 
+\PHPUnit_Util_Filter::addDirectoryToFilter(TEST_ROOT);
+
 class AllTests
 {
 	public static function suite()
