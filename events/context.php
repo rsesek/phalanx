@@ -31,6 +31,17 @@ class Context
 	// GET request.
 	protected $base_url = '/';
 	
+	// This closure is used to load an event with a given underscored name. It
+	// must return a fully-qualified (including namespace) name of a class from
+	// this generic event name. Signature:
+	//   function Class __closure(String $event_name);
+	protected $event_class_loader = null;
+	
+	// This closure is used to load a view for a specific Event object.
+	// Signature:
+	//   function View __closure(Event $event);
+	protected $view_loader = null;
+	
 	public function __construct()
 	{
 		$gpc = array(
@@ -62,13 +73,11 @@ class Context
 			throw new ContextException("Unknown HTTP method '$method'");
 		}
 		
-		$event_name = \phalanx\base\underscore_to_cammelcase($event_name);
-		if (class_exists($event_name . 'Event'))
-			$event_name .= 'Event';
-		else if (!class_exists($event_name))
+		$event_class = $this->event_class_loader($event_name);
+		if (!class_exists($event_class))
 			throw new ContextException("Unable to locate event class for '$event_name'");
 		
-		$event = new $event_name();
+		$event = new $event_class();
 		$event->set_context($this);
 		EventPump::pump()->raise($event);
 	}
@@ -119,6 +128,12 @@ class Context
 		$this->base_url = $url;
 	}
 	public function base_url() { return $this->base_url; }
+	
+	public function set_event_class_loader(\Closure $closure) { $this->event_class_loader = $closure; }
+	public function event_class_loader() { return $this->event_class_loader; }
+	
+	public function set_view_loader(\Closure $closure) { $this->view_loader = $closure; }
+	public function view_loader() { return $this->view_loader; }
 }
 
 class ContextException extends \Exception

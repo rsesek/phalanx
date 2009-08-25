@@ -149,4 +149,37 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($event->did_end);
 		$this->assertTrue($context->did_event_handled);
 	}
+	
+	public function testDispatchPOST()
+	{
+		$_SERVER['REQUEST_METHOD'] = 'POST';
+		$_POST[TestContext::kEventPOSTVarKey] = 'test_event';
+		$pump = events\EventPump::pump();
+		$context = new TestContext();
+		$pump->set_context($context);
+		$context->dispatch();
+		$event = $pump->getLastEvent();
+		$this->assertTrue($event->did_init);
+		$this->assertTrue($event->did_handle);
+		$this->assertTrue($event->did_end);
+		$this->assertTrue($context->did_event_handled);
+	}
+	
+	public function testSetEventClassLoader()
+	{
+		$closure = function($event_name) { return 'Load:' . $event_name; };
+		$this->context->set_event_class_loader($closure);
+		$set_closure = $this->context->event_class_loader();
+		$this->assertEquals('Load:test', $set_closure('test'));
+	}
+	
+	public function testSetViewLoader()
+	{
+		$event = new TestEvent();
+		$event->test_prop = 'foo';
+		$closure = function(events\Event $e) { return 'LoadView:' . $e->test_prop; };
+		$this->context->set_view_loader($closure);
+		$set_closure = $this->context->view_loader();
+		$this->assertEquals('LoadView:foo', $set_closure($event));
+	}
 }
