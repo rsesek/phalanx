@@ -47,7 +47,7 @@ class Context
 		$gpc = array(
 			'g' => (array)$_GET,
 			'p' => (array)$_POST,
-			'c' => (array)$_COOKIE
+			'c' => (array)$_COOKIE,
 		);
 		$this->gpc = new \phalanx\base\KeyDescender($gpc);
 	}

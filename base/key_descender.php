@@ -128,7 +128,7 @@ class KeyDescender
 			if (isset($descendable->$single_key))
 				return $descendable->$single_key;
 			else
-				throw new UndefinedKeyException("Undefined '$single_key' on $descendable");
+				throw new UndefinedKeyException("Undefined '$single_key' on " . spl_object_hash($descendable));
 		}
 		else
 		{

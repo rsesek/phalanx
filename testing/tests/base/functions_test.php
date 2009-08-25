@@ -35,6 +35,10 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase
 		base\array_strip_empty($array);
 		$this->assertEquals(1, count($array));
 		$this->assertEquals(1, count($array['test']));
+		
+		$array = array('foo', null, 'bar');
+		base\array_strip_empty($array);
+		$this->assertEquals(2, count($array));
 	}
 	
 	public function testUnderscoreToCammelCase()

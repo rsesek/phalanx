@@ -53,6 +53,7 @@ class TestEvent extends events\Event
 	
 	public function init()
 	{
+		parent::init();
 		$this->did_init = true;
 	}
 	

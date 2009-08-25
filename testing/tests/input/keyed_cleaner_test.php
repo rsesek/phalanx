@@ -52,6 +52,11 @@ class KeyedCleanerTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('string', $test['str']);
 	}
 	
+	public function testGetKeyer()
+	{
+		$this->assertEquals('phalanx\base\KeyDescender', get_class($this->cleaner->keyer()));
+	}
+	
 	public function testCleanString()
 	{
 		$this->cleaner->getString('str');

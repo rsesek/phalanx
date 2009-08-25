@@ -80,13 +80,31 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('dog', $desc->get('foo.bar.moo.cat'));
 	}
 	
+	public function testGetBadObject()
+	{
+		$obj = new \stdClass();
+		$obj->foo = 'moo';
+		$desc = new KeyDescender($obj);
+		$this->setExpectedException('phalanx\base\KeyDescenderException');
+		$desc->get('foo.bar');
+	}
+	
+	public function testGetUnsetObject()
+	{
+		$obj = new \stdClass();
+		$obj->foo = new \stdClass();
+		$desc = new KeyDescender($obj);
+		$this->setExpectedException('phalanx\base\UndefinedKeyException');
+		$desc->get('foo.bar');
+	}
+	
 	public function testThrowExceptions()
 	{
 		$array = array();
 		$desc = new KeyDescender($array);
 		$desc->set_throw_undefined_errors(true);
 		$this->assertTrue($desc->throw_undefined_errors());
-		$this->setExpectedException('\phalanx\base\UndefinedKeyException');
+		$this->setExpectedException('phalanx\base\UndefinedKeyException');
 		$desc->get('undefined.key');
 	}
 	
@@ -110,7 +128,7 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 		}
 		catch (\phalanx\base\UndefinedKeyException $e)
 		{
-			$this->fail('unexpected \phalanx\base\UndefinedKeyException');
+			$this->fail('unexpected phalanx\base\UndefinedKeyException');
 		}
 	}
 	
@@ -162,6 +180,16 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 		$desc = new KeyDescender($array);
 		$desc->set('foo.test', 'abc');
 		$this->assertEquals('abc', $desc->get('foo.test'));
+	}
+	
+	public function testSetBad()
+	{
+		$array = array(
+			'foo' => 'bar'
+		);
+		$desc = new KeyDescender($array);
+		$this->setExpectedException('phalanx\base\KeyDescenderException');
+		$desc->set('foo.test', 'moo');
 	}
 	
 	public function testMagicGetter()
