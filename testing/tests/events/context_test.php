@@ -86,7 +86,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 		$_GET['__dispatch__'] = '/test_event/';
 		$context = new TestContext();
 		$context->T_tokenizeURL();
-		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventNameKey));
 	}
 	
 	public function testTokenizeURLWithID()
@@ -94,7 +94,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 		$_GET['__dispatch__'] = '/test/314159/';
 		$context = new TestContext();
 		$context->T_tokenizeURL();
-		$this->assertEquals('test', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+		$this->assertEquals('test', $context->gpc()->get('g.' . TestContext::kEventNameKey));
 		$this->assertEquals('314159', $context->gpc()->get('g.id'));
 	}
 	
@@ -103,7 +103,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 		$_GET['__dispatch__'] = '/test_event/k1/v1/';
 		$context = new TestContext();
 		$context->T_tokenizeURL();
-		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventNameKey));
 		$this->assertEquals('v1', $context->gpc()->get('g.k1'));
 	}
 	
@@ -112,7 +112,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 		$_GET['__dispatch__'] = '/test_event/k1/v1/k2/v2/';
 		$context = new TestContext();
 		$context->T_tokenizeURL();
-		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventNameKey));
 		$this->assertEquals('v1', $context->gpc()->get('g.k1'));
 		$this->assertEquals('v2', $context->gpc()->get('g.k2'));
 	}
@@ -130,7 +130,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 		$_GET['__dispatch__'] = '/test_event/314159/k1/v1/';
 		$context = new TestContext();
 		$context->T_tokenizeURL();
-		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventNameKey));
 		$this->assertEquals('314159', $context->gpc()->get('g.id'));
 		$this->assertEquals('v1', $context->gpc()->get('g.k1'));
 	}
@@ -153,7 +153,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 	public function testDispatchPOST()
 	{
 		$_SERVER['REQUEST_METHOD'] = 'POST';
-		$_POST[TestContext::kEventPOSTVarKey] = 'test_event';
+		$_POST[TestContext::kEventNameKey] = 'test_event';
 		$pump = events\EventPump::pump();
 		$context = new TestContext();
 		$pump->set_context($context);

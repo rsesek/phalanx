@@ -21,7 +21,7 @@ namespace phalanx\events;
 class Context
 {
 	// The POST variable name used to determine the event to raise.
-	const kEventPOSTVarKey = 'phalanx_event';
+	const kEventNameKey = 'phalanx_event';
 	
 	// GPC variables. By default these are unsanitized. On construction, the
 	// variable arrays are copied from their respective superglobals.
@@ -54,19 +54,19 @@ class Context
 	
 	// This raises events based on incoming GET and POST data. If it's a GET
 	// request, the URL will be used to determine the event. If the request is
-	// a POST one, the key |kEventPOSTVarKey| will be used to determine the
+	// a POST one, the key |kEventNameKey| will be used to determine the
 	// event. If neither one of those works, an exception is thrown.
 	public function dispatch()
 	{
 		$method = strtolower($_SERVER['REQUEST_METHOD']);
 		if ($method == 'post')
 		{
-			$event_name = $this->gpc->get('p.' . self::kEventPOSTVarKey);
+			$event_name = $this->gpc->get('p.' . self::kEventNameKey);
 		}
 		else if ($method == 'get')
 		{
 			$this->_tokenizeURL();
-			$event_name = $this->gpc->get('g.' . self::kEventPOSTVarKey);
+			$event_name = $this->gpc->get('g.' . self::kEventNameKey);
 		}
 		else
 		{
@@ -97,7 +97,7 @@ class Context
 		$parts = explode('/', $url);
 		\phalanx\base\array_strip_empty($parts);
 		
-		$this->gpc->set('g.' . self::kEventPOSTVarKey, $parts[0]);
+		$this->gpc->set('g.' . self::kEventNameKey, $parts[0]);
 		
 		$i = 1;
 		if (is_numeric($parts[$i]))
