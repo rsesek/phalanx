@@ -102,6 +102,15 @@ class TestContext extends events\Context
 {
 	public $did_event_handled = false;
 	
+	public function __construct()
+	{
+		parent::__construct();
+		$this->set_event_class_loader(function ($event_name) {
+			$event_name = \phalanx\base\underscore_to_cammelcase($event_name);
+			return "\phalanx\\test\\$event_name";
+		});
+	}
+	
 	public function onEventHandled(events\Event $event)
 	{
 		parent::onEventHandled($event);

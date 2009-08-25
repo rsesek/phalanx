@@ -73,7 +73,8 @@ class Context
 			throw new ContextException("Unknown HTTP method '$method'");
 		}
 		
-		$event_class = $this->event_class_loader($event_name);
+		$closure = $this->event_class_loader;
+		$event_class = $closure($event_name);
 		if (!class_exists($event_class))
 			throw new ContextException("Unable to locate event class for '$event_name'");
 		
