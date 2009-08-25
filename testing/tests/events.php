@@ -111,4 +111,5 @@ class TestContext extends events\Context
 	// Getter and setters.
 	// -------------------------------------------------------------------------
 	public function T_gpc() { return $this->gpc; }
+	public function T_tokenizeURL() { $this->_tokenizeURL(); }
 }

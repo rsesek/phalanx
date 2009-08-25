@@ -66,4 +66,87 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 		$pump->raise(new TestEvent());
 		$this->assertTrue($context->did_event_handled);
 	}
+	
+	public function testBaseURL()
+	{
+		$this->assertEquals('/', $this->context->base_url());
+		
+		$this->context->set_base_url('/foo/bar');
+		$this->assertEquals('/foo/bar/', $this->context->base_url());
+		
+		$this->context->set_base_url('/another/moo/');
+		$this->assertEquals('/another/moo/', $this->context->base_url());
+		
+		$this->context->set_base_url('');
+		$this->assertEquals('/', $this->context->base_url());
+	}
+	
+	public function testTokenizeURLSimple()
+	{
+		$_GET['__dispatch__'] = '/test_event/';
+		$context = new TestContext();
+		$context->T_tokenizeURL();
+		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+	}
+	
+	public function testTokenizeURLWithID()
+	{
+		$_GET['__dispatch__'] = '/test/314159/';
+		$context = new TestContext();
+		$context->T_tokenizeURL();
+		$this->assertEquals('test', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+		$this->assertEquals('314159', $context->gpc()->get('g.id'));
+	}
+	
+	public function testTokenizeURLWith1Pair()
+	{
+		$_GET['__dispatch__'] = '/test_event/k1/v1/';
+		$context = new TestContext();
+		$context->T_tokenizeURL();
+		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+		$this->assertEquals('v1', $context->gpc()->get('g.k1'));
+	}
+	
+	public function testTokenizeURLWith2Pair()
+	{
+		$_GET['__dispatch__'] = '/test_event/k1/v1/k2/v2/';
+		$context = new TestContext();
+		$context->T_tokenizeURL();
+		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+		$this->assertEquals('v1', $context->gpc()->get('g.k1'));
+		$this->assertEquals('v2', $context->gpc()->get('g.k2'));
+	}
+	
+	public function testTokenizeURLWithBadPair()
+	{
+		$_GET['__dispatch__'] = '/test_event/k1/';
+		$context = new TestContext();
+		$this->setExpectedException('\phalanx\events\ContextException');
+		$context->T_tokenizeURL();
+	}
+	
+	public function testTokenizeURLWithIDAndPair()
+	{
+		$_GET['__dispatch__'] = '/test_event/314159/k1/v1/';
+		$context = new TestContext();
+		$context->T_tokenizeURL();
+		$this->assertEquals('test_event', $context->gpc()->get('g.' . TestContext::kEventPOSTVarKey));
+		$this->assertEquals('314159', $context->gpc()->get('g.id'));
+		$this->assertEquals('v1', $context->gpc()->get('g.k1'));
+	}
+	
+	public function testDispatchGET()
+	{
+		$_SERVER['REQUEST_METHOD'] = 'GET';
+		$_GET['__dispatch__'] = '/test_event/314159/k1/v1/k2/v2/';
+		$pump = events\EventPump::pump();
+		$context = new TestContext();
+		$pump->set_context($context);
+		$context->dispatch();
+		$event = $pump->getLastEvent();
+		$this->assertTrue($event->did_init);
+		$this->assertTrue($event->did_handle);
+		$this->assertTrue($event->did_end);
+		$this->assertTrue($context->did_event_handled);
+	}
 }
