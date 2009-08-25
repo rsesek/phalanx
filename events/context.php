@@ -79,7 +79,6 @@ class Context
 			throw new ContextException("Unable to locate event class for '$event_name'");
 		
 		$event = new $event_class();
-		$event->set_context($this);
 		EventPump::pump()->raise($event);
 	}
 	

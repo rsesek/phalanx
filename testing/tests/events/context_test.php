@@ -165,6 +165,17 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($context->did_event_handled);
 	}
 	
+	public function testDispatchBadMethod()
+	{
+		$this->setExpectedException('\phalanx\events\ContextException');
+		$_SERVER['REQUEST_METHOD'] = 'DELETE';
+		$pump = events\EventPump::pump();
+		$context = new TestContext();
+		$pump->set_context($context);
+		$context->dispatch();
+		$this->assertNull($pump->getLastEvent());
+	}
+	
 	public function testSetEventClassLoader()
 	{
 		$closure = function($event_name) { return 'Load:' . $event_name; };
