@@ -26,42 +26,19 @@ class EventTest extends \PHPUnit_Framework_TestCase
 		$this->event = new TestEvent();
 	}
 		
-	public function testArguments()
+	public function testInput()
 	{
 		$args = new \phalanx\base\PropertyBag();
 		$args->test = 'foo';
 		$this->event = new TestEvent($args);
-		$this->assertSame($args, $this->event->arguments());
+		$this->assertSame($args, $this->event->input());
 	}
-	
-	public function testSetContext()
-	{
-		$context = new events\Context();
 		
-		$event = new TestEvent();
-		$this->assertNull($event->context(), 'Event created with a Context');
-		
-		$event->set_context($context);
-		$this->assertSame($context, $event->context());
-	}
-	
-	public function testCanRunInContext()
-	{
-		$context1 = new events\Context();
-		$context2 = new BadContext();
-		
-		$this->assertTrue(TestEvent::canRunInContext($context1));
-		$this->assertFalse(TestEvent::canRunInContext($context2));
-		
-		$this->assertTrue(events\Event::canRunInContext($context1));
-		$this->assertTrue(events\Event::canRunInContext($context2));
-	}
-	
 	public function testCancel()
 	{
 		$event = new TestEvent();
 		$this->assertFalse($event->is_cancelled());
-		$event->cancel();
+		$event->Cancel();
 		$this->assertTrue($event->is_cancelled());
 	}
 }

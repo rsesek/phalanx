@@ -35,8 +35,8 @@ class AllTests
 		require TEST_ROOT . '/tests/events.php';
 		$suite->addTestSuite(EventsSuite::suite());
 		
-		require TEST_ROOT . '/tests/input.php';
-		$suite->addTestSuite(InputSuite::suite());
+        // require TEST_ROOT . '/tests/input.php';
+        // $suite->addTestSuite(InputSuite::suite());
 		
 		return $suite;
 	}

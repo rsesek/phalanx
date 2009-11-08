@@ -20,7 +20,6 @@ use \phalanx\events as events;
 require_once 'PHPUnit/Framework.php';
 
 // Common includes.
-require PHALANX_ROOT . '/events/context.php';
 require PHALANX_ROOT . '/events/event.php';
 require PHALANX_ROOT . '/events/event_pump.php';
 
@@ -30,7 +29,6 @@ class EventsSuite
 	{
 		$suite = new \PHPUnit_Framework_TestSuite('Events');
 		
-		$suite->addTestFile(TEST_ROOT . '/tests/events/context_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/events/event_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
 		
@@ -42,84 +40,41 @@ class EventsSuite
 
 class TestEvent extends events\Event
 {
-	public $did_init = false;
-	public $did_handle = false;
-	public $did_end = false;
-	
-	public static function canRunInContext(events\Context $c)
-	{
-		return !($c instanceof BadContext);
-	}
-	
-	public function init()
-	{
-		parent::init();
-		$this->did_init = true;
-	}
-	
-	public function handle()
-	{
-		$this->did_handle = true;
-	}
-	
-	public function end()
-	{
-		$this->did_end = true;
-	}
-}
+	public $will_fire = FALSE;
+	public $fire = FALSE;
+	public $cleanup = FALSE;
 
-class BadContext extends events\Context
-{
+    static public function InputList()
+    {
+        return array('key1', 'key2');
+    }
+
+    static public function OutputList()
+    {
+        return array('will_fire', 'fire', 'cleanup');
+    }
+
+	public function WillFire()
+	{
+		$this->will_fire = TRUE;
+	}
+	
+	public function Fire()
+	{
+		$this->fire = TRUE;
+	}
+	
+	public function Cleanup()
+	{
+		$this->cleanup = TRUE;
+	}
 }
 
 class InitOnlyEvent extends TestEvent
 {
-	public function init()
+	public function WillFire()
 	{
-		parent::init();
-		$this->cancel();
+		parent::WillFire();
+		$this->Cancel();
 	}
-}
-
-class PrintEvent extends events\Event
-{
-	public function init()
-	{
-		echo 'init().';
-	}
-	
-	public function handle()
-	{
-		echo 'handle().';
-	}
-	
-	public function end()
-	{
-		echo 'end().';
-	}
-}
-
-class TestContext extends events\Context
-{
-	public $did_event_handled = false;
-	
-	public function __construct()
-	{
-		parent::__construct();
-		$this->set_event_class_loader(function ($event_name) {
-			$event_name = \phalanx\base\underscore_to_cammelcase($event_name);
-			return "\phalanx\\test\\$event_name";
-		});
-	}
-	
-	public function onEventHandled(events\Event $event)
-	{
-		parent::onEventHandled($event);
-		$this->did_event_handled = true;
-	}
-	
-	// Getter and setters.
-	// -------------------------------------------------------------------------
-	public function T_gpc() { return $this->gpc; }
-	public function T_tokenizeURL() { $this->_tokenizeURL(); }
 }

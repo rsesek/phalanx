@@ -40,11 +40,11 @@ abstract class Event
 
     // Returns an array of input keys the Event requires in order to perform
     // its work. Returning NULL means this Event requires no input.
-    abstract public static function InputList();
+    abstract static public function InputList();
 
     // Returns an array of keys that exist on this Event class that the
     // OutputHandler can access. NULL for no output.
-    abstract public static function OutputList();
+    abstract static public function OutputList();
 
     // Called before the EventPump is preparing to Fire() the event. This is a
     // good place to put permission and general sanity checks.
@@ -59,12 +59,18 @@ abstract class Event
     // even if the Event is preempted by another and this one does not Fire().
     public function Cleanup() {}
 
+    // Cancels the current event. Cleanup() will still be called.
+    final public function Cancel()
+    {
+        EventPump::Pump()->Cancel($this);        
+    }
+
 	// Getters and setters.
 	// --------------------------------------------------------------------------
 	public function input() { return $this->input; }
 	
 	// Marks the event as cancelled. Do not overload this, but rather perform
 	// cleanup in end().
-	public function cancel() { $this->cancelled = true; }
+	public function set_cancelled() { $this->cancelled = TRUE; }
 	public function is_cancelled() { return $this->cancelled; }
 }

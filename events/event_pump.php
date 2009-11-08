@@ -23,80 +23,108 @@ class EventPump
 {
 	// The shared event pump object.
 	private static $pump;
-	
-	// Index of the current event.
-	protected $current_event = -1;
-	
-	// An array of all the events that have been registered with the pump. This
-	// is a stack.
-	protected $events;
-	
-	// The current Context that events take place in.
-	protected $context;
-	
+
+	// A reference to the event currently being processed.
+	protected $current_event = NULL;
+
+    // An SplQueue of the events that were registered wtih PostEvent() but are
+    // waiting for the current event to finish.
+    protected $deferred_events = NULL;
+
+	// An SplStack of all the events that have been Fire()d by the pump.
+	protected $event_chain = NULL;
+
+    // Constructor. Do not use directly. Use EventPump::Pump().
 	public function __construct()
 	{
-		$this->events = array();
+		$this->deferred_events = new \SplQueue();
+		$this->event_chain     = new \SplStack();
 	}
-	
-	// Adds an event to the pump. Checks to see if the event can be handled
-	// and, if so, runs the handler.
-	public function raise(Event $event)
-	{
-		if (!$this->context)
-			throw new EventPumpException('EventPump::$context is NULL');
-		
-		if (!$event::canRunInContext($this->context))
-			return;
-		
-		$handled = false; // Will be true if all handling is successful.
-		
-		$idx = array_push($this->events, $event);
-		
-		$event->set_context($this->context);
-		$event->init();
-		
-		// See if the event got cancelled during the init.
-		if (!$event->is_cancelled())
-		{
-			$this->current_event = $idx - 1;		
-			$event->handle();
-			$handled = true;
-		}
-		
-		$event->end();
-		
-		if ($handled)
-			$this->context->onEventHandled($event);
-	}
-	
-	// Returns the last-raised Event.
-	public function getLastEvent()
-	{
-		return $this->events[sizeof($this->events) - 1];
-	}
-	
-	// Returns the Event that is currently being handled. This is different from
-	// the last-raised Event in that events can be cancelled in init().
-	public function getCurrentEvent()
-	{
-		return $this->events[$this->current_event];
-	}
-	
+
+    // Schedules an event to be run. If another event is currently being fired,
+    // this will wait until that event is done. If no events are currently
+    // running, the event will fire immediately.
+    public function PostEvent(Event $event)
+    {
+    }
+
+    // Preempts any currently executing event and preempts it with this event.
+    // |$event| will begin processing immediately. The other event will
+    // resume afterwards.
+    public function RaiseEvent(Event $event)
+    {
+    }
+
+    // Cancels the given Event and will begin processing the next deferred
+    // event. If no other deferred events exist, output handling begins.
+    public function Cancel(Event $event)
+    {
+    }
+
+    // Calling this function will prevent any events registered with
+    // PostEvent() from being run. A common use for this is registering an
+    // event with RaiseEvent() and then stopping any future work from happening
+    // using this method.
+    public function CancelDeferredEvents()
+    {
+    }
+
+    // This method will prevent any new events from registering with the pump
+    // until a corresponding call to UnblockEvent() is made.
+    public function BlockEvent()
+    {
+    }
+
+    // Allow other events to register again after being blocked via
+    // BlockEvent(). This must be called from within the Event that blocked.
+    public function UnblockEvent()
+    {
+    }
+
+    // Tells the pump to stop pumping events and to begin output handling. This
+    // will call the current event's Cleanup() function.
+    public function StopPump()
+    {
+    }
+
+    // Halts execution of the pump immediately without performing any event
+    // cleanup. |$message| will be displayed as output.
+    public function Terminate($message)
+    {
+    }
+
+    // Gets the currently executing Event.
+    public function GetCurrentEvent()
+    {
+        return $this->current_event;
+    }
+
+    // Returns the queue of Events that have been registered with PostEvent()
+    // and are waiting to run.
+    public function GetDeferredEvents()
+    {
+        return $this->deferred_events;
+    }
+
+    // Returns the SplStack of events that have been fired, in the order they
+    // fired.
+    public function GetEventChain()
+    {
+        return $this->event_chain;
+    }
+
 	// Getters and setters.
 	// -------------------------------------------------------------------------
-	public function set_context(Context $context) { $this->context = $context; }
-	public function context() { return $this->context; }
-	
+
 	// Returns the shared EventPump.
-	public function pump()
+	public function Pump()
 	{
 		if (!self::$pump)
 			self::set_pump(new EventPump());
 		return self::$pump;
 	}
 	public static function set_pump(EventPump $pump) { self::$pump = $pump; }
-	
+
 	// Testing methods. These are not for public consumption.
 	public static function T_set_pump($pump) { self::$pump = $pump; }
 }
