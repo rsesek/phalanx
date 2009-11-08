@@ -23,40 +23,45 @@ abstract class Event
 {
 	// The Context in which the event is being handled.
 	protected $context;
-	
-	// The arguments passed to the event upon creation.
-	protected $arguments = null;
-	
+
+	// The input passed to the event upon creation.
+	protected $input = NULL;
+
 	// Whether or not the event is cancelled.
-	protected $cancelled = false;
-	
-	public function __construct(\phalanx\base\PropertyBag $arguments = null)
+	protected $cancelled = FALSE;
+
+    // Creates an instance of the Event class. The PropertyBag of input is
+    // assembled for the Event by the Dispatcher. It collects input variables
+    // based on the keys the Event asks for via the InputList() method.
+	public function __construct(\phalanx\base\PropertyBag $input = NULL)
 	{
-		$this->arguments = $arguments;
+		$this->input = $input;
 	}
-	
-	// Does precondition checks and returns a bool indicating if the event can be
-	// handled in the given |context|.
-	public static function canRunInContext(Context $context) { return true; }
-	
-	// Performs setup tasks for event handling. |$this->context| is present at
-	// this time. This is a good place to do permission checks.
-	public function init() {}
-	
-	// The actual event handling code. All output is buffered.
-	abstract public function handle();
-	
-	// Events perform clean up tasks here. If |is_cancelled()| is true, then the
-	// event handle()ing code was interuppted either internally (the event raised
-	// an event) or was prevented from handle()ing due to precondition failures.
-	public function end() {}
-	
+
+    // Returns an array of input keys the Event requires in order to perform
+    // its work. Returning NULL means this Event requires no input.
+    abstract public static function InputList();
+
+    // Returns an array of keys that exist on this Event class that the
+    // OutputHandler can access. NULL for no output.
+    abstract public static function OutputList();
+
+    // Called before the EventPump is preparing to Fire() the event. This is a
+    // good place to put permission and general sanity checks.
+    public function WillFire() {}
+
+    // The actual processing work of the Event happens in Fire(). As the Event
+    // generates output, it should put it into the properties it declared in
+    // OutputList().
+    abstract public function Fire();
+
+    // Called after the EventPump is done with the Event. This will be called
+    // even if the Event is preempted by another and this one does not Fire().
+    public function Cleanup() {}
+
 	// Getters and setters.
 	// --------------------------------------------------------------------------
-	public function arguments() { return $this->arguments; }
-	
-	public function set_context(Context $context) { $this->context = $context; }
-	public function context() { return $this->context; }
+	public function input() { return $this->input; }
 	
 	// Marks the event as cancelled. Do not overload this, but rather perform
 	// cleanup in end().
