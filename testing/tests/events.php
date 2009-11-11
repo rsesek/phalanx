@@ -20,6 +20,7 @@ use \phalanx\events as events;
 require_once 'PHPUnit/Framework.php';
 
 // Common includes.
+require PHALANX_ROOT . '/events/dispatcher.php';
 require PHALANX_ROOT . '/events/event.php';
 require PHALANX_ROOT . '/events/event_pump.php';
 require PHALANX_ROOT . '/events/output_handler.php';
@@ -30,6 +31,7 @@ class EventsSuite
 	{
 		$suite = new \PHPUnit_Framework_TestSuite('Events');
 		
+		$suite->addTestFile(TEST_ROOT . '/tests/events/dispatcher_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/events/event_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/events/output_handler_test.php');
@@ -110,5 +112,21 @@ class TestOutputHandler extends events\OutputHandler
     public function T_GetEventData(events\Event $event)
     {
         return $this->_GetEventData($event);
+    }
+}
+
+class TestDispatcher extends events\Dispatcher
+{
+    protected function _GetEventName()
+    {
+        return 'event.test';
+    }
+
+    protected function _GetInput(Array $input_list)
+    {
+        $input = new \phalanx\base\PropertyBag();
+        foreach ($input_list as $key)
+            $input->Set($key, 'test:' . $key);
+        return $input;
     }
 }

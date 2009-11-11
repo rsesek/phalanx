@@ -21,6 +21,8 @@ require_once 'PHPUnit/Framework.php';
 
 class OutputHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    protected $handler;
+
 	public function setUp()
 	{
 		$this->handler = new TestOutputHandler();

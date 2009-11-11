@@ -21,6 +21,8 @@ require_once 'PHPUnit/Framework.php';
 
 class EventTest extends \PHPUnit_Framework_TestCase
 {
+    protected $event;
+
 	public function setUp()
 	{
 		$this->event = new TestEvent();
