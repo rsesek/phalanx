@@ -22,6 +22,7 @@ require_once 'PHPUnit/Framework.php';
 // Common includes.
 require PHALANX_ROOT . '/events/event.php';
 require PHALANX_ROOT . '/events/event_pump.php';
+require PHALANX_ROOT . '/events/output_handler.php';
 
 class EventsSuite
 {
@@ -31,6 +32,7 @@ class EventsSuite
 		
 		$suite->addTestFile(TEST_ROOT . '/tests/events/event_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
+		$suite->addTestFile(TEST_ROOT . '/tests/events/output_handler_test.php');
 		
 		return $suite;
 	}
@@ -44,6 +46,21 @@ class TestEvent extends events\Event
 	public $fire = FALSE;
 	public $cleanup = FALSE;
 
+    public $out1;
+    public $out2;
+    public $out2_never_true = FALSE;
+
+    // The property should hide this from OutputHandler::_GetEventData().
+    public function out2()
+    {
+        $this->out2_never_true = TRUE;
+    }
+
+    public function out3()
+    {
+        return 'moo';
+    }
+
     static public function InputList()
     {
         return array('key1', 'key2');
@@ -51,7 +68,7 @@ class TestEvent extends events\Event
 
     static public function OutputList()
     {
-        return array('will_fire', 'fire', 'cleanup');
+        return array('will_fire', 'fire', 'cleanup', 'out1', 'out2', 'out3', 'no_out');
     }
 
 	public function WillFire()
@@ -62,6 +79,8 @@ class TestEvent extends events\Event
 	public function Fire()
 	{
 		$this->fire = TRUE;
+        $this->out1 = 'foo';
+        $this->out2 = 'bar';
 	}
 	
 	public function Cleanup()
@@ -77,4 +96,19 @@ class InitOnlyEvent extends TestEvent
 		parent::WillFire();
 		$this->Cancel();
 	}
+}
+
+class TestOutputHandler extends events\OutputHandler
+{
+    public $do_start = FALSE;
+
+    protected function _DoStart()
+    {
+        $this->do_start = TRUE;
+    }
+
+    public function T_GetEventData(events\Event $event)
+    {
+        return $this->_GetEventData($event);
+    }
 }

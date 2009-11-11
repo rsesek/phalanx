@@ -21,9 +21,6 @@ namespace phalanx\events;
 // the view system.
 abstract class Event
 {
-	// The Context in which the event is being handled.
-	protected $context;
-
 	// The input passed to the event upon creation.
 	protected $input = NULL;
 
@@ -62,7 +59,7 @@ abstract class Event
     // Cancels the current event. Cleanup() will still be called.
     final public function Cancel()
     {
-        EventPump::Pump()->Cancel($this);        
+        EventPump::Pump()->Cancel($this);
     }
 
 	// Getters and setters.

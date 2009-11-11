@@ -55,4 +55,13 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 		$this->pump->PostEvent($event3);
 		$this->assertSame($event3, $this->pump->GetCurrentEvent());
 	}
+
+    public function testSetOutputHandler()
+    {
+        $this->assertNull($this->pump->output_handler());
+
+        $handler = new TestOutputHandler();
+        $this->pump->set_output_handler($handler);
+        $this->assertSame($handler, $this->pump->output_handler());
+    }
 }

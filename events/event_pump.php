@@ -24,6 +24,9 @@ class EventPump
 	// The shared event pump object.
 	private static $pump;
 
+    // The OutputHandler instance for the pump.
+    protected $output_handler = NULL;
+
 	// A reference to the event currently being processed.
 	protected $current_event = NULL;
 
@@ -124,6 +127,9 @@ class EventPump
 		return self::$pump;
 	}
 	public static function set_pump(EventPump $pump) { self::$pump = $pump; }
+
+    public function set_output_handler(OutputHandler $handler) { $this->output_handler = $handler; }
+    public function output_handler() { return $this->output_handler; }
 
 	// Testing methods. These are not for public consumption.
 	public static function T_set_pump($pump) { self::$pump = $pump; }

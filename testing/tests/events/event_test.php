@@ -37,8 +37,12 @@ class EventTest extends \PHPUnit_Framework_TestCase
 	public function testCancel()
 	{
 		$event = new TestEvent();
+
+        $pump = $this->getMock('phalanx\events\EventPump');
+        $pump->expects($this->once())->method('Cancel')->with($event);
+        \phalanx\events\EventPump::T_set_pump($pump);
+
 		$this->assertFalse($event->is_cancelled());
 		$event->Cancel();
-		$this->assertTrue($event->is_cancelled());
 	}
 }
