@@ -37,11 +37,11 @@ class TestHTTPDispatcher extends events\HTTPDispatcher
     }
 }
 
-/**
- * @backupGlobals enabled
- */
 class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
 {
+    // PHPUnit Configuration {{
+        protected $backupGlobals = TRUE;
+    // }}
     protected $dispatcher;
 
     public function setUp()
@@ -131,7 +131,58 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->T_GetEventName();
     }
 
-    public function testGetInput()
+    public function testGetInputGET()
     {
+        $_GET['key1'] = '-invalid-';
+        $this->dispatcher->T_set_request_method('GET');
+        $input = $this->dispatcher->T_TokenizeURL('/event.input/key1/foo/key2/bar/misc/baz/else/4');
+        $this->dispatcher->T_set_url_input($input);
+        $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $this->assertEquals(2, $gathered_input->Count());
+        $this->assertEquals('foo', $gathered_input->key1);
+        $this->assertEquals('bar', $gathered_input->key2);
+    }
+
+    public function testGetInputPOST()
+    {
+        $_POST = array(
+            'key1' => 'foo',
+            'key2' => 'bar',
+            'misc' => 'baz',
+            'else' => 4,
+        );
+        $this->dispatcher->T_set_request_method('POST');
+        $gathered_input= $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $this->assertEquals(2, $gathered_input->Count());
+        $this->assertEquals('foo', $gathered_input->key1);
+        $this->assertEquals('bar', $gathered_input->key2);
+    }
+
+    public function testGetInputBadRequest()
+    {
+        $this->dispatcher->T_set_request_method('PUT');
+        $this->setExpectedException('phalanx\events\HTTPDispatcherException');
+        $this->dispatcher->T_GetInput(TestEvent::InputList());
+    }
+
+    public function testGetInputGETMissingKey()
+    {
+        $this->dispatcher->T_set_request_method('GET');
+        $input = $this->dispatcher->T_TokenizeURL('/event.bad/key1/foo/');
+        $this->dispatcher->T_set_url_input($input);
+        $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $this->assertEquals(1, $gathered_input->Count());
+        $this->assertEquals('foo', $gathered_input->key1);
+        $this->assertNull($gathered_input->key2);
+    }
+
+    public function testGetInputPOSTMissingKey()
+    {
+        $_POST['key1'] = 'foo';
+        $this->dispatcher->T_set_request_method('POST');
+        $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $this->assertEquals(1, $gathered_input->Count());
+        $this->assertEquals('foo', $gathered_input->key1);
+        $this->assertNull($gathered_input->key2);
     }
 }

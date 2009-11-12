@@ -27,7 +27,16 @@ class PropertyBagTest extends \PHPUnit_Framework_TestCase
 	{
 		$this->bag = new base\PropertyBag();
 	}
-	
+
+    public function testCount()
+    {
+        $this->assertEquals(0, $this->bag->Count());
+        $this->bag->foo = 'bar';
+        $this->assertEquals(1, $this->bag->Count());
+        $this->bag->moo = 'baz';
+        $this->assertEquals(2, $this->bag->Count());
+    }
+
 	public function testSetProp()
 	{
 		$this->bag->foo = 'moo';

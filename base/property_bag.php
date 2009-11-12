@@ -45,7 +45,13 @@ class PropertyBag extends KeyDescender
 	{
 		return $this->getSilent($key);
 	}
-	
+
+    // Returns the number of items in the PropertyBag.
+    public function Count()
+    {
+        return count($this->properties);
+    }
+
 	// Returns an array containing all the keys in the property bag.
 	public function allKeys()
 	{
