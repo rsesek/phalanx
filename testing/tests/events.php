@@ -23,6 +23,7 @@ require_once 'PHPUnit/Framework.php';
 require PHALANX_ROOT . '/events/dispatcher.php';
 require PHALANX_ROOT . '/events/event.php';
 require PHALANX_ROOT . '/events/event_pump.php';
+require PHALANX_ROOT . '/events/http_dispatcher.php';
 require PHALANX_ROOT . '/events/output_handler.php';
 
 class EventsSuite
@@ -34,6 +35,7 @@ class EventsSuite
 		$suite->addTestFile(TEST_ROOT . '/tests/events/dispatcher_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/events/event_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
+		$suite->addTestFile(TEST_ROOT . '/tests/events/http_dispatcher_test.php');
 		$suite->addTestFile(TEST_ROOT . '/tests/events/output_handler_test.php');
 		
 		return $suite;
