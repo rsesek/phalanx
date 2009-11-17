@@ -75,6 +75,23 @@ class CancelledEvent extends TestEvent
     }
 }
 
+class CancelledWillFireEvent extends TestEvent
+{
+    public $test;
+
+    public function WillFire()
+    {
+        parent::WillFire();
+        $this->test->pump->Cancel($this);
+    }
+
+    public function Cleanup()
+    {
+        $this->test = NULL;
+        parent::Cleanup();
+    }
+}
+
 class PreemptedCancelledEvent extends CancelledEvent
 {
     public $test;
@@ -116,6 +133,17 @@ class CurrentEventTester extends TestEvent
     public function Cleanup()
     {
         $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
+    }
+}
+
+class StopPumpEvent extends TestEvent
+{
+    public $test;
+
+    public function Fire()
+    {
+        parent::Fire();
+        $this->test->pump->StopPump();
     }
 }
 
@@ -228,6 +256,20 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($event->is_cancelled());
     }
 
+    public function testCancelInWillFire()
+    {
+        $event = new CancelledWillFireEvent();
+        $event->test = $this;
+
+        $this->pump->PostEvent($event);
+        $this->assertEquals(0, $this->pump->GetEventChain()->Count());
+
+        $this->assertTrue($event->will_fire);
+        $this->assertFalse($event->fire);
+        $this->assertTrue($event->cleanup);
+        $this->assertTrue($event->is_cancelled());
+    }
+
     public function testPreemptAndCancel()
     {
         $event       = new PreemptedCancelledEvent();
@@ -271,5 +313,37 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $this->pump->GetDeferredEvents()->Count());
         $this->pump->CancelDeferredEvents();
         $this->assertEquals(0, $this->pump->GetDeferredEvents()->Count());
+    }
+
+    public function testStopPump()
+    {
+        $this->pump = $this->getMock('phalanx\events\EventPump', array('_Exit'));
+        $this->pump->expects($this->once())->method('_Exit');
+
+        $output_handler = $this->getMock('phalanx\test\TestOutputHandler');
+        $output_handler->expects($this->once())->method('Start');
+        $this->pump->set_output_handler($output_handler);
+
+        $event = new StopPumpEvent();
+        $event->test = $this;
+        $this->pump->PostEvent($event);
+
+        $this->assertTrue($event->will_fire);
+        $this->assertTrue($event->fire);
+        $this->assertTrue($event->cleanup);
+    }
+
+    public function testTerminate()
+    {
+        $this->pump = $this->getMock('phalanx\events\EventPump', array('_Exit'));
+        $msg = 'testing 1 2 3';
+
+        ob_start();
+        $this->pump->expects($this->once())->method('_Exit');
+        $this->pump->Terminate($msg);
+        $result = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals($msg, $result);
     }
 }

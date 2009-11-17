@@ -37,9 +37,6 @@ class EventPump
 	// An SplStack of all the events that have been Fire()d by the pump.
 	protected $event_chain = NULL;
 
-    // The name of the event that is currently blocking.
-    protected $blocking_event = NULL;
-
     // Constructor. Do not use directly. Use EventPump::Pump().
 	public function __construct()
 	{
@@ -54,7 +51,7 @@ class EventPump
     {
         // There is already an event executing. Push this new event into the
         // deferred worke queue.
-        if ($this->current_event || $this->blocking_event)
+        if ($this->current_event)
         {
             $this->deferred_events->Push($event);
             return;
@@ -70,12 +67,6 @@ class EventPump
     // resume afterwards.
     public function RaiseEvent(Event $event)
     {
-        if ($this->blocking_event)
-        {
-            $this->deferred_events->Push($event);
-            return;
-        }
-
         $waiting_event = $this->current_event;
         $this->_ProcessEvent($event);
         $this->current_event = $waiting_event;
@@ -142,53 +133,13 @@ class EventPump
             $this->deferred_events->Shift();
     }
 
-    // This method will prevent any new events from registering with the pump
-    // until a corresponding call to UnblockEvent() is made.
-    public function BlockEvent()
-    {
-        if ($this->blocking_event)
-            throw new EventPumpException('EventPump is already blocked by ' . $this->blocking_event);
-
-        $event = $this->_GetCallingEvent();
-        if (!$event)
-            throw new EventPumpException('Cannot block events while not in the context of one');
-
-        $this->blocking_event = $event;
-    }
-
-    // Allow other events to register again after being blocked via
-    // BlockEvent(). This must be called from within the Event that blocked.
-    public function UnblockEvent()
-    {
-        if (!$this->blocking_event)
-            throw new EventPumpException('EventPump is not blocked');
-
-        $event = $this->_GetCallingEvent();
-        if ($event != $this->blocking_event)
-            throw new EventPumpException('EventPump is blocked by ' . $this->blocking_event .
-                                         ', not ' . $event);
-
-        $this->blocking_event = NULL;
-        $this->_DoDeferredEvents();
-    }
-
-    // This examines the stack trace to locate the calling functions.
-    protected function _GetCallingEvent()
-    {
-        $trace = debug_backtrace();
-        foreach ($trace as $frame)
-            if (isset($frame['class']) && is_subclass_of($frame['class'], 'phalanx\events\Event'))
-                return $frame['class'];
-        return NULL;
-    }
-
     // Tells the pump to stop pumping events and to begin output handling. This
     // will call the current event's Cleanup() function.
     public function StopPump()
     {
         $this->current_event->Cleanup();
         $this->output_handler->Start();
-        exit;
+        $this->_Exit();
     }
 
     // Halts execution of the pump immediately without performing any event
@@ -196,7 +147,7 @@ class EventPump
     public function Terminate($message)
     {
         echo $message;
-        exit;
+        $this->_Exit();
     }
 
     // Gets the currently executing Event.
@@ -217,6 +168,12 @@ class EventPump
     public function GetEventChain()
     {
         return $this->event_chain;
+    }
+
+    // Internal wrapper around exit() that we can mock.
+    protected function _Exit()
+    {
+        exit;
     }
 
 	// Getters and setters.
