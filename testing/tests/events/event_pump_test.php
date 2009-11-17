@@ -20,40 +20,138 @@ use \phalanx\events\EventPump;
 
 require_once 'PHPUnit/Framework.php';
 
+class NestedEvent extends TestEvent
+{
+    public $test;
+    public $inner_event;
+
+    public function Fire()
+    {
+        $count = $this->test->pump->GetDeferredEvents()->Count();
+        $this->test->pump->PostEvent($this->inner_event);
+        $this->test->assertEquals($count+1, $this->test->pump->GetDeferredEvents()->Count());
+        parent::Fire();
+    }
+
+    public function Cleanup()
+    {
+        $this->test = NULL;
+        parent::Cleanup();
+    }
+}
+
+class PreemptedEvent extends TestEvent
+{
+    public $test;
+    public $inner_event;
+
+    public function Fire()
+    {
+        $this->test->pump->RaiseEvent($this->inner_event);
+        parent::Fire();
+    }
+
+    public function Cleanup()
+    {
+        // Makes print_f() on these objects manageable.
+        $this->test = NULL;
+        parent::Cleanup();
+    }
+}
+
+class CancelledEvent extends TestEvent
+{
+    public $test;
+
+    public function Fire()
+    {
+        $this->test->pump->Cancel($this);
+    }
+
+    public function Cleanup()
+    {
+        $this->test = NULL;
+        parent::Cleanup();
+    }
+}
+
+class PreemptedCancelledEvent extends CancelledEvent
+{
+    public $test;
+    public $inner_event;
+
+    public function Fire()
+    {
+        $this->test->pump->RaiseEvent($this->inner_event);
+        parent::Fire();
+    }
+}
+
+class BlockingEvent extends TestEvent
+{
+    public $test;
+    public $unblock = FALSE;
+
+    public function Fire()
+    {
+        $this->test->pump->BlockEvent();
+    }
+}
+
+class CurrentEventTester extends TestEvent
+{
+    public $test;
+    public $inner_event;
+
+    public function WillFire()
+    {
+        $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
+    }
+    public function Fire()
+    {
+        $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
+        if ($this->inner_event)
+            $this->test->pump->RaiseEvent($this->inner_event);
+    }
+    public function Cleanup()
+    {
+        $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
+    }
+}
+
 class EventPumpTest extends \PHPUnit_Framework_TestCase
 {
 	public $pump;
-	
+
 	public function setUp()
 	{
 		$this->pump = new EventPump();
+		$this->inner_event = NULL;
 	}
-	
+
 	public function testSharedPump()
 	{
 		// Reset.
 		EventPump::T_set_pump(NULL);
-		
+
 		$this->assertNotNull(EventPump::Pump(), 'Did not create shared pump.');
 		$this->assertNotSame($this->pump, EventPump::Pump());
-		
+
 		EventPump::set_pump($this->pump);
 		$this->assertSame($this->pump, EventPump::Pump());
 	}
-	
+
 	public function testGetCurrentEvent()
 	{
-		$event1 = new TestEvent();
-		$this->pump->PostEvent($event1);
-		$this->assertSame($event1, $this->pump->GetCurrentEvent());
-		
-		$event2 = new InitOnlyEvent();
-		$this->pump->PostEvent($event2);
-		$this->assertSame($event1, $this->pump->GetCurrentEvent());
-		
-		$event3 = new TestEvent();
-		$this->pump->PostEvent($event3);
-		$this->assertSame($event3, $this->pump->GetCurrentEvent());
+		$event = new CurrentEventTester();
+		$event->test = $this;
+		$this->pump->PostEvent($event);
+
+        $event = new CurrentEventTester();
+        $event->test = $this;
+        $event->inner_event = new CurrentEventTester();
+        $event->inner_event->test = $this;
+		$this->pump->PostEvent($event);
 	}
 
     public function testSetOutputHandler()
@@ -63,5 +161,115 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
         $handler = new TestOutputHandler();
         $this->pump->set_output_handler($handler);
         $this->assertSame($handler, $this->pump->output_handler());
+    }
+
+    public function testPostEvent()
+    {
+        $event = new TestEvent();
+
+        $this->assertEquals(0, $this->pump->GetEventChain()->Count());
+        $this->pump->PostEvent($event);
+        $this->assertEquals(1, $this->pump->GetEventChain()->Count());
+
+        $this->assertTrue($event->will_fire);
+        $this->assertTrue($event->fire);
+        $this->assertTrue($event->cleanup);
+    }
+
+    public function testRaiseEvent()
+    {
+        $event = new TestEvent();
+
+        $this->assertEquals(0, $this->pump->GetEventChain()->Count());
+        $this->pump->RaiseEvent($event);
+        $this->assertEquals(1, $this->pump->GetEventChain()->Count());
+
+        $this->assertTrue($event->will_fire);
+        $this->assertTrue($event->fire);
+        $this->assertTrue($event->cleanup);
+    }
+
+    public function testRaiseEventPreempted()
+    {
+        $event       = new PreemptedEvent();
+        $inner_event = new TestEvent();
+        $event->test        = $this;
+        $event->inner_event = $inner_event;
+
+        $this->assertEquals(0, $this->pump->GetEventChain()->Count());
+        $this->pump->PostEvent($event);
+        $this->assertEquals(2, $this->pump->GetEventChain()->Count());
+
+        $this->assertTrue($event->will_fire);
+        $this->assertTrue($event->fire);
+        $this->assertTrue($event->cleanup);
+
+        $this->assertTrue($inner_event->will_fire);
+        $this->assertTrue($inner_event->fire);
+        $this->assertTrue($inner_event->cleanup);
+
+        // |$this->inner_event| finished executing before |$event|, so it
+        // should be further down the stack.
+        $this->assertSame($inner_event, $this->pump->GetEventChain()->Bottom());
+        $this->assertSame($event, $this->pump->GetEventChain()->Top());
+    }
+
+    public function testCancel()
+    {
+        $event = new CancelledEvent();
+        $event->test = $this;
+
+        $this->pump->PostEvent($event);
+        $this->assertEquals(0, $this->pump->GetEventChain()->Count());
+
+        $this->assertTrue($event->will_fire);
+        $this->assertFalse($event->fire);
+        $this->assertTrue($event->cleanup);
+        $this->assertTrue($event->is_cancelled());
+    }
+
+    public function testPreemptAndCancel()
+    {
+        $event       = new PreemptedCancelledEvent();
+        $inner_event = new TestEvent();
+        $event->test        = $this;
+        $event->inner_event = $inner_event;
+
+        $this->assertEquals(0, $this->pump->GetEventChain()->Count());
+        $this->pump->PostEvent($event);
+        $this->assertEquals(1, $this->pump->GetEventChain()->Count());
+
+        $this->assertTrue($event->will_fire);
+        $this->assertFalse($event->fire);
+        $this->assertTrue($event->cleanup);
+        $this->assertTrue($event->is_cancelled());
+
+        $this->assertTrue($inner_event->will_fire);
+        $this->assertTrue($inner_event->fire);
+        $this->assertTrue($inner_event->cleanup);
+        $this->assertFalse($inner_event->is_cancelled());
+    }
+
+    public function testDeferredWork()
+    {
+        $event       = new NestedEvent();
+        $inner_event = new TestEvent();
+        $event->test        = $this;
+        $event->inner_event = $inner_event;
+
+        $this->assertEquals(0, $this->pump->GetDeferredEvents()->Count());
+        $this->pump->PostEvent($event);
+        $this->assertEquals(0, $this->pump->GetDeferredEvents()->Count());
+    }
+
+    public function testCancelDeferredEvents()
+    {
+        $this->pump->GetDeferredEvents()->Push(new TestEvent());
+        $this->pump->GetDeferredEvents()->Push(new TestEvent());
+        $this->pump->GetDeferredEvents()->Push(new TestEvent());
+
+        $this->assertEquals(3, $this->pump->GetDeferredEvents()->Count());
+        $this->pump->CancelDeferredEvents();
+        $this->assertEquals(0, $this->pump->GetDeferredEvents()->Count());
     }
 }
