@@ -15,32 +15,21 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
+use \phalanx\input as input;
 
 require_once 'PHPUnit/Framework.php';
 
-define('PHALANX_ROOT', dirname(dirname(__FILE__)));
-define('TEST_ROOT', dirname(__FILE__));
+// Common includes.
+require PHALANX_ROOT . '/views/view.php';
 
-\PHPUnit_Util_Filter::addDirectoryToFilter(TEST_ROOT);
-
-class AllTests
+class ViewSuite
 {
 	public static function suite()
 	{
-		$suite = new \PHPUnit_Framework_TestSuite('Phalanx');
-
-		require TEST_ROOT . '/tests/base.php';
-		$suite->addTestSuite(BaseSuite::suite());
-
-		require TEST_ROOT . '/tests/events.php';
-		$suite->addTestSuite(EventsSuite::suite());
-
-        // require TEST_ROOT . '/tests/input.php';
-        // $suite->addTestSuite(InputSuite::suite());
-
-        require TEST_ROOT . '/tests/views.php';
-        $suite->addTestSuite(ViewSuite::suite());
-
+		$suite = new \PHPUnit_Framework_TestSuite('Views');
+		
+		$suite->addTestFile(TEST_ROOT . '/tests/views/view_test.php');
+		
 		return $suite;
 	}
 }
