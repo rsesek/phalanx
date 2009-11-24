@@ -24,8 +24,8 @@ require_once TEST_ROOT . '/tests/events/context_test.php';
 
 class FormKeyTest extends \PHPUnit_Framework_TestCase
 {
-	public $manager = null;
-	public $delegate = null;
+	public $manager = NULL;
+	public $delegate = NULL;
 	
 	public function setUp()
 	{

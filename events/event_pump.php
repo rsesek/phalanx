@@ -186,13 +186,13 @@ class EventPump
 			self::set_pump(new EventPump());
 		return self::$pump;
 	}
-	public static function set_pump(EventPump $pump) { self::$pump = $pump; }
+	static public function set_pump(EventPump $pump) { self::$pump = $pump; }
 
     public function set_output_handler(OutputHandler $handler) { $this->output_handler = $handler; }
     public function output_handler() { return $this->output_handler; }
 
 	// Testing methods. These are not for public consumption.
-	public static function T_set_pump($pump) { self::$pump = $pump; }
+	static public function T_set_pump($pump) { self::$pump = $pump; }
 }
 
 class EventPumpException extends \Exception

@@ -50,6 +50,6 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertType('phalanx\base\PropertyBag', $data);
         $this->assertEquals($expected, $data->ToArray());
-        $this->assertFalse($event->out2_never_true);
+        $this->assertFalse($event->out2_never_TRUE);
     }
 }

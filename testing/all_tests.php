@@ -25,7 +25,7 @@ define('TEST_ROOT', dirname(__FILE__));
 
 class AllTests
 {
-	public static function suite()
+	static public function suite()
 	{
 		$suite = new \PHPUnit_Framework_TestSuite('Phalanx');
 

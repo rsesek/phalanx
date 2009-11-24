@@ -33,7 +33,7 @@ use \phalanx\base\PropertyBag as PropertyBag;
 class FormKeyManager
 {
 	// See FormKeyManagerDelegate (below).
-	protected $delegate = null;
+	protected $delegate = NULL;
 	
 	// The amount of time, in seconds, for which a form key should be considered
 	// valid. Default is 1 hour.
@@ -61,7 +61,7 @@ class FormKeyManager
 	
 	// This generates a form key as a hidden <input> element with a given
 	// name and ID. If |$name| is not given, |phalanx_form_key| is used.
-	public function generateHTML($name = null)
+	public function generateHTML($name = NULL)
 	{
 		$name = ($name ?: 'phalanx_form_key');
 		return '<input type="hidden" name="' . $name . '" id="' . $name . '" value="' . $this->generate() . '" />';
@@ -81,12 +81,12 @@ class FormKeyManager
 	{
 		$form_key = $this->delegate->getFormKey($key);
 		if (!$form_key)
-			return false;
+			return FALSE;
 		
 		if ($form_key->timestamp < time()-$this->lifetime)
-			return false;
+			return FALSE;
 		
-		return true;
+		return TRUE;
 	}
 	
 	// This marks a key as invalid and removes it from storage.

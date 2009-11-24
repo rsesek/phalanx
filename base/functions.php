@@ -19,18 +19,18 @@ use \phalanx\events as events;
 
 // Iterates over an array and unsets any empty elements in the array. This
 // operates on the parameter itself.
-function array_strip_empty(Array & $array)
+function ArrayStripEmpty(Array & $array)
 {
 	foreach ($array as $key => $value)
 		if (is_array($array[$key]))
-			array_strip_empty($array[$key]);
+			ArrayStripEmpty($array[$key]);
 		else if (empty($value))
 			unset($array[$key]);
 }
 
 // Turns an under_scored string into a CamelCased one. If |$first_char| is
-// true, then the first character will also be capatalized.
-function underscore_to_cammelcase($string, $first_char = true)
+// TRUE, then the first character will also be capatalized.
+function UnderscoreToCammelCase($string, $first_char = TRUE)
 {
 	if ($first_char)
 		$string[0] = strtoupper($string[0]);

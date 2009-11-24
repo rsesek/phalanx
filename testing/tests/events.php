@@ -28,7 +28,7 @@ require PHALANX_ROOT . '/events/output_handler.php';
 
 class EventsSuite
 {
-	public static function suite()
+	static public function suite()
 	{
 		$suite = new \PHPUnit_Framework_TestSuite('Events');
 		
@@ -52,12 +52,12 @@ class TestEvent extends events\Event
 
     public $out1;
     public $out2;
-    public $out2_never_true = FALSE;
+    public $out2_never_TRUE = FALSE;
 
     // The property should hide this from OutputHandler::_GetEventData().
     public function out2()
     {
-        $this->out2_never_true = TRUE;
+        $this->out2_never_TRUE = TRUE;
     }
 
     public function out3()

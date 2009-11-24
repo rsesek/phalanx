@@ -20,17 +20,17 @@ namespace phalanx\input;
 
 class Cleaner
 {
-	public static function string($str)
+	static public function String($str)
 	{
 		return "$str";
 	}
 	
-	public static function trimmed_string($str)
+	static public function TrimmedString($str)
 	{
 		return trim($str);
 	}
 	
-	public static function html($str)
+	static public function HTML($str)
 	{
 		$find = array(
 			'<',
@@ -45,23 +45,23 @@ class Cleaner
 		return str_replace($find, $replace, $str);
 	}
 	
-	public static function int($int)
+	static public function Int($int)
 	{
 		return intval($int);
 	}
 	
-	public static function float($float)
+	static public function Float($float)
 	{
 		return floatval($float);
 	}
 	
-	public static function bool($bool)
+	static public function Bool($bool)
 	{
-		$str = strtolower(self::trimmed_string($bool));
-		if ($str == 'yes' || $str == 'true')
-			return true;
-		else if ($str == 'no' || $str == 'false')
-			return false;
+		$str = strtolower(self::TrimmedString($bool));
+		if ($str == 'yes' || $str == 'TRUE')
+			return TRUE;
+		else if ($str == 'no' || $str == 'FALSE')
+			return FALSE;
 		return (bool)$bool;
 	}
 }

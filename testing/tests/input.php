@@ -26,7 +26,7 @@ require PHALANX_ROOT . '/input/keyed_cleaner.php';
 
 class InputSuite
 {
-	public static function suite()
+	static public function suite()
 	{
 		$suite = new \PHPUnit_Framework_TestSuite('Input');
 		
@@ -40,27 +40,27 @@ class InputSuite
 
 class TestFormKeyManagerDelegate implements input\FormKeyManagerDelegate
 {
-	public $did_get = false;
-	public $did_save = false;
-	public $did_delete = false;
+	public $did_get = FALSE;
+	public $did_save = FALSE;
+	public $did_delete = FALSE;
 	
 	public $key_storage = array();
 	
 	public function getFormKey($key)
 	{
-		$this->did_get = true;
+		$this->did_get = TRUE;
 		return $this->key_storage[$key];
 	}
 	
 	public function saveFormKey(\phalanx\base\PropertyBag $form_key)
 	{
-		$this->did_save = true;
+		$this->did_save = TRUE;
 		$this->key_storage[$form_key->key] = $form_key;
 	}
 	
 	public function deleteKey($key)
 	{
-		$this->did_delete = true;
+		$this->did_delete = TRUE;
 		unset($this->key_storage[$key]);
 	}
 }

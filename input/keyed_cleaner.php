@@ -21,7 +21,7 @@ namespace phalanx\input;
 // happens onthey specified key of the array. Example:
 //
 // 	$cleaner = new KeyedCleaner($context->gpc);
-// 	$cleaner->getHTML('p.some_key');
+// 	$cleaner->GetHTML('p.some_key');
 // 	print $context->gpc['p']['some_key'];
 class KeyedCleaner
 {
@@ -35,45 +35,45 @@ class KeyedCleaner
 		$this->keyer = new \phalanx\base\KeyDescender($array);
 	}
 	
-	public function getString($key)
+	public function GetString($key)
 	{
-		$val = Cleaner::string($this->keyer->get($key));
-		$this->keyer->set($key, $val);
+		$val = Cleaner::String($this->keyer->Get($key));
+		$this->keyer->Set($key, $val);
 		return $val;
 	}
 	
-	public function getTrimmedString($key)
+	public function GetTrimmedString($key)
 	{
-		$val = Cleaner::trimmed_string($this->keyer->get($key));
-		$this->keyer->set($key, $val);
+		$val = Cleaner::TrimmedString($this->keyer->Get($key));
+		$this->keyer->Set($key, $val);
 		return $val;
 	}
 	
-	public function getHTML($key)
+	public function GetHTML($key)
 	{
-		$val = Cleaner::html($this->keyer->get($key));
-		$this->keyer->set($key, $val);
+		$val = Cleaner::HTML($this->keyer->Get($key));
+		$this->keyer->Set($key, $val);
 		return $val;
 	}
 	
-	public function getInt($key)
+	public function GetInt($key)
 	{
-		$val = Cleaner::int($this->keyer->get($key));
-		$this->keyer->set($key, $val);
+		$val = Cleaner::Int($this->keyer->Get($key));
+		$this->keyer->Set($key, $val);
 		return $val;
 	}
 	
-	public function getFloat($key)
+	public function GetFloat($key)
 	{
-		$val = Cleaner::float($this->keyer->get($key));
-		$this->keyer->set($key, $val);
+		$val = Cleaner::Float($this->keyer->Get($key));
+		$this->keyer->Set($key, $val);
 		return $val;
 	}
 	
-	public function getBool($key)
+	public function GetBool($key)
 	{
-		$val = Cleaner::bool($this->keyer->get($key));
-		$this->keyer->set($key, $val);
+		$val = Cleaner::Bool($this->keyer->Get($key));
+		$this->keyer->Set($key, $val);
 		return $val;
 	}
 	

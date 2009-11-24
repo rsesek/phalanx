@@ -24,7 +24,7 @@ require PHALANX_ROOT . '/views/view.php';
 
 class ViewSuite
 {
-	public static function suite()
+	static public function suite()
 	{
 		$suite = new \PHPUnit_Framework_TestSuite('Views');
 		

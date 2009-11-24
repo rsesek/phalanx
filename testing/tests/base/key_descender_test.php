@@ -102,7 +102,7 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 	{
 		$array = array();
 		$desc = new KeyDescender($array);
-		$desc->set_throw_undefined_errors(true);
+		$desc->set_throw_undefined_errors(TRUE);
 		$this->assertTrue($desc->throw_undefined_errors());
 		$this->setExpectedException('phalanx\base\UndefinedKeyException');
 		$desc->get('undefined.key');
@@ -112,7 +112,7 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 	{
 		$array = array();
 		$desc = new KeyDescender($array);
-		$desc->set_throw_undefined_errors(false);
+		$desc->set_throw_undefined_errors(FALSE);
 		$this->assertFalse($desc->throw_undefined_errors());
 		$this->assertNull($desc->get('undefined.key'));
 	}
@@ -121,7 +121,7 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 	{
 		$array = array();
 		$desc = new KeyDescender($array);
-		$desc->set_throw_undefined_errors(true);
+		$desc->set_throw_undefined_errors(TRUE);
 		try
 		{
 			$this->assertNull($desc->getSilent('undefined_key'));

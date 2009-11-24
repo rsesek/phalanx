@@ -27,39 +27,39 @@ class KeyDescender
 	
 	// Whether or not we throw exceptions for undefined keys. This enables
 	// strict keyed access. Otherwise, NULL will be returned on failure.
-	protected $throw_undefined_errors = true;
+	protected $throw_undefined_errors = TRUE;
 	
 	public function __construct(/* Array|Object */ & $root)
 	{
-		if (!self::isDescendable($root))
+		if (!self::IsDescendable($root))
 			throw new KeyDescenderException('Cannot create a KeyDescender on a non-descendable reference');
 		$this->root = &$root;
 	}
 	
 	// Checks whether a given type is descendable. This is used to create the
 	// base case for recursive descention.
-	public static function isDescendable($value)
+	static public function IsDescendable($value)
 	{
 		return (is_array($value) || is_object($value));
 	}
 	
 	// Returns a ref to the keyed value. Example: "foo.bar.baz"
-	public function & get($key)
+	public function & Get($key)
 	{
 		$stack = explode('.', $key);
 		$current = &$this->root;
-		for ($i = 0; $i < sizeof($stack); $i++)
+		for ($i = 0; $i < count($stack); $i++)
 		{
 			try
 			{
-				$current = &$this->_get($current, $stack[$i]);
+				$current = &$this->_Get($current, $stack[$i]);
 			}
 			// Catch subkey exceptions and re-throw them as main key ones.
 			catch (UndefinedKeyException $e)
 			{
 				if ($this->throw_undefined_errors)
 					throw new UndefinedKeyException("Undefined key $key");
-				return null;
+				return NULL;
 			}
 		}
 		
@@ -68,12 +68,12 @@ class KeyDescender
 	
 	// Returns a key, ignoring the |$this->throw_undefined_errors| setting and
 	// returning NULL if not found.
-	public function getSilent($key)
+	public function GetSilent($key)
 	{
-		$value = null;
+		$value = NULL;
 		try
 		{
-			$value = $this->get($key);
+			$value = $this->Get($key);
 		}
 		catch (UndefinedKeyException $e)
 		{}
@@ -81,7 +81,7 @@ class KeyDescender
 	}
 
 	// Sets a value for a given key.
-	public function set($key, $value)
+	public function Set($key, $value)
 	{
 		// Get the parent of the key we're inserting.
 		$stack = explode('.', $key);
@@ -89,9 +89,9 @@ class KeyDescender
 		// Remove the subkey that we will be creating (the last one).
 		$single_key = array_pop($stack);
 		
-		$parent = null;
+		$parent = NULL;
 		// Attach to root.
-		if (sizeof($stack) < 1)
+		if (count($stack) < 1)
 		{
 			$parent = &$this->root;
 		}
@@ -99,10 +99,10 @@ class KeyDescender
 		else
 		{
 			$parent_key = implode('.', $stack);
-			$parent = &$this->get($parent_key);
+			$parent = &$this->Get($parent_key);
 		}
 		
-		if ($parent === null)
+		if ($parent === NULL)
 			throw new UndefinedKeyException("Cannot insert '$key' because it has a non-existent super-key");
 		
 		if (is_object($parent))
@@ -114,7 +114,7 @@ class KeyDescender
 	}
 	
 	// Returns a value from a given key in a descendable.
-	protected function & _get(& $descendable, $single_key)
+	protected function & _Get(& $descendable, $single_key)
 	{
 		if (is_array($descendable))
 		{
@@ -138,8 +138,8 @@ class KeyDescender
 	
 	// Wrappers for get() and set() so we can do magical property access, which
 	// will even apply to arrays.
-	public function __get($key) { return $this->get($key); }
-	public function __set($key, $value) { $this->set($key, $value); }
+	public function __get($key) { return $this->Get($key); }
+	public function __set($key, $value) { $this->Set($key, $value); }
 	
 	// Getters and setters.
 	// -------------------------------------------------------------------------

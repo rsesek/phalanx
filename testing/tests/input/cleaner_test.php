@@ -32,10 +32,10 @@ class CleanerTest extends \PHPUnit_Framework_TestCase
 			'dqhtml'	=> '<strong>html with "double quotes"</strong>',
 			'int'		=> 42,
 			'float'	=> 3.14159,
-			'bool1'	=> true,
-			'bool0'	=> false,
+			'bool1'	=> TRUE,
+			'bool0'	=> FALSE,
 			'boolT'	=> 'TrRuE',
-			'boolF'	=> 'false',
+			'boolF'	=> 'FALSE',
 			'boolY'	=> 'YES',
 			'boolN'	=> 'no',
 			'entity' => 'red, green, & blue'
@@ -44,55 +44,55 @@ class CleanerTest extends \PHPUnit_Framework_TestCase
 	
 	public function testCleanString()
 	{
-		$this->assertEquals('string', Cleaner::string($this->fixture['str']));
-		$this->assertEquals(' trimmed string	', Cleaner::string($this->fixture['tstr']));
-		$this->assertEquals('<strong>html</strong>', Cleaner::string($this->fixture['html']));
-		$this->assertEquals('"double quoted string"', Cleaner::string($this->fixture['dqstr']));
-		$this->assertEquals("'single quoted string'", Cleaner::string($this->fixture['sqstr']));
-		$this->assertEquals('<strong>html with "double quotes"</strong>', Cleaner::string($this->fixture['dqhtml']));
-		$this->assertEquals('red, green, & blue', Cleaner::string($this->fixture['entity']));
+		$this->assertEquals('string', Cleaner::String($this->fixture['str']));
+		$this->assertEquals(' trimmed string	', Cleaner::String($this->fixture['tstr']));
+		$this->assertEquals('<strong>html</strong>', Cleaner::String($this->fixture['html']));
+		$this->assertEquals('"double quoted string"', Cleaner::String($this->fixture['dqstr']));
+		$this->assertEquals("'single quoted string'", Cleaner::String($this->fixture['sqstr']));
+		$this->assertEquals('<strong>html with "double quotes"</strong>', Cleaner::String($this->fixture['dqhtml']));
+		$this->assertEquals('red, green, & blue', Cleaner::String($this->fixture['entity']));
 	}
 	
 	public function testCleanTrimmedStr()
 	{
-		$this->assertEquals('string', Cleaner::trimmed_string($this->fixture['str']));
-		$this->assertEquals('trimmed string', Cleaner::trimmed_string($this->fixture['tstr']));
+		$this->assertEquals('string', Cleaner::TrimmedString($this->fixture['str']));
+		$this->assertEquals('trimmed string', Cleaner::TrimmedString($this->fixture['tstr']));
 	}
 	
 	public function testCleanHTML()
 	{
-		$this->assertEquals('string', Cleaner::html($this->fixture['str']));
-		$this->assertEquals('&lt;strong&gt;html&lt;/strong&gt;', Cleaner::html($this->fixture['html']));
-		$this->assertEquals('&quo;double quoted string&quo;', Cleaner::html($this->fixture['dqstr']));
-		$this->assertEquals("'single quoted string'", Cleaner::html($this->fixture['sqstr']));
-		$this->assertEquals('&lt;strong&gt;html with &quo;double quotes&quo;&lt;/strong&gt;', Cleaner::html($this->fixture['dqhtml']));
-		$this->assertEquals('red, green, & blue', Cleaner::html($this->fixture['entity']));
+		$this->assertEquals('string', Cleaner::HTML($this->fixture['str']));
+		$this->assertEquals('&lt;strong&gt;html&lt;/strong&gt;', Cleaner::HTML($this->fixture['html']));
+		$this->assertEquals('&quo;double quoted string&quo;', Cleaner::HTML($this->fixture['dqstr']));
+		$this->assertEquals("'single quoted string'", Cleaner::HTML($this->fixture['sqstr']));
+		$this->assertEquals('&lt;strong&gt;html with &quo;double quotes&quo;&lt;/strong&gt;', Cleaner::HTML($this->fixture['dqHTML']));
+		$this->assertEquals('red, green, & blue', Cleaner::HTML($this->fixture['entity']));
 	}
 	
 	public function testCleanInt()
 	{
-		$this->assertEquals(0, Cleaner::int($this->fixture['str']));
-		$this->assertEquals(42, Cleaner::int($this->fixture['int']));
-		$this->assertEquals(3, Cleaner::int($this->fixture['float']));
-		$this->assertEquals(1, Cleaner::int($this->fixture['bool1']));
+		$this->assertEquals(0, Cleaner::Int($this->fixture['str']));
+		$this->assertEquals(42, Cleaner::Int($this->fixture['int']));
+		$this->assertEquals(3, Cleaner::Int($this->fixture['float']));
+		$this->assertEquals(1, Cleaner::Int($this->fixture['bool1']));
 	}
 	
 	public function testCleanFloat()
 	{
-		$this->assertEquals(0.0, Cleaner::float($this->fixture['str']));
-		$this->assertEquals(42.0, Cleaner::float($this->fixture['int']));
-		$this->assertEquals(3.14159, Cleaner::float($this->fixture['float']));
+		$this->assertEquals(0.0, Cleaner::Float($this->fixture['str']));
+		$this->assertEquals(42.0, Cleaner::Float($this->fixture['int']));
+		$this->assertEquals(3.14159, Cleaner::Float($this->fixture['float']));
 	}
 	
 	public function testCleanBool()
 	{
-		$this->assertEquals(true, Cleaner::bool($this->fixture['bool1']));
-		$this->assertEquals(true, Cleaner::bool($this->fixture['boolT']));
-		$this->assertEquals(true, Cleaner::bool($this->fixture['boolY']));
-		$this->assertEquals(false, Cleaner::bool($this->fixture['bool0']));
-		$this->assertEquals(false, Cleaner::bool($this->fixture['boolF']));
-		$this->assertEquals(false, Cleaner::bool($this->fixture['boolN']));
-		$this->assertEquals(true, Cleaner::bool('    true	'));
-		$this->assertEquals(false, Cleaner::bool('	no       '));
+		$this->assertEquals(TRUE, Cleaner::Bool($this->fixture['bool1']));
+		$this->assertEquals(TRUE, Cleaner::Bool($this->fixture['boolT']));
+		$this->assertEquals(TRUE, Cleaner::Bool($this->fixture['boolY']));
+		$this->assertEquals(FALSE, Cleaner::Bool($this->fixture['bool0']));
+		$this->assertEquals(FALSE, Cleaner::Bool($this->fixture['boolF']));
+		$this->assertEquals(FALSE, Cleaner::Bool($this->fixture['boolN']));
+		$this->assertEquals(TRUE, Cleaner::Bool('    TRUE	'));
+		$this->assertEquals(FALSE, Cleaner::Bool('	no       '));
 	}
 }

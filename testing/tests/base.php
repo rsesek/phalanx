@@ -26,7 +26,7 @@ require PHALANX_ROOT . '/base/property_bag.php';
 
 class BaseSuite
 {
-	public static function suite()
+	static public function suite()
 	{
 		$suite = new \PHPUnit_Framework_TestSuite('Base');
 		
