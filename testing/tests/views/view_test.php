@@ -21,6 +21,25 @@ require_once 'PHPUnit/Framework.php';
 
 require_once TEST_ROOT . '/tests/views.php';
 
+// Exposer.
+class TestView extends View
+{
+    public function T_Cache()
+    {
+        return $this->_Cache();
+    }
+
+    public function T_CachePath($name)
+    {
+        return $this->_CachePath($name);
+    }
+
+    public function T_ProcessTemplate($data)
+    {
+        return $this->_ProcessTemplate($data);
+    }
+}
+
 class ViewTest extends \PHPUnit_Framework_TestCase
 {
     public $saved_singleton = array();
@@ -46,7 +65,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($path, View::template_path());
     }
 
-    public function testCachePath()
+    public function testSetCachePath()
     {
         $this->assertEquals('/tmp/phalanx_views', View::cache_path());
 
@@ -57,8 +76,53 @@ class ViewTest extends \PHPUnit_Framework_TestCase
 
     public function testCtorAndTemplateName()
     {
-        $view = $this->getMock('phalanx\views\View', array('_Cache'), array('test_tpl'));
-        $view->expects($this->once())->method('_Cache');
+        $view = $this->getMock('phalanx\views\View', NULL, array('test_tpl'));
         $this->assertEquals('test_tpl', $view->template_name());
+
+        $this->assertType('phalanx\base\PropertyBag', $view->vars());
+        $this->assertEquals(0, $view->vars()->Count());
+    }
+
+    public function testProcessTemplateEntities()
+    {
+        $view = new TestView('test');
+        $data = '<strong>Some day, is it not, <'.'?php echo "Rob" ?'.'>?</strong>';
+        $this->assertEquals($data, $view->T_ProcessTemplate($data));
+    }
+
+    public function testProcessTemplateMacro()
+    {
+        $view = new TestView('test');
+        $in   = 'foo $[some.value] bar';
+        $out  = 'foo <?php $view->Get("some.value") ?> bar';
+        $this->assertEquals($out, $view->T_ProcessTemplate($in));
+    }
+
+    public function testProcessTemplateShortTags()
+    {
+        $view = new TestView('test');
+        $in   = 'foo <?php echo "Not this one"; ?> bar <? echo "But this one!" ?> moo';
+        $out  = 'foo <?php echo "Not this one"; ?> bar <?php echo "But this one!" ?> moo';
+        $this->assertEquals($out, $view->T_ProcessTemplate($in));
+    }
+
+    public function testMagicGetterSetter()
+    {
+        $view = new View('test');
+        $view->foo = 'abc';
+        $this->assertEquals('abc', $view->foo);
+        $this->assertEquals('abc', $view->vars()->Get('foo'));
+
+        $view->foo = array();
+        $view->{"foo.bar"} = '123';
+        $this->assertEquals('123', $view->{"foo.bar"});
+        $this->assertEquals('123', $view->vars()->Get('foo.bar'));
+    }
+
+    public function testCachePath()
+    {
+        View::set_cache_path('/test/value');
+        $view = new TestView('name');
+        $this->assertEquals('/test/value/name.phpi', $view->T_CachePath($view->template_name()));
     }
 }

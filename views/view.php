@@ -38,7 +38,6 @@ class View
     {
         $this->template_name = $name;
         $this->vars          = new \phalanx\base\PropertyBag();
-        $this->_Cache();
     }
 
     // Overload property accessors to set view variables.
@@ -55,6 +54,7 @@ class View
     public function Render()
     {
         $view = &$this->vars;
+        $this->_Cache();
         include $this->_CachePath($this->template_name);
     }
 
@@ -85,6 +85,14 @@ class View
     // Does any pre-processing on the template.
     protected function _ProcessTemplate($data)
     {
+        // Perform pre-process step of translating the view's var shortcut macro
+        // into its expanded form.
+        // TODO: perform automatic sanitzation?
+        $data = preg_replace('/\$\[([a-zA-Z0-0\._\- ]+)\]/', '<?php $view->Get("\1") ?>', $data);
+
+        // Convert any PHP short-tags into their full versions.
+        $data = preg_replace('/<\?(?!php)/', '<?php', $data);
+
         return $data;
     }
 
