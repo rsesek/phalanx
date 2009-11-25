@@ -53,8 +53,8 @@ class View
     // This includes the template and renders it out.
     public function Render()
     {
-        $view = &$this->vars;
         $this->_Cache();
+        $view = &$this->vars;
         include $this->_CachePath($this->template_name);
     }
 
@@ -90,7 +90,7 @@ class View
         // Perform pre-process step of translating the view's var shortcut macro
         // into its expanded form.
         // TODO: perform automatic sanitzation?
-        $data = preg_replace('/\$\[([a-zA-Z0-0\._\- ]+)\]/', '<?php $view->Get("\1") ?>', $data);
+        $data = preg_replace('/\$\[([a-zA-Z0-0\._\- ]+)\]/', '<?php echo $view->Get("\1") ?>', $data);
 
         // Convert any PHP short-tags into their full versions.
         $data = preg_replace('/<\?(?!php)/', '<?php', $data);

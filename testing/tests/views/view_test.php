@@ -106,7 +106,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
     {
         $view = new TestView('test');
         $in   = 'foo $[some.value] bar';
-        $out  = 'foo <?php $view->Get("some.value") ?> bar';
+        $out  = 'foo <?php echo $view->Get("some.value") ?> bar';
         $this->assertEquals($out, $view->T_ProcessTemplate($in));
     }
 
@@ -199,5 +199,20 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $expected = file_get_contents(sprintf(View::template_path(), 'cache_test'));
         $actual   = file_get_contents(View::cache_path() . '/cache_test.phpi');
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testRender()
+    {
+        TestView::SetupPaths();
+
+        $view = new TestView('render_test');
+        $view->name = 'Rob';
+
+        ob_start();
+        $view->Render();
+        $actual = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals('Hi, my name is Rob.', $actual);
     }
 }
