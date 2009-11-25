@@ -59,7 +59,8 @@ class KeyDescender
             {
                 if ($this->throw_undefined_errors)
                     throw new UndefinedKeyException("Undefined key $key");
-                return NULL;
+                $null = NULL;  // Avoid PHP reference error.
+                return $null;
             }
         }
 
