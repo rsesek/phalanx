@@ -63,10 +63,12 @@ class View
     protected function _Cache()
     {
         $cache_path = $this->_CachePath($this->template_name);
-        if (!file_exists($cache_path))
+        $tpl_path   = sprintf(self::$template_path, $this->template_name);
+        if (!file_exists($cache_path) || filemtime($cache_path) < filemtime($tpl_path))
         {
-            $path = sprintf(self::$template_path, $this->template_name);
-            $data = file_get_contents($path);
+            $data = file_get_contents($tpl_path);
+            if ($data === FALSE)
+                throw new ViewException('Could not load template ' . $this->template_name);
 
             $data = $this->_ProcessTemplate($data);
 

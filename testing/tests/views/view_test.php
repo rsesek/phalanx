@@ -24,6 +24,12 @@ require_once TEST_ROOT . '/tests/views.php';
 // Exposer.
 class TestView extends View
 {
+    static public function SetupPaths()
+    {
+        self::set_cache_path(dirname(__FILE__) . '/data/cache/');
+        self::set_template_path(dirname(__FILE__) . '/data/%s.tpl');
+    }
+
     public function T_Cache()
     {
         return $this->_Cache();
@@ -48,6 +54,12 @@ class ViewTest extends \PHPUnit_Framework_TestCase
     {
         $this->saved_singleton['template_path'] = View::template_path();
         $this->saved_singleton['cache_path']    = View::cache_path();
+
+        $path  = dirname(__FILE__) . '/data/cache/';
+        $files = scandir($path);
+        foreach ($files as $file)
+            if ($file[0] != '.')
+                unlink($path . $file);
     }
 
     public function tearDown()
@@ -124,5 +136,68 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         View::set_cache_path('/test/value');
         $view = new TestView('name');
         $this->assertEquals('/test/value/name.phpi', $view->T_CachePath($view->template_name()));
+    }
+
+    public function testCacheMiss()
+    {
+        TestView::SetupPaths();
+        $view = new TestView('cache_test');
+
+        $files = scandir(View::cache_path());
+        $this->assertEquals(2, count($files));  // Only dotfiles.
+
+        $view->T_Cache();
+
+        $files = scandir(View::cache_path());
+        $this->assertEquals(3, count($files));
+
+        $expected = file_get_contents(sprintf(View::template_path(), 'cache_test'));
+        $actual   = file_get_contents(View::cache_path() . '/cache_test.phpi');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testCacheHit()
+    {
+        $expected = 'Cache hit!';
+        TestView::SetupPaths();
+        file_put_contents(View::cache_path() . '/cache_test.phpi', $expected);
+        $view = new TestView('cache_test');
+
+        $files = scandir(View::cache_path());
+        $this->assertEquals(3, count($files));
+
+        $view->T_Cache();
+
+        $files = scandir(View::cache_path());
+        $this->assertEquals(3, count($files));
+
+        $actual = file_get_contents(View::cache_path() . '/cache_test.phpi');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testCacheInvalidate()
+    {
+        TestView::SetupPaths();
+        file_put_contents(View::cache_path() . '/cache_test.phpi', 'Invalid template data');
+        $view = new TestView('cache_test');
+
+        // Need to wait for the mtime to make a difference.
+        sleep(1);
+        clearstatcache();
+
+        // Touch the template to update its mtime.
+        touch(sprintf(View::template_path(), 'cache_test'));
+
+        $files = scandir(View::cache_path());
+        $this->assertEquals(3, count($files));
+
+        $view->T_Cache();
+
+        $files = scandir(View::cache_path());
+        $this->assertEquals(3, count($files));
+
+        $expected = file_get_contents(sprintf(View::template_path(), 'cache_test'));
+        $actual   = file_get_contents(View::cache_path() . '/cache_test.phpi');
+        $this->assertEquals($expected, $actual);
     }
 }
