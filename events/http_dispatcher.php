@@ -48,13 +48,13 @@ class HTTPDispatcher extends Dispatcher
     public function event_input_key() { return $this->event_input_key; }
 
     // This splits a request URL into the event name and then appropriate key
-	// value matching. URLs can take the form:
-	//   /event_name/id
-	//   /event_name/k1/v1/k2/v2/
-	protected function _TokenizeURL($url)
-	{
+    // value matching. URLs can take the form:
+    //   /event_name/id
+    //   /event_name/k1/v1/k2/v2/
+    protected function _TokenizeURL($url)
+    {
         $input = new \phalanx\base\PropertyBag();
-		$parts = explode('/', trim($url, '/'));
+        $parts = explode('/', trim($url, '/'));
 
         $input->Set('_event', $parts[0]);
         array_shift($parts);
@@ -64,15 +64,15 @@ class HTTPDispatcher extends Dispatcher
             $input->Set('_id', $parts[0]);
             return $input;
         }
-   
-		for ($i = 0; $i < count($parts); $i += 2)
-		{
-			if (!isset($parts[$i]) || !isset($parts[$i+1]))
-				throw new HTTPDispatcherException("Invalid key-value pair in URL '$url'");
-			$input->Set($parts[$i], $parts[$i+1]);
-		}
-		return $input;
-	}
+
+        for ($i = 0; $i < count($parts); $i += 2)
+        {
+            if (!isset($parts[$i]) || !isset($parts[$i+1]))
+                throw new HTTPDispatcherException("Invalid key-value pair in URL '$url'");
+            $input->Set($parts[$i], $parts[$i+1]);
+        }
+        return $input;
+    }
 
     // Gets the event name.
     protected function _GetEventName()

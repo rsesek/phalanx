@@ -20,48 +20,48 @@ namespace phalanx\input;
 
 class Cleaner
 {
-	static public function String($str)
-	{
-		return "$str";
-	}
-	
-	static public function TrimmedString($str)
-	{
-		return trim($str);
-	}
-	
-	static public function HTML($str)
-	{
-		$find = array(
-			'<',
-			'>',
-			'"'
-		);
-		$replace = array(
-			'&lt;',
-			'&gt;',
-			'&quo;'
-		);
-		return str_replace($find, $replace, $str);
-	}
-	
-	static public function Int($int)
-	{
-		return intval($int);
-	}
-	
-	static public function Float($float)
-	{
-		return floatval($float);
-	}
-	
-	static public function Bool($bool)
-	{
-		$str = strtolower(self::TrimmedString($bool));
-		if ($str == 'yes' || $str == 'TRUE')
-			return TRUE;
-		else if ($str == 'no' || $str == 'FALSE')
-			return FALSE;
-		return (bool)$bool;
-	}
+    static public function String($str)
+    {
+        return "$str";
+    }
+
+    static public function TrimmedString($str)
+    {
+        return trim($str);
+    }
+
+    static public function HTML($str)
+    {
+        $find = array(
+            '<',
+            '>',
+            '"'
+        );
+        $replace = array(
+            '&lt;',
+            '&gt;',
+            '&quo;'
+        );
+        return str_replace($find, $replace, $str);
+    }
+
+    static public function Int($int)
+    {
+        return intval($int);
+    }
+
+    static public function Float($float)
+    {
+        return floatval($float);
+    }
+
+    static public function Bool($bool)
+    {
+        $str = strtolower(self::TrimmedString($bool));
+        if ($str == 'yes' || $str == 'TRUE')
+            return TRUE;
+        else if ($str == 'no' || $str == 'FALSE')
+            return FALSE;
+        return (bool)$bool;
+    }
 }

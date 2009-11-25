@@ -21,19 +21,19 @@ namespace phalanx\events;
 // the view system.
 abstract class Event
 {
-	// The input passed to the event upon creation.
-	protected $input = NULL;
+    // The input passed to the event upon creation.
+    protected $input = NULL;
 
-	// Whether or not the event is cancelled.
-	protected $cancelled = FALSE;
+    // Whether or not the event is cancelled.
+    protected $cancelled = FALSE;
 
     // Creates an instance of the Event class. The PropertyBag of input is
     // assembled for the Event by the Dispatcher. It collects input variables
     // based on the keys the Event asks for via the InputList() method.
-	public function __construct(\phalanx\base\PropertyBag $input = NULL)
-	{
-		$this->input = $input;
-	}
+    public function __construct(\phalanx\base\PropertyBag $input = NULL)
+    {
+        $this->input = $input;
+    }
 
     // Returns an array of input keys the Event requires in order to perform
     // its work. Returning NULL means this Event requires no input.
@@ -62,12 +62,12 @@ abstract class Event
         EventPump::Pump()->Cancel($this);
     }
 
-	// Getters and setters.
-	// --------------------------------------------------------------------------
-	public function input() { return $this->input; }
-	
-	// Marks the event as cancelled. Do not overload this, but rather perform
-	// cleanup in end().
-	public function set_cancelled() { $this->cancelled = TRUE; }
-	public function is_cancelled() { return $this->cancelled; }
+    // Getters and setters.
+    // --------------------------------------------------------------------------
+    public function input() { return $this->input; }
+
+    // Marks the event as cancelled. Do not overload this, but rather perform
+    // cleanup in end().
+    public function set_cancelled() { $this->cancelled = TRUE; }
+    public function is_cancelled() { return $this->cancelled; }
 }

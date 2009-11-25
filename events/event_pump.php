@@ -21,28 +21,28 @@ namespace phalanx\events;
 // the last non-cancelled event is usually the one whose output is rendered.
 class EventPump
 {
-	// The shared event pump object.
-	private static $pump;
+    // The shared event pump object.
+    private static $pump;
 
     // The OutputHandler instance for the pump.
     protected $output_handler = NULL;
 
-	// A reference to the event currently being processed.
-	protected $current_event = NULL;
+    // A reference to the event currently being processed.
+    protected $current_event = NULL;
 
     // An SplQueue of the events that were registered wtih PostEvent() but are
     // waiting for the current event to finish.
     protected $deferred_events = NULL;
 
-	// An SplStack of all the events that have been Fire()d by the pump.
-	protected $event_chain = NULL;
+    // An SplStack of all the events that have been Fire()d by the pump.
+    protected $event_chain = NULL;
 
     // Constructor. Do not use directly. Use EventPump::Pump().
-	public function __construct()
-	{
-		$this->deferred_events = new \SplQueue();
-		$this->event_chain     = new \SplStack();
-	}
+    public function __construct()
+    {
+        $this->deferred_events = new \SplQueue();
+        $this->event_chain     = new \SplStack();
+    }
 
     // Schedules an event to be run. If another event is currently being fired,
     // this will wait until that event is done. If no events are currently
@@ -176,23 +176,23 @@ class EventPump
         exit;
     }
 
-	// Getters and setters.
-	// -------------------------------------------------------------------------
+    // Getters and setters.
+    // -------------------------------------------------------------------------
 
-	// Returns the shared EventPump.
-	public function Pump()
-	{
-		if (!self::$pump)
-			self::set_pump(new EventPump());
-		return self::$pump;
-	}
-	static public function set_pump(EventPump $pump) { self::$pump = $pump; }
+    // Returns the shared EventPump.
+    public function Pump()
+    {
+        if (!self::$pump)
+            self::set_pump(new EventPump());
+        return self::$pump;
+    }
+    static public function set_pump(EventPump $pump) { self::$pump = $pump; }
 
     public function set_output_handler(OutputHandler $handler) { $this->output_handler = $handler; }
     public function output_handler() { return $this->output_handler; }
 
-	// Testing methods. These are not for public consumption.
-	static public function T_set_pump($pump) { self::$pump = $pump; }
+    // Testing methods. These are not for public consumption.
+    static public function T_set_pump($pump) { self::$pump = $pump; }
 }
 
 class EventPumpException extends \Exception

@@ -24,12 +24,12 @@ require PHALANX_ROOT . '/views/view.php';
 
 class ViewSuite
 {
-	static public function suite()
-	{
-		$suite = new \PHPUnit_Framework_TestSuite('Views');
-		
-		$suite->addTestFile(TEST_ROOT . '/tests/views/view_test.php');
-		
-		return $suite;
-	}
+    static public function suite()
+    {
+        $suite = new \PHPUnit_Framework_TestSuite('Views');
+
+        $suite->addTestFile(TEST_ROOT . '/tests/views/view_test.php');
+
+        return $suite;
+    }
 }

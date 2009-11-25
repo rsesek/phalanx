@@ -21,18 +21,18 @@ use \phalanx\events as events;
 // operates on the parameter itself.
 function ArrayStripEmpty(Array & $array)
 {
-	foreach ($array as $key => $value)
-		if (is_array($array[$key]))
-			ArrayStripEmpty($array[$key]);
-		else if (empty($value))
-			unset($array[$key]);
+    foreach ($array as $key => $value)
+        if (is_array($array[$key]))
+            ArrayStripEmpty($array[$key]);
+        else if (empty($value))
+            unset($array[$key]);
 }
 
 // Turns an under_scored string into a CamelCased one. If |$first_char| is
 // TRUE, then the first character will also be capatalized.
 function UnderscoreToCammelCase($string, $first_char = TRUE)
 {
-	if ($first_char)
-		$string[0] = strtoupper($string[0]);
-	return preg_replace_callback('/_([a-z])/', function($c) { return strtoupper($c[1]); }, $string);
+    if ($first_char)
+        $string[0] = strtoupper($string[0]);
+    return preg_replace_callback('/_([a-z])/', function($c) { return strtoupper($c[1]); }, $string);
 }

@@ -26,41 +26,41 @@ require PHALANX_ROOT . '/input/keyed_cleaner.php';
 
 class InputSuite
 {
-	static public function suite()
-	{
-		$suite = new \PHPUnit_Framework_TestSuite('Input');
-		
-		$suite->addTestFile(TEST_ROOT . '/tests/input/cleaner_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/input/form_key_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/input/keyed_cleaner_test.php');
-		
-		return $suite;
-	}
+    static public function suite()
+    {
+        $suite = new \PHPUnit_Framework_TestSuite('Input');
+
+        $suite->addTestFile(TEST_ROOT . '/tests/input/cleaner_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/input/form_key_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/input/keyed_cleaner_test.php');
+
+        return $suite;
+    }
 }
 
 class TestFormKeyManagerDelegate implements input\FormKeyManagerDelegate
 {
-	public $did_get = FALSE;
-	public $did_save = FALSE;
-	public $did_delete = FALSE;
-	
-	public $key_storage = array();
-	
-	public function getFormKey($key)
-	{
-		$this->did_get = TRUE;
-		return $this->key_storage[$key];
-	}
-	
-	public function saveFormKey(\phalanx\base\PropertyBag $form_key)
-	{
-		$this->did_save = TRUE;
-		$this->key_storage[$form_key->key] = $form_key;
-	}
-	
-	public function deleteKey($key)
-	{
-		$this->did_delete = TRUE;
-		unset($this->key_storage[$key]);
-	}
+    public $did_get = FALSE;
+    public $did_save = FALSE;
+    public $did_delete = FALSE;
+
+    public $key_storage = array();
+
+    public function getFormKey($key)
+    {
+        $this->did_get = TRUE;
+        return $this->key_storage[$key];
+    }
+
+    public function saveFormKey(\phalanx\base\PropertyBag $form_key)
+    {
+        $this->did_save = TRUE;
+        $this->key_storage[$form_key->key] = $form_key;
+    }
+
+    public function deleteKey($key)
+    {
+        $this->did_delete = TRUE;
+        unset($this->key_storage[$key]);
+    }
 }

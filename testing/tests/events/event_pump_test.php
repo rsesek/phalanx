@@ -149,38 +149,38 @@ class StopPumpEvent extends TestEvent
 
 class EventPumpTest extends \PHPUnit_Framework_TestCase
 {
-	public $pump;
+    public $pump;
 
-	public function setUp()
-	{
-		$this->pump = new EventPump();
-		$this->inner_event = NULL;
-	}
+    public function setUp()
+    {
+        $this->pump = new EventPump();
+        $this->inner_event = NULL;
+    }
 
-	public function testSharedPump()
-	{
-		// Reset.
-		EventPump::T_set_pump(NULL);
+    public function testSharedPump()
+    {
+        // Reset.
+        EventPump::T_set_pump(NULL);
 
-		$this->assertNotNull(EventPump::Pump(), 'Did not create shared pump.');
-		$this->assertNotSame($this->pump, EventPump::Pump());
+        $this->assertNotNull(EventPump::Pump(), 'Did not create shared pump.');
+        $this->assertNotSame($this->pump, EventPump::Pump());
 
-		EventPump::set_pump($this->pump);
-		$this->assertSame($this->pump, EventPump::Pump());
-	}
+        EventPump::set_pump($this->pump);
+        $this->assertSame($this->pump, EventPump::Pump());
+    }
 
-	public function testGetCurrentEvent()
-	{
-		$event = new CurrentEventTester();
-		$event->test = $this;
-		$this->pump->PostEvent($event);
+    public function testGetCurrentEvent()
+    {
+        $event = new CurrentEventTester();
+        $event->test = $this;
+        $this->pump->PostEvent($event);
 
         $event = new CurrentEventTester();
         $event->test = $this;
         $event->inner_event = new CurrentEventTester();
         $event->inner_event->test = $this;
-		$this->pump->PostEvent($event);
-	}
+        $this->pump->PostEvent($event);
+    }
 
     public function testSetOutputHandler()
     {

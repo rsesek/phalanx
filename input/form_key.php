@@ -25,89 +25,89 @@ use \phalanx\base\PropertyBag as PropertyBag;
 // The form key is defined as an object with the following required properties.
 // Implementations are free to store additional data in a form key, so long as
 // all required fields are persisted.
-// 	FormKey (stdClass) {
-//			key (string): Unique form key identifier
-// 		timestamp (integer): UNIX timestamp of key creation
-// 	}
+//     FormKey (stdClass) {
+//            key (string): Unique form key identifier
+//         timestamp (integer): UNIX timestamp of key creation
+//     }
 //
 class FormKeyManager
 {
-	// See FormKeyManagerDelegate (below).
-	protected $delegate = NULL;
-	
-	// The amount of time, in seconds, for which a form key should be considered
-	// valid. Default is 1 hour.
-	protected $lifetime = 3600;
-	
-	// Initializes a FormKeyManager with a delegate.
-	public function __construct(FormKeyManagerDelegate $delegate)
-	{
-		$this->delegate = $delegate;
-	}
-	
-	// This generates a new form key (a SHA1 hash) that can be used to uniquely
-	// validate a given form POST.
-	public function generate()
-	{
-		$key = sha1(rand() . microtime() . rand());
-		
-		$form_key = new PropertyBag();
-		$form_key->key = $key;
-		$form_key->timestamp = time();
-		$this->delegate->saveFormKey($form_key);
-		
-		return $key;
-	}
-	
-	// This generates a form key as a hidden <input> element with a given
-	// name and ID. If |$name| is not given, |phalanx_form_key| is used.
-	public function generateHTML($name = NULL)
-	{
-		$name = ($name ?: 'phalanx_form_key');
-		return '<input type="hidden" name="' . $name . '" id="' . $name . '" value="' . $this->generate() . '" />';
-	}
-	
-	// This checks to see if a given key is valid. If so, it will then remove
-	// the key from storage. This returns a BOOl, which is if the key was valid.
-	public function validate($key)
-	{
-		$valid = $this->isValid($key);
-		$this->invalidate($key);
-		return $valid;
-	}
-	
-	// This checks if a given form key is valid and returns a BOOL result.
-	public function isValid($key)
-	{
-		$form_key = $this->delegate->getFormKey($key);
-		if (!$form_key)
-			return FALSE;
-		
-		if ($form_key->timestamp < time()-$this->lifetime)
-			return FALSE;
-		
-		return TRUE;
-	}
-	
-	// This marks a key as invalid and removes it from storage.
-	public function invalidate($key)
-	{
-		$this->delegate->deleteKey($key);
-	}
-	
-	// Setters and getters.
-	// -------------------------------------------------------------------------
-	public function set_delegate(FormKeyManagerDelegate $delegate) { $this->delegate = $delegate; }
-	public function delegate() { return $this->delegate; }
+    // See FormKeyManagerDelegate (below).
+    protected $delegate = NULL;
+
+    // The amount of time, in seconds, for which a form key should be considered
+    // valid. Default is 1 hour.
+    protected $lifetime = 3600;
+
+    // Initializes a FormKeyManager with a delegate.
+    public function __construct(FormKeyManagerDelegate $delegate)
+    {
+        $this->delegate = $delegate;
+    }
+
+    // This generates a new form key (a SHA1 hash) that can be used to uniquely
+    // validate a given form POST.
+    public function generate()
+    {
+        $key = sha1(rand() . microtime() . rand());
+
+        $form_key = new PropertyBag();
+        $form_key->key = $key;
+        $form_key->timestamp = time();
+        $this->delegate->saveFormKey($form_key);
+
+        return $key;
+    }
+
+    // This generates a form key as a hidden <input> element with a given
+    // name and ID. If |$name| is not given, |phalanx_form_key| is used.
+    public function generateHTML($name = NULL)
+    {
+        $name = ($name ?: 'phalanx_form_key');
+        return '<input type="hidden" name="' . $name . '" id="' . $name . '" value="' . $this->generate() . '" />';
+    }
+
+    // This checks to see if a given key is valid. If so, it will then remove
+    // the key from storage. This returns a BOOl, which is if the key was valid.
+    public function validate($key)
+    {
+        $valid = $this->isValid($key);
+        $this->invalidate($key);
+        return $valid;
+    }
+
+    // This checks if a given form key is valid and returns a BOOL result.
+    public function isValid($key)
+    {
+        $form_key = $this->delegate->getFormKey($key);
+        if (!$form_key)
+            return FALSE;
+
+        if ($form_key->timestamp < time()-$this->lifetime)
+            return FALSE;
+
+        return TRUE;
+    }
+
+    // This marks a key as invalid and removes it from storage.
+    public function invalidate($key)
+    {
+        $this->delegate->deleteKey($key);
+    }
+
+    // Setters and getters.
+    // -------------------------------------------------------------------------
+    public function set_delegate(FormKeyManagerDelegate $delegate) { $this->delegate = $delegate; }
+    public function delegate() { return $this->delegate; }
 }
 
 // This interface should be implemented by FormKeyManager's delegate to store
 // and retrieve keys. All methods must be implemented.
 interface FormKeyManagerDelegate
 {
-	public function getFormKey($key);
-	public function saveFormKey(PropertyBag $form_key);
-	public function deleteKey($key);
+    public function getFormKey($key);
+    public function saveFormKey(PropertyBag $form_key);
+    public function deleteKey($key);
 }
 
 // If you want form validation to happen automatically on every POST request,
@@ -117,31 +117,31 @@ interface FormKeyManagerDelegate
 
 class ValidateFormKeyEvent extends \phalanx\events\Event
 {
-	// The form key manager.
-	protected $manager;
-	
-	// The string to look in Context.gpc.p(ost) for.
-	protected $post_variable;
-	
-	public function __construct(FormKeyManager $manager, $post_variable)
-	{
-		$this->manager = $manager;
-		$this->post_variable = $post_variable;
-	}
-	
-	public function init()
-	{
-		// If we're not in a POST, then simply cancel the event.
-		if (count($this->context()->gpc()->get('p')) < 1)
-			$this->cancel();
-	}
-	
-	public function handle()
-	{
-		$key = $this->context()->gpc()->getSilent('p.' . $this->post_variable);
-		if (!$key || !$this->manager->validate($key))
-			throw new FormKeyException('Form key "' . $key . '" did not validate.');
-	}
+    // The form key manager.
+    protected $manager;
+
+    // The string to look in Context.gpc.p(ost) for.
+    protected $post_variable;
+
+    public function __construct(FormKeyManager $manager, $post_variable)
+    {
+        $this->manager = $manager;
+        $this->post_variable = $post_variable;
+    }
+
+    public function init()
+    {
+        // If we're not in a POST, then simply cancel the event.
+        if (count($this->context()->gpc()->get('p')) < 1)
+            $this->cancel();
+    }
+
+    public function handle()
+    {
+        $key = $this->context()->gpc()->getSilent('p.' . $this->post_variable);
+        if (!$key || !$this->manager->validate($key))
+            throw new FormKeyException('Form key "' . $key . '" did not validate.');
+    }
 }
 
 class FormKeyException extends \Exception

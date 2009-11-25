@@ -23,10 +23,10 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
 {
     protected $handler;
 
-	public function setUp()
-	{
-		$this->handler = new TestOutputHandler();
-	}
+    public function setUp()
+    {
+        $this->handler = new TestOutputHandler();
+    }
 
     public function testStart()
     {

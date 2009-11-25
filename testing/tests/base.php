@@ -26,14 +26,14 @@ require PHALANX_ROOT . '/base/property_bag.php';
 
 class BaseSuite
 {
-	static public function suite()
-	{
-		$suite = new \PHPUnit_Framework_TestSuite('Base');
-		
-		$suite->addTestFile(TEST_ROOT . '/tests/base/functions_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/base/key_descender_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/base/property_bag_test.php');
-		
-		return $suite;
-	}
+    static public function suite()
+    {
+        $suite = new \PHPUnit_Framework_TestSuite('Base');
+
+        $suite->addTestFile(TEST_ROOT . '/tests/base/functions_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/base/key_descender_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/base/property_bag_test.php');
+
+        return $suite;
+    }
 }

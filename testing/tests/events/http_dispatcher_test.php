@@ -58,43 +58,43 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     public function testTokenizeURLSimple()
-	{
-		$url = '/test_event/';
-		$params = $this->dispatcher->T_TokenizeURL($url);
-		$this->assertEquals('test_event', $params->_event);
-	}
-	
-	public function testTokenizeURLWithID()
-	{
-		$url = '/test/314159/';
-		$params = $this->dispatcher->T_TokenizeURL($url);
-		$this->assertEquals('test', $params->_event);
-		$this->assertEquals('314159', $params->_id);
-	}
-	
-	public function testTokenizeURLWith1Pair()
-	{
-		$url = '/test_event/k1/v1/';
-		$params = $this->dispatcher->T_TokenizeURL($url);
-		$this->assertEquals('test_event', $params->_event);
-		$this->assertEquals('v1', $params->k1);
-	}
-	
-	public function testTokenizeURLWith2Pair()
-	{
-		$url = '/test_event/k1/v1/k2/v2/';
-		$params = $this->dispatcher->T_TokenizeURL($url);
-		$this->assertEquals('test_event', $params->_event);
-		$this->assertEquals('v1', $params->k1);
-		$this->assertEquals('v2', $params->k2);
-	}
-	
-	public function testTokenizeURLWithBadPair()
-	{
-		$url = '/test_event/k1/v1/k2/';
-		$this->setExpectedException('phalanx\events\HTTPDispatcherException');
-		$this->dispatcher->T_TokenizeURL($url);
-	}
+    {
+        $url = '/test_event/';
+        $params = $this->dispatcher->T_TokenizeURL($url);
+        $this->assertEquals('test_event', $params->_event);
+    }
+
+    public function testTokenizeURLWithID()
+    {
+        $url = '/test/314159/';
+        $params = $this->dispatcher->T_TokenizeURL($url);
+        $this->assertEquals('test', $params->_event);
+        $this->assertEquals('314159', $params->_id);
+    }
+
+    public function testTokenizeURLWith1Pair()
+    {
+        $url = '/test_event/k1/v1/';
+        $params = $this->dispatcher->T_TokenizeURL($url);
+        $this->assertEquals('test_event', $params->_event);
+        $this->assertEquals('v1', $params->k1);
+    }
+
+    public function testTokenizeURLWith2Pair()
+    {
+        $url = '/test_event/k1/v1/k2/v2/';
+        $params = $this->dispatcher->T_TokenizeURL($url);
+        $this->assertEquals('test_event', $params->_event);
+        $this->assertEquals('v1', $params->k1);
+        $this->assertEquals('v2', $params->k2);
+    }
+
+    public function testTokenizeURLWithBadPair()
+    {
+        $url = '/test_event/k1/v1/k2/';
+        $this->setExpectedException('phalanx\events\HTTPDispatcherException');
+        $this->dispatcher->T_TokenizeURL($url);
+    }
 
     public function testGetEventNameGET()
     {

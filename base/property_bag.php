@@ -24,27 +24,27 @@ namespace phalanx\base;
 // object, the contents are copied rather than referenced.
 class PropertyBag extends KeyDescender
 {
-	// We override __set() and __get() and put the data in here.
-	protected $properties = array();
-	
-	public function __construct($properties = array())
-	{
-		if (self::IsDescendable($properties))
-			$this->properties = $properties;
-		$this->root = &$this->properties;
-	}
-	
-	// Sets a key-value pair.
-	public function __set($key, $value)
-	{
-		parent::__set($key, $value);
-	}
-	
-	// Returns the value for a given key.
-	public function __get($key)
-	{
-		return $this->getSilent($key);
-	}
+    // We override __set() and __get() and put the data in here.
+    protected $properties = array();
+
+    public function __construct($properties = array())
+    {
+        if (self::IsDescendable($properties))
+            $this->properties = $properties;
+        $this->root = &$this->properties;
+    }
+
+    // Sets a key-value pair.
+    public function __set($key, $value)
+    {
+        parent::__set($key, $value);
+    }
+
+    // Returns the value for a given key.
+    public function __get($key)
+    {
+        return $this->getSilent($key);
+    }
 
     // Returns the number of items in the PropertyBag.
     public function Count()
@@ -52,33 +52,33 @@ class PropertyBag extends KeyDescender
         return count($this->properties);
     }
 
-	// Returns an array containing all the keys in the property bag.
-	public function AllKeys()
-	{
-		return array_keys($this->properties);
-	}
-	
-	// Returns an array of just the values in the property bag.
-	public function AllValues()
-	{
-		return array_values($this->properties);
-	}
-	
-	// Returns the entire property bag as an associative array/hash.
-	public function ToArray()
-	{
-		return $this->properties;
-	}
-	
-	// Checks whether or not a given key has been set in the property bag.
-	public function HasKey($key)
-	{
-		return isset($this->properties[$key]);
-	}
-	
-	// Checks if a value is in the property bag.
-	public function Contains($value)
-	{
-		return in_array($value, $this->properties);
-	}
+    // Returns an array containing all the keys in the property bag.
+    public function AllKeys()
+    {
+        return array_keys($this->properties);
+    }
+
+    // Returns an array of just the values in the property bag.
+    public function AllValues()
+    {
+        return array_values($this->properties);
+    }
+
+    // Returns the entire property bag as an associative array/hash.
+    public function ToArray()
+    {
+        return $this->properties;
+    }
+
+    // Checks whether or not a given key has been set in the property bag.
+    public function HasKey($key)
+    {
+        return isset($this->properties[$key]);
+    }
+
+    // Checks if a value is in the property bag.
+    public function Contains($value)
+    {
+        return in_array($value, $this->properties);
+    }
 }

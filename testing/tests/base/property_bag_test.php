@@ -21,12 +21,12 @@ require_once 'PHPUnit/Framework.php';
 
 class PropertyBagTest extends \PHPUnit_Framework_TestCase
 {
-	public $bag;
-	
-	public function setUp()
-	{
-		$this->bag = new base\PropertyBag();
-	}
+    public $bag;
+
+    public function setUp()
+    {
+        $this->bag = new base\PropertyBag();
+    }
 
     public function testCount()
     {
@@ -37,62 +37,62 @@ class PropertyBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $this->bag->Count());
     }
 
-	public function testSetProp()
-	{
-		$this->bag->foo = 'moo';
-		$this->assertEquals('moo', $this->bag->foo);
-	}
-	
-	public function testGetNullProp()
-	{
-		$this->assertNull($this->bag->foo);
-	}
-	
-	public function testAllKeys()
-	{
-		$this->bag->foo = 'abc';
-		$this->bag->moo = 'def';
-		$this->bag->bar = 'hij';
-		
-		$keys = array('foo', 'moo', 'bar');
-		$this->assertEquals($keys, $this->bag->allKeys());
-	}
-	
-	public function testAllValues()
-	{
-		$this->bag->foo = 'abc';
-		$this->bag->moo = 'def';
-		$this->bag->bar = 'hij';
-		
-		$values = array('abc', 'def', 'hij');
-		$this->assertEquals($values, $this->bag->allValues());
-	}
-	
-	public function testToArray()
-	{
-		$this->bag->foo = 'abc';
-		$this->bag->moo = 'def';
-		$this->bag->bar = 'hij';
-		
-		$array = array(
-			'foo' => 'abc',
-			'moo' => 'def',
-			'bar' => 'hij'
-		);
-		$this->assertEquals($array, $this->bag->toArray());
-	}
-	
-	public function testHasKey()
-	{
-		$this->assertFalse($this->bag->hasKey('foo'));
-		$this->bag->foo = 'moo';
-		$this->assertTrue($this->bag->hasKey('foo'));
-	}
-	
-	public function testContains()
-	{
-		$this->bag->foo = 'moo';
-		$this->assertTrue($this->bag->contains('moo'));
-		$this->assertFalse($this->bag->contains('foo'));
-	}
+    public function testSetProp()
+    {
+        $this->bag->foo = 'moo';
+        $this->assertEquals('moo', $this->bag->foo);
+    }
+
+    public function testGetNullProp()
+    {
+        $this->assertNull($this->bag->foo);
+    }
+
+    public function testAllKeys()
+    {
+        $this->bag->foo = 'abc';
+        $this->bag->moo = 'def';
+        $this->bag->bar = 'hij';
+
+        $keys = array('foo', 'moo', 'bar');
+        $this->assertEquals($keys, $this->bag->allKeys());
+    }
+
+    public function testAllValues()
+    {
+        $this->bag->foo = 'abc';
+        $this->bag->moo = 'def';
+        $this->bag->bar = 'hij';
+
+        $values = array('abc', 'def', 'hij');
+        $this->assertEquals($values, $this->bag->allValues());
+    }
+
+    public function testToArray()
+    {
+        $this->bag->foo = 'abc';
+        $this->bag->moo = 'def';
+        $this->bag->bar = 'hij';
+
+        $array = array(
+            'foo' => 'abc',
+            'moo' => 'def',
+            'bar' => 'hij'
+        );
+        $this->assertEquals($array, $this->bag->toArray());
+    }
+
+    public function testHasKey()
+    {
+        $this->assertFalse($this->bag->hasKey('foo'));
+        $this->bag->foo = 'moo';
+        $this->assertTrue($this->bag->hasKey('foo'));
+    }
+
+    public function testContains()
+    {
+        $this->bag->foo = 'moo';
+        $this->assertTrue($this->bag->contains('moo'));
+        $this->assertFalse($this->bag->contains('foo'));
+    }
 }

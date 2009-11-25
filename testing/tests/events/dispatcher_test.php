@@ -43,7 +43,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNotNull($this->dispatcher->pump());
         $this->assertSame(events\EventPump::Pump(), $this->dispatcher->pump());
-        
+
         $pump = new events\EventPump();
         $this->dispatcher->set_pump($pump);
         $this->assertSame($pump, $this->dispatcher->pump());

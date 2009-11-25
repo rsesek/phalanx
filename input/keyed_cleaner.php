@@ -20,65 +20,65 @@ namespace phalanx\input;
 // operations are performed on an instance of this class, the cleaning operation
 // happens onthey specified key of the array. Example:
 //
-// 	$cleaner = new KeyedCleaner($context->gpc);
-// 	$cleaner->GetHTML('p.some_key');
-// 	print $context->gpc['p']['some_key'];
+//     $cleaner = new KeyedCleaner($context->gpc);
+//     $cleaner->GetHTML('p.some_key');
+//     print $context->gpc['p']['some_key'];
 class KeyedCleaner
 {
-	// A ref to the array this cleaner manages. Operations performed on this
-	// object will affect this array.
-	protected $keyer;
-	
-	// Creates a new cleaner, setting a ref to the array.
-	public function __construct(/* Array|Object */ & $array)
-	{
-		$this->keyer = new \phalanx\base\KeyDescender($array);
-	}
-	
-	public function GetString($key)
-	{
-		$val = Cleaner::String($this->keyer->Get($key));
-		$this->keyer->Set($key, $val);
-		return $val;
-	}
-	
-	public function GetTrimmedString($key)
-	{
-		$val = Cleaner::TrimmedString($this->keyer->Get($key));
-		$this->keyer->Set($key, $val);
-		return $val;
-	}
-	
-	public function GetHTML($key)
-	{
-		$val = Cleaner::HTML($this->keyer->Get($key));
-		$this->keyer->Set($key, $val);
-		return $val;
-	}
-	
-	public function GetInt($key)
-	{
-		$val = Cleaner::Int($this->keyer->Get($key));
-		$this->keyer->Set($key, $val);
-		return $val;
-	}
-	
-	public function GetFloat($key)
-	{
-		$val = Cleaner::Float($this->keyer->Get($key));
-		$this->keyer->Set($key, $val);
-		return $val;
-	}
-	
-	public function GetBool($key)
-	{
-		$val = Cleaner::Bool($this->keyer->Get($key));
-		$this->keyer->Set($key, $val);
-		return $val;
-	}
-	
-	// Getters and setters.
-	// -------------------------------------------------------------------------
-	public function keyer() { return $this->keyer; }
-	public function & ref() { return $this->keyer->root(); }
+    // A ref to the array this cleaner manages. Operations performed on this
+    // object will affect this array.
+    protected $keyer;
+
+    // Creates a new cleaner, setting a ref to the array.
+    public function __construct(/* Array|Object */ & $array)
+    {
+        $this->keyer = new \phalanx\base\KeyDescender($array);
+    }
+
+    public function GetString($key)
+    {
+        $val = Cleaner::String($this->keyer->Get($key));
+        $this->keyer->Set($key, $val);
+        return $val;
+    }
+
+    public function GetTrimmedString($key)
+    {
+        $val = Cleaner::TrimmedString($this->keyer->Get($key));
+        $this->keyer->Set($key, $val);
+        return $val;
+    }
+
+    public function GetHTML($key)
+    {
+        $val = Cleaner::HTML($this->keyer->Get($key));
+        $this->keyer->Set($key, $val);
+        return $val;
+    }
+
+    public function GetInt($key)
+    {
+        $val = Cleaner::Int($this->keyer->Get($key));
+        $this->keyer->Set($key, $val);
+        return $val;
+    }
+
+    public function GetFloat($key)
+    {
+        $val = Cleaner::Float($this->keyer->Get($key));
+        $this->keyer->Set($key, $val);
+        return $val;
+    }
+
+    public function GetBool($key)
+    {
+        $val = Cleaner::Bool($this->keyer->Get($key));
+        $this->keyer->Set($key, $val);
+        return $val;
+    }
+
+    // Getters and setters.
+    // -------------------------------------------------------------------------
+    public function keyer() { return $this->keyer; }
+    public function & ref() { return $this->keyer->root(); }
 }

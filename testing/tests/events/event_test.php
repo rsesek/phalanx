@@ -23,28 +23,28 @@ class EventTest extends \PHPUnit_Framework_TestCase
 {
     protected $event;
 
-	public function setUp()
-	{
-		$this->event = new TestEvent();
-	}
-		
-	public function testInput()
-	{
-		$args = new \phalanx\base\PropertyBag();
-		$args->test = 'foo';
-		$this->event = new TestEvent($args);
-		$this->assertSame($args, $this->event->input());
-	}
-		
-	public function testCancel()
-	{
-		$event = new TestEvent();
+    public function setUp()
+    {
+        $this->event = new TestEvent();
+    }
+
+    public function testInput()
+    {
+        $args = new \phalanx\base\PropertyBag();
+        $args->test = 'foo';
+        $this->event = new TestEvent($args);
+        $this->assertSame($args, $this->event->input());
+    }
+
+    public function testCancel()
+    {
+        $event = new TestEvent();
 
         $pump = $this->getMock('phalanx\events\EventPump');
         $pump->expects($this->once())->method('Cancel')->with($event);
         \phalanx\events\EventPump::T_set_pump($pump);
 
-		$this->assertFalse($event->is_cancelled());
-		$event->Cancel();
-	}
+        $this->assertFalse($event->is_cancelled());
+        $event->Cancel();
+    }
 }

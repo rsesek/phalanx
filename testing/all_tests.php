@@ -25,15 +25,15 @@ define('TEST_ROOT', dirname(__FILE__));
 
 class AllTests
 {
-	static public function suite()
-	{
-		$suite = new \PHPUnit_Framework_TestSuite('Phalanx');
+    static public function suite()
+    {
+        $suite = new \PHPUnit_Framework_TestSuite('Phalanx');
 
-		require TEST_ROOT . '/tests/base.php';
-		$suite->addTestSuite(BaseSuite::suite());
+        require TEST_ROOT . '/tests/base.php';
+        $suite->addTestSuite(BaseSuite::suite());
 
-		require TEST_ROOT . '/tests/events.php';
-		$suite->addTestSuite(EventsSuite::suite());
+        require TEST_ROOT . '/tests/events.php';
+        $suite->addTestSuite(EventsSuite::suite());
 
         // require TEST_ROOT . '/tests/input.php';
         // $suite->addTestSuite(InputSuite::suite());
@@ -41,6 +41,6 @@ class AllTests
         require TEST_ROOT . '/tests/views.php';
         $suite->addTestSuite(ViewSuite::suite());
 
-		return $suite;
-	}
+        return $suite;
+    }
 }

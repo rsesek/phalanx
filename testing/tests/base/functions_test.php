@@ -21,33 +21,33 @@ require_once 'PHPUnit/Framework.php';
 
 class FunctionsTest extends \PHPUnit_Framework_TestCase
 {
-	public function testArrayStripEmpty()
-	{
-		$array = array(1, 4, 6);
-		base\ArrayStripEmpty($array);
-		$this->assertEquals(3, count($array));
-		
-		$array = array(1, 0, 5, '');
-		base\ArrayStripEmpty($array);
-		$this->assertEquals(2, count($array));
-		
-		$array = array('', 'test' => array('', 6));
-		base\ArrayStripEmpty($array);
-		$this->assertEquals(1, count($array));
-		$this->assertEquals(1, count($array['test']));
-		
-		$array = array('foo', NULL, 'bar');
-		base\ArrayStripEmpty($array);
-		$this->assertEquals(2, count($array));
-	}
-	
-	public function testUnderscoreToCammelCase()
-	{
-		$str = 'under_score';
-		$this->assertEquals('UnderScore', base\UnderscoreToCammelCase($str));
-		$this->assertEquals('underScore', base\UnderscoreToCammelCase($str, FALSE));
-		
-		$str = 'many_many_under_scores';
-		$this->assertEquals('ManyManyUnderScores', base\UnderscoreToCammelCase($str));
-	}
+    public function testArrayStripEmpty()
+    {
+        $array = array(1, 4, 6);
+        base\ArrayStripEmpty($array);
+        $this->assertEquals(3, count($array));
+
+        $array = array(1, 0, 5, '');
+        base\ArrayStripEmpty($array);
+        $this->assertEquals(2, count($array));
+
+        $array = array('', 'test' => array('', 6));
+        base\ArrayStripEmpty($array);
+        $this->assertEquals(1, count($array));
+        $this->assertEquals(1, count($array['test']));
+
+        $array = array('foo', NULL, 'bar');
+        base\ArrayStripEmpty($array);
+        $this->assertEquals(2, count($array));
+    }
+
+    public function testUnderscoreToCammelCase()
+    {
+        $str = 'under_score';
+        $this->assertEquals('UnderScore', base\UnderscoreToCammelCase($str));
+        $this->assertEquals('underScore', base\UnderscoreToCammelCase($str, FALSE));
+
+        $str = 'many_many_under_scores';
+        $this->assertEquals('ManyManyUnderScores', base\UnderscoreToCammelCase($str));
+    }
 }

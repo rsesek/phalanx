@@ -28,27 +28,27 @@ require PHALANX_ROOT . '/events/output_handler.php';
 
 class EventsSuite
 {
-	static public function suite()
-	{
-		$suite = new \PHPUnit_Framework_TestSuite('Events');
-		
-		$suite->addTestFile(TEST_ROOT . '/tests/events/dispatcher_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/events/event_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/events/http_dispatcher_test.php');
-		$suite->addTestFile(TEST_ROOT . '/tests/events/output_handler_test.php');
-		
-		return $suite;
-	}
+    static public function suite()
+    {
+        $suite = new \PHPUnit_Framework_TestSuite('Events');
+
+        $suite->addTestFile(TEST_ROOT . '/tests/events/dispatcher_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/events/event_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/events/http_dispatcher_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/events/output_handler_test.php');
+
+        return $suite;
+    }
 }
 
 // Common fixtures.
 
 class TestEvent extends events\Event
 {
-	public $will_fire = FALSE;
-	public $fire = FALSE;
-	public $cleanup = FALSE;
+    public $will_fire = FALSE;
+    public $fire = FALSE;
+    public $cleanup = FALSE;
 
     public $out1;
     public $out2;
@@ -75,31 +75,31 @@ class TestEvent extends events\Event
         return array('will_fire', 'fire', 'cleanup', 'out1', 'out2', 'out3', 'no_out');
     }
 
-	public function WillFire()
-	{
-		$this->will_fire = TRUE;
-	}
-	
-	public function Fire()
-	{
-		$this->fire = TRUE;
+    public function WillFire()
+    {
+        $this->will_fire = TRUE;
+    }
+
+    public function Fire()
+    {
+        $this->fire = TRUE;
         $this->out1 = 'foo';
         $this->out2 = 'bar';
-	}
-	
-	public function Cleanup()
-	{
-		$this->cleanup = TRUE;
-	}
+    }
+
+    public function Cleanup()
+    {
+        $this->cleanup = TRUE;
+    }
 }
 
 class InitOnlyEvent extends TestEvent
 {
-	public function WillFire()
-	{
-		parent::WillFire();
-		$this->Cancel();
-	}
+    public function WillFire()
+    {
+        parent::WillFire();
+        $this->Cancel();
+    }
 }
 
 class TestOutputHandler extends events\OutputHandler
