@@ -32,13 +32,14 @@ class InputSuite
 
         $suite->addTestFile(TEST_ROOT . '/tests/input/cleaner_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/input/form_key_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/input/form_key_event_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/input/keyed_cleaner_test.php');
 
         return $suite;
     }
 }
 
-class TestFormKeyManagerDelegate implements input\FormKeyManagerDelegate
+class TestFormKeyManagerDelegate implements input\FormKeyManagerDelegate //,
 {
     public $did_get = FALSE;
     public $did_save = FALSE;
@@ -46,19 +47,21 @@ class TestFormKeyManagerDelegate implements input\FormKeyManagerDelegate
 
     public $key_storage = array();
 
-    public function getFormKey($key)
+    public function GetFormKey($key)
     {
         $this->did_get = TRUE;
-        return $this->key_storage[$key];
+        if (isset($this->key_storage[$key]))
+            return $this->key_storage[$key];
+        return NULL;
     }
 
-    public function saveFormKey(\phalanx\base\PropertyBag $form_key)
+    public function SaveFormKey(\phalanx\base\PropertyBag $form_key)
     {
         $this->did_save = TRUE;
         $this->key_storage[$form_key->key] = $form_key;
     }
 
-    public function deleteKey($key)
+    public function DeleteKey($key)
     {
         $this->did_delete = TRUE;
         unset($this->key_storage[$key]);

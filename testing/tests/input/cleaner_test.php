@@ -24,13 +24,13 @@ class CleanerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->fixture = array(
-            'str'        => 'string',
-            'tstr'    => ' trimmed string    ',
-            'html'    => '<strong>html</strong>',
+            'str'      => 'string',
+            'tstr'     => ' trimmed string    ',
+            'html'     => '<strong>html</strong>',
             'dqstr'    => '"double quoted string"',
             'sqstr'    => "'single quoted string'",
-            'dqhtml'    => '<strong>html with "double quotes"</strong>',
-            'int'        => 42,
+            'dqhtml'   => '<strong>html with "double quotes"</strong>',
+            'int'      => 42,
             'float'    => 3.14159,
             'bool1'    => TRUE,
             'bool0'    => FALSE,
@@ -38,7 +38,7 @@ class CleanerTest extends \PHPUnit_Framework_TestCase
             'boolF'    => 'FALSE',
             'boolY'    => 'YES',
             'boolN'    => 'no',
-            'entity' => 'red, green, & blue'
+            'entity'   => 'red, green, & blue'
         );
     }
 
@@ -65,7 +65,7 @@ class CleanerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('&lt;strong&gt;html&lt;/strong&gt;', Cleaner::HTML($this->fixture['html']));
         $this->assertEquals('&quo;double quoted string&quo;', Cleaner::HTML($this->fixture['dqstr']));
         $this->assertEquals("'single quoted string'", Cleaner::HTML($this->fixture['sqstr']));
-        $this->assertEquals('&lt;strong&gt;html with &quo;double quotes&quo;&lt;/strong&gt;', Cleaner::HTML($this->fixture['dqHTML']));
+        $this->assertEquals('&lt;strong&gt;html with &quo;double quotes&quo;&lt;/strong&gt;', Cleaner::HTML($this->fixture['dqhtml']));
         $this->assertEquals('red, green, & blue', Cleaner::HTML($this->fixture['entity']));
     }
 

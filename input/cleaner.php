@@ -58,9 +58,9 @@ class Cleaner
     static public function Bool($bool)
     {
         $str = strtolower(self::TrimmedString($bool));
-        if ($str == 'yes' || $str == 'TRUE')
+        if ($str == 'yes' || $str == 'true')
             return TRUE;
-        else if ($str == 'no' || $str == 'FALSE')
+        else if ($str == 'no' || $str == 'false')
             return FALSE;
         return (bool)$bool;
     }

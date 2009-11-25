@@ -27,13 +27,13 @@ class KeyedCleanerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->fixture = array(
-            'str'        => 'string',
-            'tstr'    => ' trimmed string    ',
-            'html'    => '<strong>html</strong>',
+            'str'      => 'string',
+            'tstr'     => ' trimmed string    ',
+            'html'     => '<strong>html</strong>',
             'dqstr'    => '"double quoted string"',
             'sqstr'    => "'single quoted string'",
-            'dqhtml'    => '<strong>html with "double quotes"</strong>',
-            'int'        => 42,
+            'dqhtml'   => '<strong>html with "double quotes"</strong>',
+            'int'      => 42,
             'float'    => 3.14159,
             'bool1'    => TRUE,
             'bool0'    => FALSE,
