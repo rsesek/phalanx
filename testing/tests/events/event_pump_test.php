@@ -333,6 +333,18 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($event->cleanup);
     }
 
+	public function testStopPumpNoCurrentEvent()
+    {
+        $this->pump = $this->getMock('phalanx\events\EventPump', array('_Exit'));
+        $this->pump->expects($this->once())->method('_Exit');
+
+        $output_handler = $this->getMock('phalanx\test\TestOutputHandler');
+        $output_handler->expects($this->once())->method('Start');
+        $this->pump->set_output_handler($output_handler);
+
+		$this->pump->StopPump();
+    }
+
     public function testTerminate()
     {
         $this->pump = $this->getMock('phalanx\events\EventPump', array('_Exit'));
