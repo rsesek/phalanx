@@ -1,6 +1,6 @@
 <?php
 // Phalanx
-// Copyright (c) 2009 Blue Static
+// Copyright (c) 2009-2010 Blue Static
 // 
 // This program is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -25,6 +25,7 @@ require PHALANX_ROOT . '/events/event.php';
 require PHALANX_ROOT . '/events/event_pump.php';
 require PHALANX_ROOT . '/events/http_dispatcher.php';
 require PHALANX_ROOT . '/events/output_handler.php';
+require PHALANX_ROOT . '/events/view_output_handler.php';
 
 class EventsSuite
 {
@@ -37,6 +38,7 @@ class EventsSuite
         $suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/events/http_dispatcher_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/events/output_handler_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/events/view_output_handler_test.php');
 
         return $suite;
     }
@@ -52,12 +54,12 @@ class TestEvent extends events\Event
 
     public $out1;
     public $out2;
-    public $out2_never_TRUE = FALSE;
+    public $out2_never_true = FALSE;
 
     // The property should hide this from OutputHandler::_GetEventData().
     public function out2()
     {
-        $this->out2_never_TRUE = TRUE;
+        $this->out2_never_true = TRUE;
     }
 
     public function out3()

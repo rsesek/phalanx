@@ -1,6 +1,6 @@
 <?php
 // Phalanx
-// Copyright (c) 2009 Blue Static
+// Copyright (c) 2009-2010 Blue Static
 // 
 // This program is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -90,7 +90,7 @@ class View
         // Perform pre-process step of translating the view's var shortcut macro
         // into its expanded form.
         // TODO: perform automatic sanitzation?
-        $data = preg_replace('/\$\[([a-zA-Z0-0\._\- ]+)\]/', '<?php echo $view->Get("\1") ?>', $data);
+        $data = preg_replace('/\$\[([a-zA-Z0-9\._\- ]+)\]/', '<?php echo $view->Get("\1") ?>', $data);
 
         // Convert any PHP short-tags into their full versions.
         $data = preg_replace('/<\?(?!php)/', '<?php', $data);

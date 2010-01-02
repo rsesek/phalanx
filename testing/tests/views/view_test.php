@@ -1,6 +1,6 @@
 <?php
 // Phalanx
-// Copyright (c) 2009 Blue Static
+// Copyright (c) 2009-2010 Blue Static
 // 
 // This program is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -20,31 +20,6 @@ use phalanx\views\View;
 require_once 'PHPUnit/Framework.php';
 
 require_once TEST_ROOT . '/tests/views.php';
-
-// Exposer.
-class TestView extends View
-{
-    static public function SetupPaths()
-    {
-        self::set_cache_path(dirname(__FILE__) . '/data/cache/');
-        self::set_template_path(dirname(__FILE__) . '/data/%s.tpl');
-    }
-
-    public function T_Cache()
-    {
-        return $this->_Cache();
-    }
-
-    public function T_CachePath($name)
-    {
-        return $this->_CachePath($name);
-    }
-
-    public function T_ProcessTemplate($data)
-    {
-        return $this->_ProcessTemplate($data);
-    }
-}
 
 class ViewTest extends \PHPUnit_Framework_TestCase
 {

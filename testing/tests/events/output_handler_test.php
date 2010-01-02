@@ -1,6 +1,6 @@
 <?php
 // Phalanx
-// Copyright (c) 2009 Blue Static
+// Copyright (c) 2009-2010 Blue Static
 // 
 // This program is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -50,6 +50,6 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertType('phalanx\base\PropertyBag', $data);
         $this->assertEquals($expected, $data->ToArray());
-        $this->assertFalse($event->out2_never_TRUE);
+        $this->assertFalse($event->out2_never_true);
     }
 }
