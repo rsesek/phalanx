@@ -25,7 +25,7 @@ abstract class Event
     protected $input = NULL;
 
     // Whether or not the event is cancelled.
-    protected $cancelled = FALSE;
+    private $cancelled = FALSE;
 
     // Creates an instance of the Event class. The PropertyBag of input is
     // assembled for the Event by the Dispatcher. It collects input variables
@@ -68,6 +68,6 @@ abstract class Event
 
     // Marks the event as cancelled. Do not overload this, but rather perform
     // cleanup in end().
-    public function set_cancelled() { $this->cancelled = TRUE; }
-    public function is_cancelled() { return $this->cancelled; }
+    final public function set_cancelled() { $this->cancelled = TRUE; }
+    final public function is_cancelled() { return $this->cancelled; }
 }
