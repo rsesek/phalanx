@@ -1,6 +1,6 @@
 <?php
 // Phalanx
-// Copyright (c) 2009 Blue Static
+// Copyright (c) 2009-2010 Blue Static
 // 
 // This program is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -15,6 +15,8 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\base;
+
+require_once PHALANX_ROOT . '/base/key_descender.php';
 
 // A property bag can be used instead of an array to store key-value pairs in
 // an object. While \stdClass can be used for this, too, PropertyBag provides

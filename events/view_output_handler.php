@@ -17,6 +17,10 @@
 namespace phalanx\events;
 use \phalanx\views\View as View;
 
+require_once PHALANX_ROOT . '/events/event_pump.php';
+require_once PHALANX_ROOT . '/events/output_handler.php';
+require_once PHALANX_ROOT . '/views/view.php';
+
 // This implementation of OutputHandler uses the Views system to present
 // output. This class requires a Lambda function to transform the last-
 // processed event's name into a template name.

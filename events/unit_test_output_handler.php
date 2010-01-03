@@ -16,6 +16,9 @@
 
 namespace phalanx\events;
 
+require_once PHALANX_ROOT . '/events/event_pump.php';
+require_once PHALANX_ROOT . '/events/output_handler.php';
+
 // This OutputHandler implementation can be used by application developers to
 // test their own events. This OutputHandler does nothing but collect the
 // output from ALL events in the chain and stores it.

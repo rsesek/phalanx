@@ -20,7 +20,7 @@ use \phalanx\views as views;
 require_once 'PHPUnit/Framework.php';
 
 // Common includes.
-require PHALANX_ROOT . '/views/view.php';
+require_once PHALANX_ROOT . '/views/view.php';
 
 class ViewSuite
 {

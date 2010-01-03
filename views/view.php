@@ -16,6 +16,9 @@
 
 namespace phalanx\views;
 
+require_once PHALANX_ROOT . '/base/property_bag.php';
+require_once PHALANX_ROOT . '/input/keyed_cleaner.php';
+
 class View
 {
     // Base path for loading the template file. Use %s to indicate where the

@@ -20,13 +20,13 @@ use \phalanx\events as events;
 require_once 'PHPUnit/Framework.php';
 
 // Common includes.
-require PHALANX_ROOT . '/events/dispatcher.php';
-require PHALANX_ROOT . '/events/event.php';
-require PHALANX_ROOT . '/events/event_pump.php';
-require PHALANX_ROOT . '/events/http_dispatcher.php';
-require PHALANX_ROOT . '/events/output_handler.php';
-require PHALANX_ROOT . '/events/view_output_handler.php';
-require PHALANX_ROOT . '/events/unit_test_output_handler.php';
+require_once PHALANX_ROOT . '/events/dispatcher.php';
+require_once PHALANX_ROOT . '/events/event.php';
+require_once PHALANX_ROOT . '/events/event_pump.php';
+require_once PHALANX_ROOT . '/events/http_dispatcher.php';
+require_once PHALANX_ROOT . '/events/output_handler.php';
+require_once PHALANX_ROOT . '/events/view_output_handler.php';
+require_once PHALANX_ROOT . '/events/unit_test_output_handler.php';
 
 class EventsSuite
 {

@@ -1,6 +1,6 @@
 <?php
 // Phalanx
-// Copyright (c) 2009 Blue Static
+// Copyright (c) 2009-2010 Blue Static
 // 
 // This program is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -15,6 +15,9 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\input;
+
+require_once PHALANX_ROOT . '/base/key_descender.php';
+require_once PHALANX_ROOT . '/input/cleaner.php';
 
 // A KeyedCleaner manages a reference to a base\KeyedDescender. When clean
 // operations are performed on an instance of this class, the cleaning operation
