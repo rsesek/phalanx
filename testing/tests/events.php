@@ -84,6 +84,7 @@ class TestEvent extends events\Event
     public function WillFire()
     {
         $this->will_fire = TRUE;
+        parent::WillFire();  // Boost code coverage. No-op.
     }
 
     public function Fire()
