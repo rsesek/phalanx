@@ -81,7 +81,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
     {
         $view = new TestView('test');
         $in   = 'foo $[some.value] bar';
-        $out  = 'foo <?php echo $view->Get("some.value") ?> bar';
+        $out  = 'foo <?php echo $view->GetHTML("some.value") ?> bar';
         $this->assertEquals($out, $view->T_ProcessTemplate($in));
     }
 
