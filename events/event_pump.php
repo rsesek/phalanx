@@ -137,8 +137,8 @@ class EventPump
     // will call the current event's Cleanup() function.
     public function StopPump()
     {
-		if ($this->current_event)
-	        $this->current_event->Cleanup();
+        if ($this->current_event)
+            $this->current_event->Cleanup();
         $this->output_handler->Start();
         $this->_Exit();
     }
