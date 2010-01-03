@@ -104,17 +104,6 @@ class PreemptedCancelledEvent extends CancelledEvent
     }
 }
 
-class BlockingEvent extends TestEvent
-{
-    public $test;
-    public $unblock = FALSE;
-
-    public function Fire()
-    {
-        $this->test->pump->BlockEvent();
-    }
-}
-
 class CurrentEventTester extends TestEvent
 {
     public $test;
