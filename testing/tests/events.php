@@ -26,6 +26,7 @@ require PHALANX_ROOT . '/events/event_pump.php';
 require PHALANX_ROOT . '/events/http_dispatcher.php';
 require PHALANX_ROOT . '/events/output_handler.php';
 require PHALANX_ROOT . '/events/view_output_handler.php';
+require PHALANX_ROOT . '/events/unit_test_output_handler.php';
 
 class EventsSuite
 {
@@ -39,6 +40,7 @@ class EventsSuite
         $suite->addTestFile(TEST_ROOT . '/tests/events/http_dispatcher_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/events/output_handler_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/events/view_output_handler_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/events/unit_test_output_handler_test.php');
 
         return $suite;
     }
@@ -55,6 +57,8 @@ class TestEvent extends events\Event
     public $out1;
     public $out2;
     public $out2_never_true = FALSE;
+
+    public $id = NULL;
 
     // The property should hide this from OutputHandler::_GetEventData().
     public function out2()
@@ -74,7 +78,7 @@ class TestEvent extends events\Event
 
     static public function OutputList()
     {
-        return array('will_fire', 'fire', 'cleanup', 'out1', 'out2', 'out3', 'no_out');
+        return array('will_fire', 'fire', 'cleanup', 'out1', 'out2', 'out3', 'no_out', 'id');
     }
 
     public function WillFire()

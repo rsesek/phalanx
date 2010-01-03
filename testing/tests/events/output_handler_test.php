@@ -47,6 +47,7 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
             'out1'       => 'foo',
             'out2'       => 'bar',
             'out3'       => 'moo',
+            'id'         => NULL
         );
         $this->assertType('phalanx\base\PropertyBag', $data);
         $this->assertEquals($expected, $data->ToArray());
