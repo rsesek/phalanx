@@ -29,9 +29,17 @@ function ArrayStripEmpty(Array & $array)
 
 // Turns an under_scored string into a CamelCased one. If |$first_char| is
 // TRUE, then the first character will also be capatalized.
-function UnderscoreToCammelCase($string, $first_char = TRUE)
+function UnderscoreToCamelCase($string, $first_char = TRUE)
 {
     if ($first_char)
         $string[0] = strtoupper($string[0]);
     return preg_replace_callback('/_([a-z])/', function($c) { return strtoupper($c[1]); }, $string);
+}
+
+// Turns a CamelCase string to an under_scored one.
+function CamelCaseToUnderscore($string)
+{
+    $string = preg_replace('/([A-Z]+)([A-Z][a-z])/','\1_\2',$string);
+    $string = preg_replace('/([a-z])([A-Z])/','\1_\2', $string);
+    return strtolower($string);
 }

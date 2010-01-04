@@ -1,6 +1,6 @@
 <?php
 // Phalanx
-// Copyright (c) 2009 Blue Static
+// Copyright (c) 2009-2010 Blue Static
 // 
 // This program is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -41,13 +41,25 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, count($array));
     }
 
-    public function testUnderscoreToCammelCase()
+    public function testUnderscoreToCamelCase()
     {
         $str = 'under_score';
-        $this->assertEquals('UnderScore', base\UnderscoreToCammelCase($str));
-        $this->assertEquals('underScore', base\UnderscoreToCammelCase($str, FALSE));
+        $this->assertEquals('UnderScore', base\UnderscoreToCamelCase($str));
+        $this->assertEquals('underScore', base\UnderscoreToCamelCase($str, FALSE));
 
         $str = 'many_many_under_scores';
-        $this->assertEquals('ManyManyUnderScores', base\UnderscoreToCammelCase($str));
+        $this->assertEquals('ManyManyUnderScores', base\UnderscoreToCamelCase($str));
+    }
+
+    public function testCamelCaseToUnderscore()
+    {
+        $str = 'CamelCase';
+        $this->assertEquals('camel_case', base\CamelCaseToUnderscore($str));
+
+        $str = 'camelCase';
+        $this->assertEquals('camel_case', base\CamelCaseToUnderscore($str));
+
+        $str = 'AVeryLongTitleCase';
+        $this->assertEquals('a_very_long_title_case', base\CamelCaseToUnderscore($str));
     }
 }
