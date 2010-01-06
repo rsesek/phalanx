@@ -138,9 +138,10 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
         $input = $this->dispatcher->T_TokenizeURL('/event.input/key1/foo/key2/bar/misc/baz/else/4');
         $this->dispatcher->T_set_url_input($input);
         $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
-        $this->assertEquals(2, $gathered_input->Count());
+        $this->assertEquals(3, $gathered_input->Count());
         $this->assertEquals('foo', $gathered_input->key1);
         $this->assertEquals('bar', $gathered_input->key2);
+        $this->assertEquals('GET', $gathered_input->_method);
     }
 
     public function testGetInputPOST()
@@ -153,9 +154,10 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
         );
         $this->dispatcher->T_set_request_method('POST');
         $gathered_input= $this->dispatcher->T_GetInput(TestEvent::InputList());
-        $this->assertEquals(2, $gathered_input->Count());
+        $this->assertEquals(3, $gathered_input->Count());
         $this->assertEquals('foo', $gathered_input->key1);
         $this->assertEquals('bar', $gathered_input->key2);
+        $this->assertEquals('POST', $gathered_input->_method);
     }
 
     public function testGetInputBadRequest()
@@ -171,8 +173,9 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
         $input = $this->dispatcher->T_TokenizeURL('/event.bad/key1/foo/');
         $this->dispatcher->T_set_url_input($input);
         $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
-        $this->assertEquals(1, $gathered_input->Count());
+        $this->assertEquals(2, $gathered_input->Count());
         $this->assertEquals('foo', $gathered_input->key1);
+        $this->assertEquals('GET', $gathered_input->_method);
         $this->assertNull($gathered_input->key2);
     }
 
@@ -181,8 +184,9 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
         $_POST['key1'] = 'foo';
         $this->dispatcher->T_set_request_method('POST');
         $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
-        $this->assertEquals(1, $gathered_input->Count());
+        $this->assertEquals(2, $gathered_input->Count());
         $this->assertEquals('foo', $gathered_input->key1);
+        $this->assertEquals('POST', $gathered_input->_method);
         $this->assertNull($gathered_input->key2);
     }
 }

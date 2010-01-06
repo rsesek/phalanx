@@ -92,6 +92,7 @@ class HTTPDispatcher extends Dispatcher
     protected function _GetInput(Array $keys)
     {
         $input = new \phalanx\base\PropertyBag();
+        $input->_method = $this->request_method;
         if ($this->request_method == 'GET')
         {
             foreach ($keys as $key)
