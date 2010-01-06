@@ -39,9 +39,10 @@ abstract class OutputHandler
         $output_list = $event::OutputList();
         foreach ($output_list as $key)
         {
-            if (property_exists($event, $key))
+            $class = new \ReflectionClass(get_class($event));
+            if ($class->HasProperty($key) && $class->GetProperty($key)->IsPublic())
                 $data->Set($key, $event->$key);
-            else if (method_exists($event, $key))
+            else if ($class->HasMethod($key) && $class->GetMethod($key)->IsPublic())
                 $data->Set($key, $event->$key());
         }
         return $data;
