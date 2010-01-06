@@ -112,15 +112,18 @@ class CurrentEventTester extends TestEvent
     public function WillFire()
     {
         $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
+        $this->test->assertEquals(EventPump::EVENT_WILL_FIRE, $this->test->pump->current_event_state());
     }
     public function Fire()
     {
         $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
+        $this->test->assertEquals(EventPump::EVENT_FIRE, $this->test->pump->current_event_state());
         if ($this->inner_event)
             $this->test->pump->RaiseEvent($this->inner_event);
     }
     public function Cleanup()
     {
+        $this->test->assertEquals(EventPump::EVENT_CLEANUP, $this->test->pump->current_event_state());
         $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
     }
 }
@@ -133,6 +136,23 @@ class StopPumpEvent extends TestEvent
     {
         parent::Fire();
         $this->test->pump->StopPump();
+    }
+}
+
+class GetEventChainEvent extends TestEvent
+{
+    public $test;
+
+    public function Fire()
+    {
+        parent::Fire();
+        $chain = $this->test->pump->GetEventChain();
+        $this->test->assertSame($this, $chain->Top());
+    }
+
+    public function Cleanup()
+    {
+        $this->test = NULL;
     }
 }
 
@@ -346,5 +366,25 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
         ob_end_clean();
 
         $this->assertEquals($msg, $result);
+    }
+
+    public function testGetEventChain()
+    {
+        $event = new GetEventChainEvent();
+        $event->test = $this;
+        $this->pump->PostEvent($event);
+    }
+
+    public function testGetLongerEventChain()
+    {
+        $event1 = new TestEvent();
+        $event2 = new GetEventChainEvent();
+        $event2->test = $this;
+        $this->pump->PostEvent($event1);
+        $this->pump->PostEvent($event2);
+        print_r($this->pump->GetEventChain());
+        $this->assertEquals(2, $this->pump->GetEventChain()->Count());
+        $this->assertSame($event2, $this->pump->GetEventChain()->Top());
+        $this->assertSame($event1, $this->pump->GetEventChain()->Bottom());
     }
 }

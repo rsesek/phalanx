@@ -30,6 +30,15 @@ class EventPump
     // A reference to the event currently being processed.
     protected $current_event = NULL;
 
+    // The state of the current event. Be aware that the state of the event is
+    // set BEFORE the specified method is called. This is used to avoid event
+    // reentrancy.
+    const NO_CURRENT_EVENT = 0;
+    const EVENT_WILL_FIRE = 1;
+    const EVENT_FIRE = 2;
+    const EVENT_CLEANUP = 3;
+    protected $current_event_state = self::NO_CURRENT_EVENT;
+
     // An SplQueue of the events that were registered wtih PostEvent() but are
     // waiting for the current event to finish.
     protected $deferred_events = NULL;
@@ -67,9 +76,14 @@ class EventPump
     // resume afterwards.
     public function RaiseEvent(Event $event)
     {
-        $waiting_event = $this->current_event;
+        $waiting_event       = $this->current_event;
+        $waiting_event_state = $this->current_event_state;
+
         $this->_ProcessEvent($event);
-        $this->current_event = $waiting_event;
+
+        $this->current_event       = $waiting_event;
+        $this->current_event_state = $waiting_event_state;
+
         $this->_DoDeferredEvents();
     }
 
@@ -77,7 +91,10 @@ class EventPump
     // TRUE if the event completed successfully, FALSE if otherwise.
     protected function _ProcessEvent(Event $event)
     {
-        $this->current_event = $event;
+        $this->current_event       = $event;
+        $this->current_event_state = self::NO_CURRENT_EVENT;
+
+        $this->current_event_state = self::EVENT_WILL_FIRE;
         $this->current_event->WillFire();
 
         // Make sure the event didn't get cancelled in WillFire().
@@ -88,6 +105,7 @@ class EventPump
             return FALSE;
         }
 
+        $this->current_event_state = self::EVENT_FIRE;
         $this->current_event->Fire();
 
         // Make sure the event didn't get cancelled in Fire().
@@ -100,7 +118,10 @@ class EventPump
 
         // The event successfully executed, so add it to the event chain.
         $this->event_chain->Push($this->current_event);
+        $this->current_event_state = self::EVENT_CLEANUP;
         $this->current_event->Cleanup();
+
+        $this->current_event_state = self::NO_CURRENT_EVENT;
         $this->current_event = NULL;
         return TRUE;
     }
@@ -137,8 +158,12 @@ class EventPump
     // will call the current event's Cleanup() function.
     public function StopPump()
     {
-        if ($this->current_event)
+        if ($this->current_event && $this->current_event_state < self::EVENT_CLEANUP)
+        {
+            $this->current_event_state = self::EVENT_CLEANUP;
             $this->current_event->Cleanup();
+        }
+
         $this->output_handler->Start();
         $this->_Exit();
     }
@@ -165,10 +190,17 @@ class EventPump
     }
 
     // Returns the SplStack of events that have been fired, in the order they
-    // fired.
+    // fired. If this is called while an event is being fired, it will be
+    // included.
     public function GetEventChain()
     {
-        return $this->event_chain;
+        $chain = $this->event_chain;
+        if ($this->current_event && ($chain->IsEmpty() || $chain->Bottom() != $this->current_event))
+        {
+            $chain = clone $this->event_chain;
+            $chain->Push($this->current_event);
+        }
+        return $chain;
     }
 
     // Internal wrapper around exit() that we can mock.
@@ -191,6 +223,8 @@ class EventPump
 
     public function set_output_handler(OutputHandler $handler) { $this->output_handler = $handler; }
     public function output_handler() { return $this->output_handler; }
+
+    public function current_event_state() { return $this->current_event_state; }
 
     // Testing methods. These are not for public consumption.
     static public function T_set_pump($pump) { self::$pump = $pump; }
