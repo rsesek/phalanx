@@ -88,12 +88,12 @@ class EventPump
     }
 
     // This function does the bulk of the event processing work. This returns
-    // TRUE if the event completed successfully, FALSE if otherwise.
+    // TRUE if the event completed successfully, FALSE if otherwise. Note that
+    // this will clobber the current event. Caller is responsible for ensuring
+    // it is safe to call this function.
     protected function _ProcessEvent(Event $event)
     {
         $this->current_event       = $event;
-        $this->current_event_state = self::NO_CURRENT_EVENT;
-
         $this->current_event_state = self::EVENT_WILL_FIRE;
         $this->current_event->WillFire();
 
@@ -101,7 +101,8 @@ class EventPump
         if ($this->current_event->is_cancelled())
         {
             $this->current_event->Cleanup();
-            $this->current_event = NULL;
+            $this->current_event       = NULL;
+            $this->current_event_state = self::NO_CURRENT_EVENT;
             return FALSE;
         }
 
@@ -112,7 +113,8 @@ class EventPump
         if ($this->current_event->is_cancelled())
         {
             $this->current_event->Cleanup();
-            $this->current_event = NULL;
+            $this->current_event       = NULL;
+            $this->current_event_state = self::NO_CURRENT_EVENT;
             return FALSE;
         }
 

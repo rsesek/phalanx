@@ -382,7 +382,6 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
         $event2->test = $this;
         $this->pump->PostEvent($event1);
         $this->pump->PostEvent($event2);
-        print_r($this->pump->GetEventChain());
         $this->assertEquals(2, $this->pump->GetEventChain()->Count());
         $this->assertSame($event2, $this->pump->GetEventChain()->Top());
         $this->assertSame($event1, $this->pump->GetEventChain()->Bottom());
