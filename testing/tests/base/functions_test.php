@@ -62,4 +62,27 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase
         $str = 'AVeryLongTitleCase';
         $this->assertEquals('a_very_long_title_case', base\CamelCaseToUnderscore($str));
     }
+
+    protected function _RandomHelper($arg, $lower, $upper)
+    {
+        $list = array();
+        for ($i = 0; $i < 200; $i++)
+        {
+            $rand = base\Random($arg);
+            $this->assertNotContains($rand, $list, 'Duplicate random string!');
+            $list[] = $rand;
+            $this->assertGreaterThanOrEqual($lower, strlen($rand), 'Random string not in lower bound');
+            $this->assertLessThanOrEqual($upper, strlen($rand), 'Random string not in upper bound');
+        }
+    }
+
+    public function testRandomDefault()
+    {
+        $this->_RandomHelper(NULL, 20, 100);
+    }
+
+    public function testRandomArgument()
+    {
+        $this->_RandomHelper(20, 20, 20);
+    }
 }

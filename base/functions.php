@@ -43,3 +43,25 @@ function CamelCaseToUnderscore($string)
     $string = preg_replace('/([a-z])([A-Z])/','\1_\2', $string);
     return strtolower($string);
 }
+
+// Creates a random string of length |$length|, or a random length between 20
+// and 100 if NULL.
+function Random($length = NULL)
+{
+    if ($length === NULL)
+        $length = rand(20, 100);
+
+    $string = '';
+    for ($i = 0; $i < $length; $i++)
+    {
+        $type = rand(0, 300);
+        if ($type < 100)
+            $string .= rand(0, 9);
+        else if ($type < 200)
+            $string .= chr(rand(65, 90));
+        else
+            $string .= chr(rand(97, 122));
+    }
+
+    return $string;
+}
