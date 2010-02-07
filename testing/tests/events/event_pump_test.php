@@ -139,23 +139,6 @@ class StopPumpEvent extends TestEvent
     }
 }
 
-class GetEventChainEvent extends TestEvent
-{
-    public $test;
-
-    public function Fire()
-    {
-        parent::Fire();
-        $chain = $this->test->pump->GetEventChain();
-        $this->test->assertSame($this, $chain->Top());
-    }
-
-    public function Cleanup()
-    {
-        $this->test = NULL;
-    }
-}
-
 class EventPumpTest extends \PHPUnit_Framework_TestCase
 {
     public $pump;
@@ -370,16 +353,16 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEventChain()
     {
-        $event = new GetEventChainEvent();
-        $event->test = $this;
+        $event = new TestEvent();
         $this->pump->PostEvent($event);
+        $this->assertEquals(1, $this->pump->GetEventChain()->Count());
+        $this->assertSame($event, $this->pump->GetEventChain()->Top());
     }
 
     public function testGetLongerEventChain()
     {
         $event1 = new TestEvent();
-        $event2 = new GetEventChainEvent();
-        $event2->test = $this;
+        $event2 = new TestEvent();
         $this->pump->PostEvent($event1);
         $this->pump->PostEvent($event2);
         $this->assertEquals(2, $this->pump->GetEventChain()->Count());

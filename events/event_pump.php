@@ -192,17 +192,11 @@ class EventPump
     }
 
     // Returns the SplStack of events that have been fired, in the order they
-    // fired. If this is called while an event is being fired, it will be
-    // included.
+    // fired. Note that this will NOT contain the current_event until AFTER
+    // Cleanup() is called from _PostEvent().
     public function GetEventChain()
     {
-        $chain = $this->event_chain;
-        if ($this->current_event && ($chain->IsEmpty() || $chain->Bottom() != $this->current_event))
-        {
-            $chain = clone $this->event_chain;
-            $chain->Push($this->current_event);
-        }
-        return $chain;
+        return $this->event_chain;
     }
 
     // Internal wrapper around exit() that we can mock.
