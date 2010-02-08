@@ -31,7 +31,7 @@ class UnitTestOutputHandler extends OutputHandler
     {
         $event_chain = EventPump::Pump()->GetEventChain();
         foreach ($event_chain as $event)
-            $this->event_data[] = $this->_GetEventData($event);
+            $this->event_data[] = $this->GetEventData($event);
     }
 
     // Returns an array of all event data in the same order of events as the

@@ -33,7 +33,7 @@ abstract class OutputHandler
     abstract protected function _DoStart();
 
     // Returns a PropertyBag of data from |$event| based on its output list.
-    protected function _GetEventData(Event $event)
+    public function GetEventData(Event $event)
     {
         $data        = new \phalanx\base\PropertyBag();
         $output_list = $event::OutputList();

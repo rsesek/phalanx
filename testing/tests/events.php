@@ -120,7 +120,8 @@ class TestOutputHandler extends events\OutputHandler
 
     public function T_GetEventData(events\Event $event)
     {
-        return $this->_GetEventData($event);
+        // TODO: GetEventData() is now public. We can remove this method.
+        return $this->GetEventData($event);
     }
 }
 

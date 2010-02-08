@@ -36,7 +36,7 @@ class ViewOutputHandler extends OutputHandler
             $event    = EventPump::Pump()->GetEventChain()->Top();
             $loader   = $this->template_loader;
             $tpl_name = $loader(get_class($event));
-            $data     = $this->_GetEventData($event);
+            $data     = $this->GetEventData($event);
 
             $view     = new View($tpl_name);
             $keys     = $data->AllKeys();
