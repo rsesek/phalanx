@@ -36,11 +36,15 @@ class View
     // Variables to provide to the template.
     protected $vars = NULL;
 
+    // Header put at the top of all cached template files.
+    protected $cache_prefix = '';
+
     // Creates a new template and 
     public function __construct($name)
     {
         $this->template_name = $name;
         $this->vars          = new \phalanx\base\PropertyBag();
+        $this->cache_prefix  = '<' . '?php require_once "' . PHALANX_ROOT . '/input/cleaner.php"; use phalanx\input\Cleaner as Cleaner; ?>';
     }
 
     // Overload property accessors to set view variables.
@@ -69,14 +73,14 @@ class View
         $tpl_path   = sprintf(self::$template_path, $this->template_name);
         if (!file_exists($cache_path) || filemtime($cache_path) < filemtime($tpl_path))
         {
-            $data = file_get_contents($tpl_path);
+            $data = @file_get_contents($tpl_path);
             if ($data === FALSE)
                 throw new ViewException('Could not load template ' . $this->template_name);
 
             $data = $this->_ProcessTemplate($data);
 
             // Cache the file.
-            if (!file_put_contents($cache_path, $data))
+            if (!file_put_contents($cache_path, $this->cache_prefix . $data))
                 throw new ViewException('Could not cache ' . $this->template_name . ' to ' . $cache_path);
         }
     }
@@ -96,6 +100,7 @@ class View
 
         // Convert any PHP short-tags into their full versions.
         $data = preg_replace('/<\?(?!php)/', '<?php', $data);
+        $data = str_replace('<' . '?php=', '<' . '?php echo', $data);
 
         return $data;
     }

@@ -43,6 +43,12 @@ class TestView extends views\View
         self::set_template_path(TEST_ROOT . '/tests/views/data/%s.tpl');
     }
 
+    public function __construct($name)
+    {
+        parent::__construct($name);
+        $this->cache_prefix = '';
+    }
+
     public function T_Cache()
     {
         return $this->_Cache();

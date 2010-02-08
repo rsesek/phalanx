@@ -31,17 +31,20 @@ class ViewOutputHandler extends OutputHandler
 
     protected function _DoStart()
     {
-        $event    = EventPump::Pump()->GetEventChain()->Top();
-        $loader   = $this->template_loader;
-        $tpl_name = $loader(get_class($event));
-        $data     = $this->_GetEventData($event);
+        if (EventPump::Pump()->GetEventChain()->Count() > 0)
+        {
+            $event    = EventPump::Pump()->GetEventChain()->Top();
+            $loader   = $this->template_loader;
+            $tpl_name = $loader(get_class($event));
+            $data     = $this->_GetEventData($event);
 
-        $view     = new View($tpl_name);
-        $keys     = $data->AllKeys();
-        foreach ($keys as $key)
-            $view->$key = $data->$key;
+            $view     = new View($tpl_name);
+            $keys     = $data->AllKeys();
+            foreach ($keys as $key)
+                $view->$key = $data->$key;
 
-        $view->Render();
+            $view->Render();
+        }
     }
 
     // Getters and setters.
