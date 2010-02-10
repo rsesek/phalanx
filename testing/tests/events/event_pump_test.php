@@ -20,6 +20,8 @@ use \phalanx\events\EventPump;
 
 require_once 'PHPUnit/Framework.php';
 
+$test = NULL;
+
 class NestedEvent extends TestEvent
 {
     public $test;
@@ -106,25 +108,30 @@ class PreemptedCancelledEvent extends CancelledEvent
 
 class CurrentEventTester extends TestEvent
 {
-    public $test;
     public $inner_event;
 
     public function WillFire()
     {
-        $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
-        $this->test->assertEquals(EventPump::EVENT_WILL_FIRE, $this->test->pump->current_event_state());
+        global $test;
+        parent::WillFire();
+        $test->assertSame($this, $test->pump->GetCurrentEvent());
+        $test->assertEquals(EventPump::EVENT_WILL_FIRE, $test->pump->GetCurrentEventState());
     }
     public function Fire()
     {
-        $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
-        $this->test->assertEquals(EventPump::EVENT_FIRE, $this->test->pump->current_event_state());
+        global $test;
+        parent::Fire();
+        $test->assertSame($this, $test->pump->GetCurrentEvent());
+        $test->assertEquals(EventPump::EVENT_FIRE, $test->pump->GetCurrentEventState());
         if ($this->inner_event)
-            $this->test->pump->RaiseEvent($this->inner_event);
+            $test->pump->RaiseEvent($this->inner_event);
     }
     public function Cleanup()
     {
-        $this->test->assertEquals(EventPump::EVENT_CLEANUP, $this->test->pump->current_event_state());
-        $this->test->assertEquals($this, $this->test->pump->GetCurrentEvent());
+        global $test;
+        parent::CleanUp();
+        $test->assertSame($this, $test->pump->GetCurrentEvent());
+        $test->assertEquals(EventPump::EVENT_CLEANUP, $test->pump->GetCurrentEventState());
     }
 }
 
@@ -145,6 +152,8 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        global $test;
+        $test = $this;
         $this->pump = new EventPump();
         $this->inner_event = NULL;
     }
@@ -164,13 +173,13 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
     public function testGetCurrentEvent()
     {
         $event = new CurrentEventTester();
-        $event->test = $this;
+        $event->name = 'first';
         $this->pump->PostEvent($event);
 
         $event = new CurrentEventTester();
-        $event->test = $this;
+        $event->name = 'outer';
         $event->inner_event = new CurrentEventTester();
-        $event->inner_event->test = $this;
+        $event->inner_event->name = 'inner';
         $this->pump->PostEvent($event);
     }
 

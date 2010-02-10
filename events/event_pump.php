@@ -27,30 +27,34 @@ class EventPump
     // The OutputHandler instance for the pump.
     protected $output_handler = NULL;
 
-    // A reference to the event currently being processed.
-    protected $current_event = NULL;
-
-    // The state of the current event. Be aware that the state of the event is
-    // set BEFORE the specified method is called. This is used to avoid event
-    // reentrancy.
-    const NO_CURRENT_EVENT = 0;
+    // Event state constants. Be aware that the state of an event is set BEFORE
+    // the specified method is called. This is used to avoid event reentrancy.
     const EVENT_WILL_FIRE = 1;
     const EVENT_FIRE = 2;
     const EVENT_CLEANUP = 3;
-    protected $current_event_state = self::NO_CURRENT_EVENT;
+    const EVENT_FINISHED = 4;
 
     // An SplQueue of the events that were registered wtih PostEvent() but are
     // waiting for the current event to finish.
     protected $deferred_events = NULL;
 
-    // An SplStack of all the events that have been Fire()d by the pump.
-    protected $event_chain = NULL;
+    // An SplStack of 2-Tuples. The stack is a history of event state changes.
+    // Each tuple stores the state and the object that achieved that state.
+    // When in absolute time these state changes happened is irrelevant, we
+    // only need to store them in order relative to each other.
+    const EVENT_STATE = 0;
+    const EVENT_OBJECT = 1;
+    protected $events = NULL;
+
+    // The event that is currently executing. Will be NULL if there is no such
+    // event.
+    protected $current_event = NULL;
 
     // Constructor. Do not use directly. Use EventPump::Pump().
     public function __construct()
     {
         $this->deferred_events = new \SplQueue();
-        $this->event_chain     = new \SplStack();
+        $this->events          = new \SplStack();
     }
 
     // Schedules an event to be run. If another event is currently being fired,
@@ -76,13 +80,11 @@ class EventPump
     // resume afterwards.
     public function RaiseEvent(Event $event)
     {
-        $waiting_event       = $this->current_event;
-        $waiting_event_state = $this->current_event_state;
+        $waiting_event = $this->current_event;
 
         $this->_ProcessEvent($event);
 
-        $this->current_event       = $waiting_event;
-        $this->current_event_state = $waiting_event_state;
+        $this->current_event = $waiting_event;
 
         $this->_DoDeferredEvents();
     }
@@ -93,38 +95,44 @@ class EventPump
     // it is safe to call this function.
     protected function _ProcessEvent(Event $event)
     {
-        $this->current_event       = $event;
-        $this->current_event_state = self::EVENT_WILL_FIRE;
+        $this->current_event = $event;
+        $tuple = array(
+            self::EVENT_STATE  => self::EVENT_WILL_FIRE,
+            self::EVENT_OBJECT => $this->current_event
+        );
+        $this->events->Push($tuple);
         $this->current_event->WillFire();
 
         // Make sure the event didn't get cancelled in WillFire().
-        if ($this->current_event->is_cancelled())
+        if ($event->is_cancelled())
         {
-            $this->current_event->Cleanup();
-            $this->current_event       = NULL;
-            $this->current_event_state = self::NO_CURRENT_EVENT;
+            $event->Cleanup();
+            $this->current_event = NULL;
             return FALSE;
         }
 
-        $this->current_event_state = self::EVENT_FIRE;
+        $tuple[self::EVENT_STATE] = self::EVENT_FIRE;
+        $this->events->Push($tuple);
         $this->current_event->Fire();
 
         // Make sure the event didn't get cancelled in Fire().
-        if ($this->current_event->is_cancelled())
+        if ($event->is_cancelled())
         {
-            $this->current_event->Cleanup();
-            $this->current_event       = NULL;
-            $this->current_event_state = self::NO_CURRENT_EVENT;
+            $event->Cleanup();
+            $this->current_event = NULL;
             return FALSE;
         }
 
         // The event successfully executed, so add it to the event chain.
-        $this->event_chain->Push($this->current_event);
-        $this->current_event_state = self::EVENT_CLEANUP;
+        $tuple[self::EVENT_STATE] = self::EVENT_CLEANUP;
+        $this->events->Push($tuple);
         $this->current_event->Cleanup();
 
-        $this->current_event_state = self::NO_CURRENT_EVENT;
+        // Mark the event as done.
+        $tuple[self::EVENT_STATE] = self::EVENT_FINISHED;
+        $this->events->Push($tuple);
         $this->current_event = NULL;
+
         return TRUE;
     }
 
@@ -160,10 +168,21 @@ class EventPump
     // will call the current event's Cleanup() function.
     public function StopPump()
     {
-        if ($this->current_event && $this->current_event_state < self::EVENT_CLEANUP)
+        if ($this->current_event)
         {
-            $this->current_event_state = self::EVENT_CLEANUP;
-            $this->current_event->Cleanup();
+            if ($this->GetCurrentEventState() < self::EVENT_CLEANUP)
+            {
+                $tuple = array(
+                    self::EVENT_STATE  => self::EVENT_CLEANUP,
+                    self::EVENT_OBJECT => $this->current_event
+                );
+                $this->events->Push($tuple);
+
+                $this->current_event->Cleanup();
+
+                $tuple[self::EVENT_STATE] = self::EVENT_FINISHED;
+                $this->events->Push($tuple);
+            }
         }
 
         $this->output_handler->Start();
@@ -184,6 +203,16 @@ class EventPump
         return $this->current_event;
     }
 
+    // Returns the current event's state. Will return -1 if there is no current
+    // event.
+    public function GetCurrentEventState()
+    {
+        foreach ($this->events as $tuple)
+            if ($tuple[self::EVENT_OBJECT] === $this->current_event)
+                return $tuple[self::EVENT_STATE];
+        return -1;
+    }
+
     // Returns the queue of Events that have been registered with PostEvent()
     // and are waiting to run.
     public function GetDeferredEvents()
@@ -196,7 +225,11 @@ class EventPump
     // Cleanup() is called from _PostEvent().
     public function GetEventChain()
     {
-        return $this->event_chain;
+        $chain = new \SplStack();
+        foreach ($this->events as $tuple)
+            if ($tuple[self::EVENT_STATE] == self::EVENT_FINISHED)
+                $chain->Unshift($tuple[self::EVENT_OBJECT]);
+        return $chain;
     }
 
     // Internal wrapper around exit() that we can mock.
@@ -220,10 +253,9 @@ class EventPump
     public function set_output_handler(OutputHandler $handler) { $this->output_handler = $handler; }
     public function output_handler() { return $this->output_handler; }
 
-    public function current_event_state() { return $this->current_event_state; }
-
     // Testing methods. These are not for public consumption.
     static public function T_set_pump($pump) { self::$pump = $pump; }
+    public function T_events() { return $this->events; }
 }
 
 class EventPumpException extends \Exception
