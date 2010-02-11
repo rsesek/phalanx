@@ -179,6 +179,14 @@ class EventPump
                 $this->events->Push($tuple);
                 $this->current_event->Cleanup();
             }
+            else if ($this->GetCurrentEventState() < self::EVENT_FINISHED)
+            {
+                $tuple = array(
+                    self::EVENT_STATE  => self::EVENT_FINISHED,
+                    self::EVENT_OBJECT => $this->current_event
+                );
+                $this->events->Push($tuple);
+            }
         }
 
         $this->output_handler->Start();
@@ -228,6 +236,13 @@ class EventPump
         return $chain;
     }
 
+    // Returns |$this->events| as a stack of 2-Tuples storing event state and
+    // the event object.
+    public function GetAllEvents()
+    {
+        return clone $this->events;
+    }
+
     // Internal wrapper around exit() that we can mock.
     protected function _Exit()
     {
@@ -251,7 +266,6 @@ class EventPump
 
     // Testing methods. These are not for public consumption.
     static public function T_set_pump($pump) { self::$pump = $pump; }
-    public function T_events() { return $this->events; }
 }
 
 class EventPumpException extends \Exception
