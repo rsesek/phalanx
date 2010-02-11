@@ -24,14 +24,16 @@ require_once PHALANX_ROOT . '/events/output_handler.php';
 // output from ALL events in the chain and stores it.
 class UnitTestOutputHandler extends OutputHandler
 {
-    // The function that transforms an event name into a template name.
+    // The function that transforms an event name into a template name. The
+    // array is indexed by ints, with 0 being the top of the event chain stack
+    // and N being the bottom (oldest).
     protected $event_data = array();
 
     protected function _DoStart()
     {
         $event_chain = EventPump::Pump()->GetEventChain();
         foreach ($event_chain as $event)
-            $this->event_data[] = $this->GetEventData($event);
+            array_push($this->event_data, $this->GetEventData($event));
     }
 
     // Returns an array of all event data in the same order of events as the

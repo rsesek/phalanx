@@ -177,11 +177,7 @@ class EventPump
                     self::EVENT_OBJECT => $this->current_event
                 );
                 $this->events->Push($tuple);
-
                 $this->current_event->Cleanup();
-
-                $tuple[self::EVENT_STATE] = self::EVENT_FINISHED;
-                $this->events->Push($tuple);
             }
         }
 
