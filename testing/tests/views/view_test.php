@@ -188,6 +188,6 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $actual = ob_get_contents();
         ob_end_clean();
 
-        $this->assertEquals('Hi, my name is Rob.', $actual);
+        $this->assertEquals('Hi, my name is Rob. This is undefined: .', $actual);
     }
 }
