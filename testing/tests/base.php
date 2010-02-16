@@ -23,6 +23,7 @@ require_once 'PHPUnit/Framework.php';
 require_once PHALANX_ROOT . '/base/functions.php';
 require_once PHALANX_ROOT . '/base/key_descender.php';
 require_once PHALANX_ROOT . '/base/property_bag.php';
+require_once PHALANX_ROOT . '/base/struct.php';
 
 class BaseSuite
 {
@@ -33,6 +34,7 @@ class BaseSuite
         $suite->addTestFile(TEST_ROOT . '/tests/base/functions_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/base/key_descender_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/base/property_bag_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/base/struct_test.php');
 
         return $suite;
     }
