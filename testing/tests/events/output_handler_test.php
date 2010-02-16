@@ -37,7 +37,8 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEventData()
     {
-        $event = new TestEvent();
+        $input = new \phalanx\base\PropertyBag(array('foo' => 'bar'));
+        $event = new TestEvent($input);
         $event->Fire();
         $data  = $this->handler->T_GetEventData($event);
         $expected = array(
@@ -47,7 +48,8 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
             'out1'       => 'foo',
             'out2'       => 'bar',
             'out3'       => 'moo',
-            'id'         => NULL
+            'id'         => NULL,
+            'input'      => $input
         );
         $this->assertType('phalanx\base\PropertyBag', $data);
         $this->assertEquals($expected, $data->ToArray());

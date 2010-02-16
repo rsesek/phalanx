@@ -37,6 +37,7 @@ abstract class OutputHandler
     {
         $data        = new \phalanx\base\PropertyBag();
         $output_list = $event::OutputList();
+        $output_list[] = 'input';
         foreach ($output_list as $key)
         {
             $class = new \ReflectionClass(get_class($event));
