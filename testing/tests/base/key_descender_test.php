@@ -207,4 +207,19 @@ class KeyDescenderTest extends \PHPUnit_Framework_TestCase
         $desc->{"foo.moo"} = 'abc123';
         $this->assertEquals('abc123', $desc->get('foo.moo'));
     }
+
+    public function testNestedKeyDescenders()
+    {
+        $array = array(
+            'foo' => 'bar',
+            'moo' => 'baz'
+        );
+        $outer = new KeyDescender($array);
+
+        $inner = array(
+            'abc' => 'def'
+        );
+        $outer->inner = new KeyDescender($inner);
+        $this->assertEquals('def', $outer->Get('inner.abc'));
+    }
 }
