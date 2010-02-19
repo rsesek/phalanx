@@ -15,31 +15,31 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\input as input;
+use \phalanx\data as data;
 
 require_once 'PHPUnit/Framework.php';
 
 // Common includes.
-require_once PHALANX_ROOT . '/input/cleaner.php';
-require_once PHALANX_ROOT . '/input/form_key.php';
-require_once PHALANX_ROOT . '/input/keyed_cleaner.php';
+require_once PHALANX_ROOT . '/data/cleaner.php';
+require_once PHALANX_ROOT . '/data/form_key.php';
+require_once PHALANX_ROOT . '/data/keyed_cleaner.php';
 
-class InputSuite
+class DataSuite
 {
     static public function suite()
     {
-        $suite = new \PHPUnit_Framework_TestSuite('Input');
+        $suite = new \PHPUnit_Framework_TestSuite('Data');
 
-        $suite->addTestFile(TEST_ROOT . '/tests/input/cleaner_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/input/form_key_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/input/form_key_event_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/input/keyed_cleaner_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/data/cleaner_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/data/form_key_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/data/form_key_event_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/data/keyed_cleaner_test.php');
 
         return $suite;
     }
 }
 
-class TestFormKeyManagerDelegate implements input\FormKeyManagerDelegate //,
+class TestFormKeyManagerDelegate implements data\FormKeyManagerDelegate //,
 {
     public $did_get = FALSE;
     public $did_save = FALSE;

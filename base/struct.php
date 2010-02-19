@@ -24,7 +24,7 @@ class Struct
     protected $fields = array();
 
     // The data that corresponds to the |$fields|.
-    private $data = array();
+    protected $data = array();
 
     // Creates a new Struct, optionally initializing the data members from an
     // iterable object.
@@ -38,7 +38,7 @@ class Struct
     }
 
     // Gets a specified key. This can return NULL.
-    final public function __get($key)
+    public function __get($key)
     {
         if (!in_array($key, $this->fields))
             throw new StructException('Invalid field "' . $key . '"');
@@ -48,7 +48,7 @@ class Struct
     }
 
     // Sets the specified key-value pair.
-    final public function __set($key, $value)
+    public function __set($key, $value)
     {
         if (!in_array($key, $this->fields))
             throw new StructException('Cannot set value for invalid field "' . $key . '"');
@@ -56,13 +56,13 @@ class Struct
     }
 
     // Returns the data members as an array.
-    final public function ToArray()
+    public function ToArray()
     {
         return $this->data;
     }
 
     // Returns the number of members in the struct.
-    final public function Count()
+    public function Count()
     {
         return count($this->fields);
     }

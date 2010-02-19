@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\input;
+namespace phalanx\data;
 
 require_once PHALANX_ROOT . '/base/key_descender.php';
-require_once PHALANX_ROOT . '/input/cleaner.php';
+require_once PHALANX_ROOT . '/data/cleaner.php';
 
 // A KeyedCleaner manages a reference to a base\KeyedDescender. When clean
 // operations are performed on an instance of this class, the cleaning operation

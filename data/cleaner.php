@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\input;
+namespace phalanx\data;
 
 // This class holds only static methods that perform cleaning operations.
 

@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\input;
+namespace phalanx\data;
 use \phalanx\base\PropertyBag as PropertyBag;
 
 require_once PHALANX_ROOT . '/base/property_bag.php';
-require_once PHALANX_ROOT . '/input/cleaner.php';
+require_once PHALANX_ROOT . '/data/cleaner.php';
 
 // This class is used to generate unique form keys, so that POST requests
 // cannot be forged easily. This uses a delegate for cross-session storage of

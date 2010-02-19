@@ -35,8 +35,8 @@ class AllTests
         require_once TEST_ROOT . '/tests/events.php';
         $suite->addTestSuite(EventsSuite::suite());
 
-        require_once TEST_ROOT . '/tests/input.php';
-        $suite->addTestSuite(InputSuite::suite());
+        require_once TEST_ROOT . '/tests/data.php';
+        $suite->addTestSuite(DataSuite::suite());
 
         require_once TEST_ROOT . '/tests/views.php';
         $suite->addTestSuite(ViewSuite::suite());

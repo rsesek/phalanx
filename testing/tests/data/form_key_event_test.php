@@ -15,11 +15,11 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\input as input;
+use \phalanx\data as data;
 
 require_once 'PHPUnit/Framework.php';
 
-require_once TEST_ROOT . '/tests/input.php';
+require_once TEST_ROOT . '/tests/data.php';
 
 class FormKeyEventTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,8 +30,8 @@ class FormKeyEventTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->pump = new \phalanx\events\EventPump();
-        $this->form_key = new input\FormKeyManager(new TestFormKeyManagerDelegate());
-        $this->event = new input\ValidateFormKeyEvent($this->form_key);
+        $this->form_key = new data\FormKeyManager(new TestFormKeyManagerDelegate());
+        $this->event = new data\ValidateFormKeyEvent($this->form_key);
     }
 
     public function testCtor()
@@ -55,12 +55,12 @@ class FormKeyEventTest extends \PHPUnit_Framework_TestCase
 
     public function testInputList()
     {
-        $this->assertEquals(array('phalanx_form_key'), input\ValidateFormKeyEvent::InputList());
+        $this->assertEquals(array('phalanx_form_key'), data\ValidateFormKeyEvent::InputList());
     }
 
     public function testOutputList()
     {
-        $this->assertNull(input\ValidateFormKeyEvent::OutputList());
+        $this->assertNull(data\ValidateFormKeyEvent::OutputList());
     }
 
     public function testInvalidPOST()
@@ -68,7 +68,7 @@ class FormKeyEventTest extends \PHPUnit_Framework_TestCase
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['phalanx_form_key'] = 'foo';
 
-        $this->setExpectedException('phalanx\input\FormKeyException');
+        $this->setExpectedException('phalanx\data\FormKeyException');
         $this->pump->PostEvent($this->event);
 
         $this->assertFalse($this->event->is_cancelled());

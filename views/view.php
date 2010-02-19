@@ -17,7 +17,7 @@
 namespace phalanx\views;
 
 require_once PHALANX_ROOT . '/base/property_bag.php';
-require_once PHALANX_ROOT . '/input/keyed_cleaner.php';
+require_once PHALANX_ROOT . '/data/keyed_cleaner.php';
 
 class View
 {
@@ -44,7 +44,7 @@ class View
     {
         $this->template_name = $name;
         $this->vars          = new \phalanx\base\PropertyBag();
-        $this->cache_prefix  = '<' . '?php require_once "' . PHALANX_ROOT . '/input/cleaner.php"; use phalanx\input\Cleaner as Cleaner; ?>';
+        $this->cache_prefix  = '<' . '?php require_once "' . PHALANX_ROOT . '/data/cleaner.php"; use phalanx\data\Cleaner as Cleaner; ?>';
     }
 
     // Overload property accessors to set view variables.
@@ -61,7 +61,7 @@ class View
     public function Render()
     {
         $this->_Cache();
-        $view = new \phalanx\input\KeyedCleaner($this->vars->ToArray());
+        $view = new \phalanx\data\KeyedCleaner($this->vars->ToArray());
         $view->keyer()->set_throw_undefined_errors(FALSE);
         include $this->_CachePath($this->template_name);
     }

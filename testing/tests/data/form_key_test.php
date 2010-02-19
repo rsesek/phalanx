@@ -15,11 +15,11 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\input as input;
+use \phalanx\data as data;
 
 require_once 'PHPUnit/Framework.php';
 
-require_once TEST_ROOT . '/tests/input.php';
+require_once TEST_ROOT . '/tests/data.php';
 
 class FormKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,7 +29,7 @@ class FormKeyTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->delegate = new TestFormKeyManagerDelegate();
-        $this->manager = new input\FormKeyManager($this->delegate);
+        $this->manager = new data\FormKeyManager($this->delegate);
     }
 
     public function testSetDelegate()

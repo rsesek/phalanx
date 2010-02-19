@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\input as input;
+use \phalanx\data as data;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -43,7 +43,7 @@ class KeyedCleanerTest extends \PHPUnit_Framework_TestCase
             'boolN'    => 'no',
             'entity' => 'red, green, & blue'
         );
-        $this->cleaner = new input\KeyedCleaner($this->fixture);
+        $this->cleaner = new data\KeyedCleaner($this->fixture);
     }
 
     public function testConstructWithRef()
