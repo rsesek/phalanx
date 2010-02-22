@@ -55,6 +55,14 @@ class Struct
         $this->data[$key] = $value;
     }
 
+    // Takes values from an array and sets the relevant values.
+    public function SetArray($array)
+    {
+        foreach ($array as $key => $value)
+            if (in_array($key, $this->fields))
+                $this->data[$key] = $value;
+    }
+
     // Returns the data members as an array.
     public function ToArray()
     {
