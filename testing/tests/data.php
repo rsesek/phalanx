@@ -23,6 +23,7 @@ require_once 'PHPUnit/Framework.php';
 require_once PHALANX_ROOT . '/data/cleaner.php';
 require_once PHALANX_ROOT . '/data/form_key.php';
 require_once PHALANX_ROOT . '/data/keyed_cleaner.php';
+require_once PHALANX_ROOT . '/data/model.php';
 
 class DataSuite
 {
@@ -34,6 +35,7 @@ class DataSuite
         $suite->addTestFile(TEST_ROOT . '/tests/data/form_key_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/data/form_key_event_test.php');
         $suite->addTestFile(TEST_ROOT . '/tests/data/keyed_cleaner_test.php');
+        $suite->addTestFile(TEST_ROOT . '/tests/data/model_test.php');
 
         return $suite;
     }

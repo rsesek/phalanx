@@ -46,6 +46,7 @@ class Struct
             return NULL;
         return $this->data[$key];
     }
+    public function Get($key) { return $this->__get($key); }
 
     // Sets the specified key-value pair.
     public function __set($key, $value)
@@ -54,6 +55,7 @@ class Struct
             throw new StructException('Cannot set value for invalid field "' . $key . '"');
         $this->data[$key] = $value;
     }
+    public function Set($key, $value) { $this->__set($key, $value); }
 
     // Takes values from an array and sets the relevant values.
     public function SetArray($array)
