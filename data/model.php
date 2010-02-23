@@ -62,15 +62,22 @@ class Model extends \phalanx\base\Struct
         }
     }
 
-    // Fetches an object based on the |$this->condition|.
+    // Fetches an object and returns the result based on the |$this->condition|.
     public function Fetch()
     {
         $stmt = self::$db->Prepare("SELECT * FROM {$this->table} WHERE " . $this->condition());
         $stmt->Execute($this->ToArray());
-        $result = $stmt->Fetch(\PDO::FETCH_ASSOC);
+        $result = $stmt->FetchObject();
         if (!$result)
             throw new ModelException("Could not fetch " . get_class($this));
-        $this->SetArray($result);
+        return $result;
+    }
+
+    // Fetches an object and stores the result in the model, overwriting
+    // existing data values.
+    public function FetchInto()
+    {
+        $this->SetFrom($this->Fetch());
     }
 
     // Inserts the new model into the database. This will explicitly filter out

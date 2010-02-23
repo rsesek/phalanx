@@ -57,8 +57,8 @@ class Struct
     }
     public function Set($key, $value) { $this->__set($key, $value); }
 
-    // Takes values from an array and sets the relevant values.
-    public function SetArray($array)
+    // Takes values from an array or object and sets the relevant values.
+    public function SetFrom($array)
     {
         foreach ($array as $key => $value)
             if (in_array($key, $this->fields))

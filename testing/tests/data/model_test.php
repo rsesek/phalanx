@@ -103,7 +103,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $this->testInsert();
         $model = new TestModel(1);
-        $model->Fetch();
+        $model->FetchInto();
         $this->assertEquals('Hello', $model->title);
         $this->assertEquals('A test', $model->description);
     }
@@ -118,7 +118,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $model = new TestModel();
         $model->set_condition('title = :title');
         $model->title = 'test';
-        $model->Fetch();
+        $model->FetchInto();
         $this->assertEquals('foobar', $model->description);
     }
 
@@ -135,7 +135,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $model->Update();
 
         $model = new TestModel(1);
-        $model->Fetch();
+        $model->FetchInto();
         $this->assertEquals('Test Update', $model->title);
         $this->assertEquals('foobar', $model->description);
         $this->assertEquals('bravo', $model->value);
@@ -148,12 +148,12 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $model->Delete();
 
         $model = new TestModel(2);
-        $model->Fetch();
+        $model->FetchInto();
         $this->assertEquals('Hello', $model->title);
 
         $this->setExpectedException('phalanx\data\ModelException');
         $model = new TestModel(1);
-        $model->Fetch();
+        $model->FetchInto();
     }
 
     public function testCompoundBadCreate()
@@ -173,7 +173,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
     {
         $this->testCompoundInsert();
         $model = new CompoundKeyModel(array('id_1' => 1, 'id_2' => 2));
-        $model->Fetch();
+        $model->FetchInto();
         $this->assertEquals('foo', $model->value);
     }
 }

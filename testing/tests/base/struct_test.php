@@ -76,14 +76,27 @@ class StructTest extends \PHPUnit_Framework_TestCase
         $foo = $this->struct->fourth;
     }
 
-    public function testSetArray()
+    public function testSetFromArray()
     {
         $array = array(
             'first'  => 1,
             'second' => 2,
             'fourth' => 4
         );
-        $this->struct->SetArray($array);
+        $this->struct->SetFrom($array);
+        $this->assertEquals(1, $this->struct->first);
+        $this->assertEquals(2, $this->struct->second);
+        $this->assertNull($this->struct->third);
+        $this->assertEquals(3, $this->struct->Count());
+    }
+
+    public function testSetFromObject()
+    {
+        $obj = new \StdClass();
+        $obj->first  = 1;
+        $obj->second = 2;
+        $obj->fourth = 4;
+        $this->struct->SetFrom($obj);
         $this->assertEquals(1, $this->struct->first);
         $this->assertEquals(2, $this->struct->second);
         $this->assertNull($this->struct->third);
