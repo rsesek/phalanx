@@ -190,4 +190,19 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $test = new PrefixTest();
         $this->assertEquals('test_prefix', $test->table());
     }
+
+    public function testSuccessfulQueryWithTMI()
+    {
+        $model = new TestModel();
+        $model->title = 'Title';
+        $model->description = 'Desc';
+        $model->value = 'Value';
+        $model->Insert();
+
+        $model = new TestModel(1);
+        $model->title = 'Title2';
+        $model->Update();
+        $data = $model->Fetch();
+        $this->assertEquals('Title2', $data->title);
+    }
 }

@@ -70,7 +70,7 @@ class Model extends \phalanx\base\Struct
     public function Fetch()
     {
         $stmt = self::$db->Prepare("SELECT * FROM {$this->table} WHERE " . $this->condition());
-        $stmt->Execute($this->ToArray());
+        $stmt->Execute($this->_GetSQLParams($stmt));
         $result = $stmt->FetchObject();
         if (!$result)
             throw new ModelException("Could not fetch " . get_class($this));
@@ -111,14 +111,32 @@ class Model extends \phalanx\base\Struct
         $updates   = array_map(function($s) { return "$s = :$s"; }, array_keys($this->ToArray()));
         $condition = $this->condition();
         $stmt = self::$db->Prepare("UPDATE {$this->table} SET " . implode(', ', $updates) . " WHERE $condition");
-        $stmt->Execute($this->ToArray());
+        $stmt->Execute($this->_GetSQLParams($stmt));
     }
 
     // Deletes a record in the database based on the set condition.
     public function Delete()
     {
         $stmt = self::$db->Prepare("DELETE FROM {$this->table} WHERE " . $this->condition());
-        $stmt->Execute($this->ToArray());
+        $stmt->Execute($this->_GetSQLParams($stmt));
+    }
+
+    // Returns a subest of |$this->data| that is required to execute a given
+    // PDOStatement. This will only work on queries whose parameters are
+    // specified using :name syntax. It will filter all values that are not
+    // used in the query.
+    protected function _GetSQLParams(\PDOStatement $stmt)
+    {
+        $matches = array();
+        preg_match_all('/\:[a-z0-9_\-]+/i', $stmt->queryString, $matches);
+        $params = array();
+        $data   = $this->ToArray();
+        foreach ($matches[0] as $key)
+        {
+            $key = substr($key, 1);  // Cut off leading colon.
+            $params[$key] = $data[$key];            
+        }
+        return $params;
     }
 
     // Getters and setters.
