@@ -31,6 +31,9 @@ class Model extends \phalanx\base\Struct
     // The PDO object the model will use when performing operations.
     static protected $db = NULL;
 
+    // The string prefix to put in front of the table name.
+    protected $table_prefix = '';
+
     // The name of the database table the object belongs to
     protected $table = 'table';
 
@@ -60,6 +63,7 @@ class Model extends \phalanx\base\Struct
                 throw new ModelException('Cannot create ' . get_class($this) . ' when a singular value is given for a compound primary key.');
             $this->Set($this->primary_key, $condition_data);
         }
+        $this->table = $this->table_prefix . $this->table;
     }
 
     // Fetches an object and returns the result based on the |$this->condition|.

@@ -48,6 +48,14 @@ class CompoundKeyModel extends data\Model
     );
 }
 
+class PrefixTest extends data\Model
+{
+    protected $table_prefix = 'test_';
+    protected $table = 'prefix';
+
+    public function table() { return $this->table; }
+}
+
 class ModelTest extends \PHPUnit_Framework_TestCase
 {
     public $db;
@@ -175,5 +183,11 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $model = new CompoundKeyModel(array('id_1' => 1, 'id_2' => 2));
         $model->FetchInto();
         $this->assertEquals('foo', $model->value);
+    }
+
+    public function testPrefix()
+    {
+        $test = new PrefixTest();
+        $this->assertEquals('test_prefix', $test->table());
     }
 }
