@@ -130,6 +130,8 @@ class KeyDescender
                 return $descendable->Get($single_key);
             else if (isset($descendable->$single_key))
                 return $descendable->$single_key;
+            else if (method_exists($descendable, '__get'))
+                return $descendable->__get($single_key);
             else
                 throw new UndefinedKeyException("Undefined '$single_key' on " . spl_object_hash($descendable));
         }
