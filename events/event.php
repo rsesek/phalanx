@@ -27,6 +27,9 @@ abstract class Event
     // Whether or not the event is cancelled.
     private $cancelled = FALSE;
 
+    // The state of the event. This should ONLY ever be changed by the pump.
+    private $state = 0;
+
     // Creates an instance of the Event class. The PropertyBag of input is
     // assembled for the Event by the Dispatcher. It collects input variables
     // based on the keys the Event asks for via the InputList() method.
@@ -70,4 +73,10 @@ abstract class Event
     // cleanup in end().
     final public function set_cancelled() { $this->cancelled = TRUE; }
     final public function is_cancelled() { return $this->cancelled; }
+
+    // Sets and gets the state. Setting the state is reserved for the
+    // EventPump. Changing it outside that context WILL result in unexpected
+    // application behavior.
+    final public function set_state($state) { $this->state = $state; }
+    final public function state() { return $this->state; }
 }

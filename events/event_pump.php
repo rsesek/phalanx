@@ -38,12 +38,10 @@ class EventPump
     // waiting for the current event to finish.
     protected $deferred_events = NULL;
 
-    // An SplStack of 2-Tuples. The stack is a history of event state changes.
-    // Each tuple stores the state and the object that achieved that state.
-    // When in absolute time these state changes happened is irrelevant, we
-    // only need to store them in order relative to each other.
-    const EVENT_STATE = 0;
-    const EVENT_OBJECT = 1;
+    // A SplStack of Event objects. The stack is a history of event state
+    // changes. The actual change that happened doesn't actually matter
+    // (and can be computed based on the occurrence count), but we need to
+    // maintain relative ordering of the changes amongst all Events.
     protected $events = NULL;
 
     // The event that is currently executing. Will be NULL if there is no such
@@ -91,17 +89,14 @@ class EventPump
 
     // This function does the bulk of the event processing work. This returns
     // TRUE if the event completed successfully, FALSE if otherwise. Note that
-    // this will clobber the current event. Caller is responsible for ensuring
-    // it is safe to call this function.
+    // this will clobber the |$this->current_event|. Caller is responsible for
+    // ensuring it is safe to call this function.
     protected function _ProcessEvent(Event $event)
     {
         $this->current_event = $event;
-        $tuple = array(
-            self::EVENT_STATE  => self::EVENT_WILL_FIRE,
-            self::EVENT_OBJECT => $this->current_event
-        );
-        $this->events->Push($tuple);
-        $this->current_event->WillFire();
+        $event->set_state(self::EVENT_WILL_FIRE);
+        $this->events->Push($event);
+        $event->WillFire();
 
         // Make sure the event didn't get cancelled in WillFire().
         if ($event->is_cancelled())
@@ -111,9 +106,9 @@ class EventPump
             return FALSE;
         }
 
-        $tuple[self::EVENT_STATE] = self::EVENT_FIRE;
-        $this->events->Push($tuple);
-        $this->current_event->Fire();
+        $event->set_state(self::EVENT_FIRE);
+        $this->events->Push($event);
+        $event->Fire();
 
         // Make sure the event didn't get cancelled in Fire().
         if ($event->is_cancelled())
@@ -124,13 +119,13 @@ class EventPump
         }
 
         // The event successfully executed, so add it to the event chain.
-        $tuple[self::EVENT_STATE] = self::EVENT_CLEANUP;
-        $this->events->Push($tuple);
-        $this->current_event->Cleanup();
+        $event->set_state(self::EVENT_CLEANUP);
+        $this->events->Push($event);
+        $event->Cleanup();
 
         // Mark the event as done.
-        $tuple[self::EVENT_STATE] = self::EVENT_FINISHED;
-        $this->events->Push($tuple);
+        $event->set_state(self::EVENT_FINISHED);
+        $this->events->Push($event);
         $this->current_event = NULL;
 
         return TRUE;
@@ -170,22 +165,16 @@ class EventPump
     {
         if ($this->current_event)
         {
-            if ($this->GetCurrentEventState() < self::EVENT_CLEANUP)
+            if ($this->current_event->state() < self::EVENT_CLEANUP)
             {
-                $tuple = array(
-                    self::EVENT_STATE  => self::EVENT_CLEANUP,
-                    self::EVENT_OBJECT => $this->current_event
-                );
-                $this->events->Push($tuple);
+                $this->current_event->set_state(self::EVENT_CLEANUP);
+                $this->events->Push($this->current_event);
                 $this->current_event->Cleanup();
             }
-            else if ($this->GetCurrentEventState() < self::EVENT_FINISHED)
+            else if ($this->current_event->state() < self::EVENT_FINISHED)
             {
-                $tuple = array(
-                    self::EVENT_STATE  => self::EVENT_FINISHED,
-                    self::EVENT_OBJECT => $this->current_event
-                );
-                $this->events->Push($tuple);
+                $this->current_event->set_state(self::EVENT_FINISHED);
+                $this->events->Push($this->current_event);
             }
         }
 
@@ -211,10 +200,9 @@ class EventPump
     // event.
     public function GetCurrentEventState()
     {
-        foreach ($this->events as $tuple)
-            if ($tuple[self::EVENT_OBJECT] === $this->current_event)
-                return $tuple[self::EVENT_STATE];
-        return -1;
+        if (!$this->current_event)
+            return -1;
+        return $this->current_event->state();
     }
 
     // Returns the queue of Events that have been registered with PostEvent()
@@ -230,14 +218,24 @@ class EventPump
     public function GetEventChain()
     {
         $chain = new \SplStack();
-        foreach ($this->events as $tuple)
-            if ($tuple[self::EVENT_STATE] == self::EVENT_FINISHED)
-                $chain->Unshift($tuple[self::EVENT_OBJECT]);
+        $added = array();
+        // If we traverse in order, then we preserve the order that events
+        // made it to the EVENT_FINISHED state, so long as we exclude
+        // duplicates.
+        foreach ($this->events as $event)
+        {
+            if ($event->state() == self::EVENT_FINISHED && !in_array($event, $added))
+            {
+                $chain->Unshift($event);
+                $added[] = $event;
+            }
+        }
         return $chain;
     }
 
-    // Returns |$this->events| as a stack of 2-Tuples storing event state and
-    // the event object.
+    // Returns |$this->events| as a stack. Note that events will likely appear
+    // multiple times in this stack. The occurrence count corresponds to which
+    // states the event has passed through.
     public function GetAllEvents()
     {
         return clone $this->events;
