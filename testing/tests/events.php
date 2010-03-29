@@ -28,26 +28,6 @@ require_once PHALANX_ROOT . '/events/output_handler.php';
 require_once PHALANX_ROOT . '/events/view_output_handler.php';
 require_once PHALANX_ROOT . '/events/unit_test_output_handler.php';
 
-class EventsSuite
-{
-    static public function suite()
-    {
-        $suite = new \PHPUnit_Framework_TestSuite('Events');
-
-        $suite->addTestFile(TEST_ROOT . '/tests/events/dispatcher_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/events/event_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/events/event_pump_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/events/http_dispatcher_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/events/output_handler_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/events/view_output_handler_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/events/unit_test_output_handler_test.php');
-
-        return $suite;
-    }
-}
-
-// Common fixtures.
-
 class TestEvent extends events\Event
 {
     public $will_fire = FALSE;

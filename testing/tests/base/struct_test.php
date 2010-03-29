@@ -17,7 +17,7 @@
 namespace phalanx\test;
 use \phalanx\base as base;
 
-require_once 'PHPUnit/Framework.php';
+require_once TEST_ROOT . '/tests/base.php';
 
 class TestStruct extends base\Struct
 {

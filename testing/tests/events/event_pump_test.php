@@ -20,6 +20,8 @@ use \phalanx\events\EventPump;
 
 require_once 'PHPUnit/Framework.php';
 
+require_once TEST_ROOT . '/tests/events.php';
+
 $test = NULL;
 
 class NestedEvent extends TestEvent

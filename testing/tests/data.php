@@ -25,22 +25,6 @@ require_once PHALANX_ROOT . '/data/form_key.php';
 require_once PHALANX_ROOT . '/data/keyed_cleaner.php';
 require_once PHALANX_ROOT . '/data/model.php';
 
-class DataSuite
-{
-    static public function suite()
-    {
-        $suite = new \PHPUnit_Framework_TestSuite('Data');
-
-        $suite->addTestFile(TEST_ROOT . '/tests/data/cleaner_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/data/form_key_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/data/form_key_event_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/data/keyed_cleaner_test.php');
-        $suite->addTestFile(TEST_ROOT . '/tests/data/model_test.php');
-
-        return $suite;
-    }
-}
-
 class TestFormKeyManagerDelegate implements data\FormKeyManagerDelegate //,
 {
     public $did_get = FALSE;

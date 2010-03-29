@@ -22,18 +22,6 @@ require_once 'PHPUnit/Framework.php';
 // Common includes.
 require_once PHALANX_ROOT . '/views/view.php';
 
-class ViewSuite
-{
-    static public function suite()
-    {
-        $suite = new \PHPUnit_Framework_TestSuite('Views');
-
-        $suite->addTestFile(TEST_ROOT . '/tests/views/view_test.php');
-
-        return $suite;
-    }
-}
-
 // Exposer.
 class TestView extends views\View
 {

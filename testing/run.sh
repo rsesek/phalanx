@@ -1,8 +1,6 @@
 #!/bin/sh
 
-phpunit \
-    --verbose \
-    --color \
-    --coverage-html ./unittest_coverage \
-    $@ \
-all_tests.php
+OLDPWD=$(pwd)
+cd $(dirname "$0")
+phpunit --verbose $@
+cd $OLDPWD

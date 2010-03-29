@@ -18,29 +18,8 @@ namespace phalanx\test;
 
 require_once 'PHPUnit/Framework.php';
 
-define('PHALANX_ROOT', dirname(dirname(__FILE__)));
-define('TEST_ROOT', dirname(__FILE__));
-
-\PHPUnit_Util_Filter::addDirectoryToFilter(TEST_ROOT);
-
-class AllTests
+if (!defined('PHALANX_ROOT'))
 {
-    static public function suite()
-    {
-        $suite = new \PHPUnit_Framework_TestSuite('Phalanx');
-
-        require_once TEST_ROOT . '/tests/base.php';
-        $suite->addTestSuite(BaseSuite::suite());
-
-        require_once TEST_ROOT . '/tests/events.php';
-        $suite->addTestSuite(EventsSuite::suite());
-
-        require_once TEST_ROOT . '/tests/data.php';
-        $suite->addTestSuite(DataSuite::suite());
-
-        require_once TEST_ROOT . '/tests/views.php';
-        $suite->addTestSuite(ViewSuite::suite());
-
-        return $suite;
-    }
+    define('PHALANX_ROOT', dirname(dirname(__FILE__)));
+    define('TEST_ROOT', dirname(__FILE__));
 }
