@@ -64,4 +64,13 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher->Start();
     }
+
+    public function testBypassRules()
+    {
+        $this->assertNull($this->dispatcher->GetBypassRule('foo'));
+        $this->dispatcher->AddBypassRule('foo', 'moo');
+        $this->assertEquals('moo', $this->dispatcher->GetBypassRule('foo'));
+        $this->dispatcher->RemoveBypassRule('foo');
+        $this->assertNull($this->dispatcher->GetBypassRule('foo'));
+    }
 }

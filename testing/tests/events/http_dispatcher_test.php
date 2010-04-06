@@ -127,8 +127,8 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->T_set_request_method('PUT');
         $input = $this->dispatcher->T_TokenizeURL('/');
         $this->dispatcher->T_set_url_input($input);
-        $this->setExpectedException('phalanx\events\HTTPDispatcherException');
-        $this->dispatcher->T_GetEventName();
+        $this->setExpectedException('phalanx\events\DispatcherException');
+        $this->dispatcher->Start();
     }
 
     public function testGetInputGET()

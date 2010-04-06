@@ -42,7 +42,10 @@ class HTTPDispatcher extends Dispatcher
     public function Start()
     {
         $this->request_method = strtoupper($_SERVER['REQUEST_METHOD']);
-        $this->url_input      = $this->_TokenizeURL($_GET['__dispatch__']);
+        $url = '';
+        if (isset($_GET['__dispatch__']))
+            $url = $_GET['__dispatch__'];
+        $this->url_input      = $this->_TokenizeURL($url);
         parent::Start();
     }
 
@@ -84,8 +87,9 @@ class HTTPDispatcher extends Dispatcher
         if ($url_event != NULL)
             return $url_event;
         if ($this->request_method == 'POST')
-            return $_POST[$this->event_input_key];
-        throw new HTTPDispatcherException('Cannot determine event name in ' . __METHOD__);
+            if (isset($_POST[$this->event_input_key]))
+                return $_POST[$this->event_input_key];
+        return '';
     }
 
     // Returns the input based on the keys provided.

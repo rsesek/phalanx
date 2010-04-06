@@ -29,12 +29,34 @@ abstract class Dispatcher
     // the Dispatcher will use EventPump::Pump() singleton.
     protected $pump = NULL;
 
+    // An associative array of bypass rules. Bypass rules allow clients to
+    // specify either an event name or a closure to execute for a string key
+    // of an input event name. For example, clients will commonly want to
+    // specify an alternative event name for the empty input event name, like
+    // so (note that this is NOT an event class name, just another event name):
+    //    '' => 'home'
+    // This could alternatively be done using closuers:
+    //    '' => function() { EventPump::Pump()->PostEvent(new MyHomeEvent()); }
+    protected $bypass_rules = array();
+
     // This will begin synthesizing events and sending them to the pump.
     public function Start()
     {
         $event_name  = $this->_GetEventName();
+        $bypass = $this->GetBypassRule($event_name);
+        if ($bypass instanceof \Closure)
+        {
+            $bypass();
+            return;
+        }
+        else if ($bypass)
+        {
+            $event_name = $bypass;
+        }
+        if (!$event_name)
+            throw new DispatcherException('Could not determine event name');
         $loader      = $this->event_loader;
-        $event_class = $loader($event_name);
+        $event_class = $loader($event_name);            
         $input       = $this->_GetInput($event_class::InputList());
         $event       = new $event_class($input);
         $this->pump()->PostEvent($event);
@@ -60,4 +82,17 @@ abstract class Dispatcher
             return EventPump::Pump();
         return $this->pump;
     }
+
+    // Adds and removes bypass rules to the list.
+    public function AddBypassRule($name, $rule) { $this->bypass_rules[$name] = $rule; }
+    public function RemoveBypassRule($name) { unset($this->bypass_rules[$name]); }
+    public function GetBypassRule($name)
+    {
+        if (!isset($this->bypass_rules[$name]))
+            return NULL;
+        return $this->bypass_rules[$name];
+    }
 }
+
+class DispatcherException extends \Exception
+{}
