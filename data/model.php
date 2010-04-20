@@ -139,6 +139,31 @@ class Model extends \phalanx\base\Struct
         return $params;
     }
 
+    // Returns an array of Model objects of the correct type based on a group
+    // condition. If no condition is specified, returns all results in the table.
+    static public function FetchGroup($condition = '', $params = array())
+    {
+        $class = get_called_class();  // Late static binding.
+        $props = new $class();
+        $sql = "SELECT * FROM {$props->table_prefix}{$props->table}";
+        if ($condition)
+            $sql .= " WHERE $condition";
+        $stmt = self::$db->Prepare($sql);
+
+        if (!is_array($params))
+            $params = array($params);
+        $stmt->Execute($params);
+
+        $results = array();
+        while ($obj = $stmt->FetchObject())
+        {
+            $model = new $class();
+            $model->SetFrom($obj);
+            $results[] = $model;
+        }
+        return $results;
+    }
+
     // Getters and setters.
     // ------------------------------------------------------------------------
     public function condition() { return $this->condition; }

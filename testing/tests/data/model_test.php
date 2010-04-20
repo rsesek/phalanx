@@ -130,6 +130,38 @@ class ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobar', $model->description);
     }
 
+    public function testFetchGroup()
+    {
+      $model = new TestModel();
+      $model->title = 'test';
+      $model->description = 'foo';
+      $model->Insert();
+
+      $model = new TestModel();
+      $model->title = 'test';
+      $model->description = 'bar';
+      $model->Insert();
+
+      $model = new TestModel();
+      $model->title = 'foo';
+      $model->description = 'test';
+      $model->Insert();
+
+      $model = new TestModel();
+      $model->title = 'test';
+      $model->description = 'baz';
+      $model->Insert();
+
+      $results = TestModel::FetchGroup('title = ?', 'test');
+      $this->assertEquals(3, count($results));
+
+      $results = TestModel::FetchGroup('title = :title', array('title' => 'test'));
+      $this->assertEquals(3, count($results));
+
+      $results = TestModel::FetchGroup();
+      $this->assertEquals(4, count($results));
+    }
+
     public function testUpdate()
     {
         $model = new TestModel();
