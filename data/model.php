@@ -43,6 +43,13 @@ class Model extends \phalanx\base\Struct
 
     // The name of the field(s) that provide the primary key. This can either
     // be a single string or an array for a compound key.
+    //
+    // A word on primary keys: This class assumes that if the primary key is
+    // singular (defined as a string), then it is auto-increment. The
+    // implications of this are that the set primary key value is igorned on
+    // inserts and upates. If you do not want this behavior for a table with a
+    // truly singluar primary key, define it as a plural/compound primary key
+    // in the Model (defined as an array).
     protected $primary_key = 'pkey';
 
     // Constructor. This takes in either the value(s) to substitute into the
@@ -128,12 +135,11 @@ class Model extends \phalanx\base\Struct
     protected function _GetSQLParams(\PDOStatement $stmt)
     {
         $matches = array();
-        preg_match_all('/\:[a-z0-9_\-]+/i', $stmt->queryString, $matches);
+        preg_match_all('/\:([a-z0-9_\-]+)/i', $stmt->queryString, $matches);
         $params = array();
         $data   = $this->ToArray();
-        foreach ($matches[0] as $key)
+        foreach ($matches[1] as $key)
         {
-            $key = substr($key, 1);  // Cut off leading colon.
             $params[$key] = $data[$key];            
         }
         return $params;
@@ -141,6 +147,8 @@ class Model extends \phalanx\base\Struct
 
     // Returns an array of Model objects of the correct type based on a group
     // condition. If no condition is specified, returns all results in the table.
+    // If the |$params| argument is not an array, it will be assumed to be a
+    // single value and will be converted to an array.
     static public function FetchGroup($condition = '', $params = array())
     {
         $class = get_called_class();  // Late static binding.
