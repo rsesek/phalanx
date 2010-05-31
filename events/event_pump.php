@@ -78,11 +78,12 @@ class EventPump
     // resume afterwards.
     public function RaiseEvent(Event $event)
     {
-        $waiting_event = $this->current_event;
+        $this->deferred_events->Push($this->current_event);
 
         $this->_ProcessEvent($event);
 
-        $this->current_event = $waiting_event;
+        if ($this->deferred_events->Count())
+            $this->current_event = $this->deferred_events->Pop();
 
         $this->_DoDeferredEvents();
     }
@@ -156,7 +157,7 @@ class EventPump
     public function CancelDeferredEvents()
     {
         while ($this->deferred_events->Count() > 0)
-            $this->deferred_events->Shift();
+            $this->deferred_events->Shift()->Cancel();
     }
 
     // Tells the pump to stop pumping events and to begin output handling. This
