@@ -156,7 +156,7 @@ class EventPump
     // using this method.
     public function CancelDeferredEvents()
     {
-        while ($this->deferred_events->Valid())
+        while ($this->deferred_events->Count() > 0)
             $this->deferred_events->Shift()->Cancel();
     }
 
