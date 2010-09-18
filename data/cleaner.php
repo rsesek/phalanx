@@ -40,7 +40,7 @@ class Cleaner
         $replace = array(
             '&lt;',
             '&gt;',
-            '&quo;'
+            '&quot;'
         );
         return str_replace($find, $replace, $str);
     }

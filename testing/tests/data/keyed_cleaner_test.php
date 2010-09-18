@@ -99,13 +99,13 @@ class KeyedCleanerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('&lt;strong&gt;html&lt;/strong&gt;', $this->fixture['html']);
 
         $this->cleaner->GetHTML('dqstr');
-        $this->assertEquals('&quo;double quoted string&quo;', $this->fixture['dqstr']);
+        $this->assertEquals('&quot;double quoted string&quot;', $this->fixture['dqstr']);
 
         $this->cleaner->GetHTML('sqstr');
         $this->assertEquals("'single quoted string'", $this->fixture['sqstr']);
 
         $this->cleaner->GetHTML('dqhtml');
-        $this->assertEquals('&lt;strong&gt;html with &quo;double quotes&quo;&lt;/strong&gt;', $this->fixture['dqhtml']);
+        $this->assertEquals('&lt;strong&gt;html with &quot;double quotes&quot;&lt;/strong&gt;', $this->fixture['dqhtml']);
 
         $this->cleaner->GetHTML('entity');
         $this->assertEquals('red, green, & blue', $this->fixture['entity']);

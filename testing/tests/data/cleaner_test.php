@@ -63,9 +63,9 @@ class CleanerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('string', Cleaner::HTML($this->fixture['str']));
         $this->assertEquals('&lt;strong&gt;html&lt;/strong&gt;', Cleaner::HTML($this->fixture['html']));
-        $this->assertEquals('&quo;double quoted string&quo;', Cleaner::HTML($this->fixture['dqstr']));
+        $this->assertEquals('&quot;double quoted string&quot;', Cleaner::HTML($this->fixture['dqstr']));
         $this->assertEquals("'single quoted string'", Cleaner::HTML($this->fixture['sqstr']));
-        $this->assertEquals('&lt;strong&gt;html with &quo;double quotes&quo;&lt;/strong&gt;', Cleaner::HTML($this->fixture['dqhtml']));
+        $this->assertEquals('&lt;strong&gt;html with &quot;double quotes&quot;&lt;/strong&gt;', Cleaner::HTML($this->fixture['dqhtml']));
         $this->assertEquals('red, green, & blue', Cleaner::HTML($this->fixture['entity']));
     }
 
