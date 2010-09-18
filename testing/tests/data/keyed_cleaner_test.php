@@ -158,4 +158,14 @@ class KeyedCleanerTest extends \PHPUnit_Framework_TestCase
         $this->cleaner->GetBool('boolN');
         $this->assertEquals(FALSE, $this->fixture['boolN']);
     }
+
+    public function testCleanNonExistant()
+    {
+        $this->assertEquals('', $this->cleaner->GetString('nString'));
+        $this->assertEquals('', $this->cleaner->GetTrimmedString('nTString'));
+        $this->assertEquals('', $this->cleaner->GetHTML('nHTML'));
+        $this->assertEquals(0, $this->cleaner->GetInt('nInt'));
+        $this->assertEquals(0.0, $this->cleaner->GetFloat('nFloat'));
+        $this->assertEquals(NULL, $this->cleaner->GetBool('nBool'));
+    }
 }

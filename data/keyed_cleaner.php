@@ -26,6 +26,9 @@ require_once PHALANX_ROOT . '/data/cleaner.php';
 //     $cleaner = new KeyedCleaner($context->gpc);
 //     $cleaner->GetHTML('p.some_key');
 //     print $context->gpc['p']['some_key'];
+//
+// Note that a KeyedCleaner will NEVER throw undefined errors.  It will merely
+// convert the value of NULL to the desired sanitized type.
 class KeyedCleaner
 {
     // A ref to the array this cleaner manages. Operations performed on this
@@ -40,44 +43,86 @@ class KeyedCleaner
 
     public function GetString($key)
     {
-        $val = Cleaner::String($this->keyer->Get($key));
-        $this->keyer->Set($key, $val);
-        return $val;
+        try
+        {
+            $val = Cleaner::String($this->keyer->Get($key));
+            $this->keyer->Set($key, $val);
+            return $val;
+        }
+        catch (\phalanx\base\UndefinedKeyException $e)
+        {
+            return '';
+        }
     }
 
     public function GetTrimmedString($key)
     {
-        $val = Cleaner::TrimmedString($this->keyer->Get($key));
-        $this->keyer->Set($key, $val);
-        return $val;
+        try
+        {
+            $val = Cleaner::TrimmedString($this->keyer->Get($key));
+            $this->keyer->Set($key, $val);
+            return $val;
+        }
+        catch (\phalanx\base\UndefinedKeyException $e)
+        {
+            return '';
+        }
     }
 
     public function GetHTML($key)
     {
-        $val = Cleaner::HTML($this->keyer->Get($key));
-        $this->keyer->Set($key, $val);
-        return $val;
+        try
+        {
+            $val = Cleaner::HTML($this->keyer->Get($key));
+            $this->keyer->Set($key, $val);
+            return $val;
+        }
+        catch (\phalanx\base\UndefinedKeyException $e)
+        {
+            return '';
+        }
     }
 
     public function GetInt($key)
     {
-        $val = Cleaner::Int($this->keyer->Get($key));
-        $this->keyer->Set($key, $val);
-        return $val;
+        try
+        {
+            $val = Cleaner::Int($this->keyer->Get($key));
+            $this->keyer->Set($key, $val);
+            return $val;
+        }
+        catch (\phalanx\base\UndefinedKeyException $e)
+        {
+            return 0;
+        }        
     }
 
     public function GetFloat($key)
     {
-        $val = Cleaner::Float($this->keyer->Get($key));
-        $this->keyer->Set($key, $val);
-        return $val;
+        try
+        {
+            $val = Cleaner::Float($this->keyer->Get($key));
+            $this->keyer->Set($key, $val);
+            return $val;
+        }
+        catch (\phalanx\base\UndefinedKeyException $e)
+        {
+            return 0.0;
+        }
     }
 
     public function GetBool($key)
     {
-        $val = Cleaner::Bool($this->keyer->Get($key));
-        $this->keyer->Set($key, $val);
-        return $val;
+        try
+        {
+            $val = Cleaner::Bool($this->keyer->Get($key));
+            $this->keyer->Set($key, $val);
+            return $val;
+        }
+        catch (\phalanx\base\UndefinedKeyException $e)
+        {
+            return NULL;
+        }        
     }
 
     // Getters and setters.
