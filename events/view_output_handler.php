@@ -34,10 +34,15 @@ class ViewOutputHandler extends OutputHandler
         if (EventPump::Pump()->GetEventChain()->Count() > 0)
         {
             $event    = EventPump::Pump()->GetEventChain()->Top();
-            $loader   = $this->template_loader;
-            $tpl_name = $loader(get_class($event));
-            $data     = $this->GetEventData($event);
+            $tpl_name = '';
+            if ($event instanceof \phalanx\views\CustomViewEvent) {
+                $tpl_name = $event->CustomTemplateName();
+            } else {
+                $loader   = $this->template_loader;
+                $tpl_name = $loader(get_class($event));
+            }
 
+            $data     = $this->GetEventData($event);
             $view     = new View($tpl_name);
             $keys     = $data->AllKeys();
             foreach ($keys as $key)

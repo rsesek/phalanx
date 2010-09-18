@@ -63,6 +63,7 @@ class View
         $this->_Cache();
         $view = new \phalanx\data\KeyedCleaner($this->vars->ToArray());
         $view->keyer()->set_throw_undefined_errors(FALSE);
+        $this->vars->set_throw_undefined_errors(FALSE);
         include $this->_CachePath($this->template_name);
     }
 

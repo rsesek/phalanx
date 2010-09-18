@@ -20,6 +20,14 @@ use \phalanx\events as events;
 require_once 'PHPUnit/Framework.php';
 require_once TEST_ROOT . '/tests/views.php';
 
+class CustomViewEvent extends TestEvent implements \phalanx\views\CustomViewEvent
+{
+    public function CustomTemplateName()
+    {
+        return 'custom_test';
+    }
+}
+
 class ViewOutputHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public $handler;
@@ -66,6 +74,22 @@ class ViewOutputHandlerTest extends \PHPUnit_Framework_TestCase
         ob_end_clean();
 
         $expected = "ViewOutputHandler test template.\n(1) foo (2) bar";
+        $this->assertEquals($expected, $data);
+    }
+
+    public function testCustomTemplate()
+    {
+        $this->handler->set_template_loader(function() { return 'render_test'; });
+        $this->pump->set_output_handler($this->handler);
+        $this->pump->PostEvent(new CustomViewEvent());
+        TestView::SetupPaths();
+
+        ob_start();
+        $this->pump->StopPump();
+        $data = ob_get_contents();
+        ob_end_clean();
+
+        $expected = "This is a custom template.";
         $this->assertEquals($expected, $data);
     }
 }
