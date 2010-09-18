@@ -110,6 +110,16 @@ class CurrentEventTester extends TestEvent
     }
 }
 
+class CancelDeferredEventsTester extends TestEvent
+{
+    public function Fire()
+    {
+        global $test;
+        $test->pump->CancelDeferredEvents();
+        parent::Fire();
+    }
+}
+
 class StopPumpEvent extends TestEvent
 {
     public function Fire()
@@ -368,5 +378,11 @@ class EventPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $this->pump->GetEventChain()->Count());
         $this->assertSame($event2, $this->pump->GetEventChain()->Top());
         $this->assertSame($event1, $this->pump->GetEventChain()->Bottom());
+    }
+
+    public function testCancelDeferredEventsByRaisingAnEvent()
+    {
+        $event = new CancelDeferredEventsTester();
+        $this->pump->RaiseEvent($event);
     }
 }
