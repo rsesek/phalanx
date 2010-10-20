@@ -66,6 +66,12 @@ class View
         include $this->_CachePath($this->template_name);
     }
 
+    // Wrapper for Cleaner::HTML().
+    public function HTML($string)
+    {
+        return \phalanx\data\Cleaner::HTML($string);
+    }
+
     // Loads the template from the file system, pre-processes the template, and
     // stores the cached result in the file system.
     protected function _Cache()
