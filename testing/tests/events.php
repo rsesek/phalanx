@@ -20,6 +20,7 @@ use \phalanx\events as events;
 require_once 'PHPUnit/Framework.php';
 
 // Common includes.
+require_once PHALANX_ROOT . '/events/cli_dispatcher.php';
 require_once PHALANX_ROOT . '/events/dispatcher.php';
 require_once PHALANX_ROOT . '/events/event.php';
 require_once PHALANX_ROOT . '/events/event_pump.php';
