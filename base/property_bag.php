@@ -26,14 +26,12 @@ require_once PHALANX_ROOT . '/base/key_descender.php';
 // object, the contents are copied rather than referenced.
 class PropertyBag extends KeyDescender
 {
-    // We override __set() and __get() and put the data in here.
-    protected $properties = array();
-
     public function __construct($properties = array())
     {
         if (self::IsDescendable($properties))
-            $this->properties = $properties;
-        $this->root = &$this->properties;
+            $this->root = $properties;
+        else
+            $this->root = array();
     }
 
     // Sets a key-value pair.
@@ -51,36 +49,36 @@ class PropertyBag extends KeyDescender
     // Returns the number of items in the PropertyBag.
     public function Count()
     {
-        return count($this->properties);
+        return count($this->root);
     }
 
     // Returns an array containing all the keys in the property bag.
     public function AllKeys()
     {
-        return array_keys($this->properties);
+        return array_keys($this->root);
     }
 
     // Returns an array of just the values in the property bag.
     public function AllValues()
     {
-        return array_values($this->properties);
+        return array_values($this->root);
     }
 
     // Returns the entire property bag as an associative array/hash.
     public function ToArray()
     {
-        return $this->properties;
+        return $this->root;
     }
 
     // Checks whether or not a given key has been set in the property bag.
     public function HasKey($key)
     {
-        return isset($this->properties[$key]);
+        return isset($this->root[$key]);
     }
 
     // Checks if a value is in the property bag.
     public function Contains($value)
     {
-        return in_array($value, $this->properties);
+        return in_array($value, $this->root);
     }
 }
