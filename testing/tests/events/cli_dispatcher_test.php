@@ -56,7 +56,7 @@ class CLIDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->dispatcher = new TestCLIDispatcher();
+        $this->dispatcher = new TestCLIDispatcher(array());
     }
 
     public function testParseNoArguments()

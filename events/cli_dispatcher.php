@@ -27,10 +27,18 @@ class CLIDispatcher extends Dispatcher
     // The input parsed from the command line arguments.
     protected $cli_input;
 
+    // The raw array of unparsed arguments.
+    protected $argv = array();
+
+    public function __construct($argv)
+    {
+        $this->argv = $argv;
+    }
+
     // Override Start() in order to parse the arguments.
     public function Start()
     {
-        $this->cli_input = $this->_ParseArguments($argv);
+        $this->cli_input = $this->_ParseArguments($this->argv);
         parent::Start();
     }
 
