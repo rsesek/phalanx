@@ -21,13 +21,14 @@ require_once 'PHPUnit/Framework.php';
 
 // Common includes.
 require_once PHALANX_ROOT . '/events/cli_dispatcher.php';
+require_once PHALANX_ROOT . '/events/cli_output_handler.php';
 require_once PHALANX_ROOT . '/events/dispatcher.php';
 require_once PHALANX_ROOT . '/events/event.php';
 require_once PHALANX_ROOT . '/events/event_pump.php';
 require_once PHALANX_ROOT . '/events/http_dispatcher.php';
 require_once PHALANX_ROOT . '/events/output_handler.php';
-require_once PHALANX_ROOT . '/events/view_output_handler.php';
 require_once PHALANX_ROOT . '/events/unit_test_output_handler.php';
+require_once PHALANX_ROOT . '/events/view_output_handler.php';
 
 class TestEvent extends events\Event
 {
