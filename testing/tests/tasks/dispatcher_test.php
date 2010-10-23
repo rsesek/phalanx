@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\tasks as events;
+use \phalanx\tasks as tasks;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -42,9 +42,9 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testSetPump()
     {
         $this->assertNotNull($this->dispatcher->pump());
-        $this->assertSame(events\TaskPump::Pump(), $this->dispatcher->pump());
+        $this->assertSame(tasks\TaskPump::Pump(), $this->dispatcher->pump());
 
-        $pump = new events\TaskPump();
+        $pump = new tasks\TaskPump();
         $this->dispatcher->set_pump($pump);
         $this->assertSame($pump, $this->dispatcher->pump());
     }

@@ -21,7 +21,7 @@ require_once PHALANX_ROOT . '/tasks/dispatcher.php';
 
 class HTTPDispatcher extends Dispatcher
 {
-    // The name of the input key to get the event name from.
+    // The name of the input key to get the task name from.
     protected $task_input_key;
 
     // The request method, uppercase.
@@ -30,12 +30,12 @@ class HTTPDispatcher extends Dispatcher
     // The input parsed from the URL.
     protected $url_input;
 
-    // Create a new HTTPDispatcher that will synthesize events based on the
-    // event name specified in the HTTP input variable, keyed by
+    // Create a new HTTPDispatcher that will synthesize tasks based on the
+    // task name specified in the HTTP input variable, keyed by
     // |$task_input_key|.
     public function __construct($task_input_key = 'phalanx_task')
     {
-        $this->event_input_key = $task_input_key;
+        $this->task_input_key = $task_input_key;
     }
 
     // Override Start() in order to parse the URL.
@@ -51,12 +51,12 @@ class HTTPDispatcher extends Dispatcher
 
     // Getters and setters.
     // ------------------------------------------------------------------------
-    public function event_input_key() { return $this->event_input_key; }
+    public function task_input_key() { return $this->task_input_key; }
 
-    // This splits a request URL into the event name and then appropriate key
+    // This splits a request URL into the task name and then appropriate key
     // value matching. URLs can take the form:
-    //   /event_name/id
-    //   /event_name/k1/v1/k2/v2/
+    //   /task_name/id
+    //   /task_name/k1/v1/k2/v2/
     protected function _TokenizeURL($url)
     {
         $input = new \phalanx\base\PropertyBag();
@@ -80,15 +80,15 @@ class HTTPDispatcher extends Dispatcher
         return $input;
     }
 
-    // Gets the event name.
+    // Gets the task name.
     protected function _GetTaskName()
     {
         $url_task = $this->url_input->Get('_task');
         if ($url_task != NULL)
             return $url_task;
         if ($this->request_method == 'POST')
-            if (isset($_POST[$this->event_input_key]))
-                return $_POST[$this->event_input_key];
+            if (isset($_POST[$this->task_input_key]))
+                return $_POST[$this->task_input_key];
         return '';
     }
 

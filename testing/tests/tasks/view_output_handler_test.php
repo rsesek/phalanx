@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\tasks as events;
+use \phalanx\tasks as tasks;
 
 require_once 'PHPUnit/Framework.php';
 require_once TEST_ROOT . '/tests/views.php';
@@ -38,9 +38,9 @@ class ViewOutputHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->handler = new events\ViewOutputHandler();
+        $this->handler = new tasks\ViewOutputHandler();
         $this->pump    = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
-        events\TaskPump::T_set_pump($this->pump);
+        tasks\TaskPump::T_set_pump($this->pump);
 
         $this->tpl_path = TestView::template_path();
         $this->cache_path = TestView::cache_path();

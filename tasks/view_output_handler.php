@@ -23,10 +23,10 @@ require_once PHALANX_ROOT . '/views/view.php';
 
 // This implementation of OutputHandler uses the Views system to present
 // output. This class requires a Lambda function to transform the last-
-// processed event's name into a template name.
+// processed task's name into a template name.
 class ViewOutputHandler extends OutputHandler
 {
-    // The function that transforms an event name into a template name.
+    // The function that transforms an task name into a template name.
     protected $template_loader;
 
     protected function _DoStart()

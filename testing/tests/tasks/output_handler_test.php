@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\tasks as events;
+use \phalanx\tasks as tasks;
 
 require_once 'PHPUnit/Framework.php';
 

@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\tasks as events;
+use \phalanx\tasks as tasks;
 use \phalanx\tasks\TaskPump;
 
 require_once 'PHPUnit/Framework.php';
@@ -325,8 +325,8 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
     public function testNestedStopPump()
     {
         // This test needs to run in a separate process. When StopPump() gets
-        // called, it won't stop execution so the outer event will continue
-        // being processed, resulting in an invalid event chain.
+        // called, it won't stop execution so the outer task will continue
+        // being processed, resulting in an invalid task chain.
         $this->markTestSkipped();
 
         $this->pump = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));

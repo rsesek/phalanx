@@ -15,11 +15,11 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\tasks as events;
+use \phalanx\tasks as tasks;
 
 require_once 'PHPUnit/Framework.php';
 
-class MessageTask extends events\Task
+class MessageTask extends tasks\Task
 {
     public $message = null;
 
@@ -48,10 +48,10 @@ class CLIOutputHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->handler = new events\CLIOutputHandler();
+        $this->handler = new tasks\CLIOutputHandler();
         $this->pump    = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
         $this->pump->set_output_handler($this->handler);
-        events\TaskPump::T_set_pump($this->pump);
+        tasks\TaskPump::T_set_pump($this->pump);
     }
 
     protected function _GetOutput()

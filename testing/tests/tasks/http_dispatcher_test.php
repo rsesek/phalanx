@@ -15,11 +15,11 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\tasks as events;
+use \phalanx\tasks as tasks;
 
 require_once 'PHPUnit/Framework.php';
 
-class TestHTTPDispatcher extends events\HTTPDispatcher
+class TestHTTPDispatcher extends tasks\HTTPDispatcher
 {
     public function T_set_request_method($m) { $this->request_method = $m; }
     public function T_set_url_input($i) { $this->url_input = $i; }
@@ -51,10 +51,10 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testCtor()
     {
-        $this->assertEquals('ename', $this->dispatcher->event_input_key());
+        $this->assertEquals('ename', $this->dispatcher->task_input_key());
 
         $this->dispatcher = new TestHTTPDispatcher();
-        $this->assertEquals('phalanx_task', $this->dispatcher->event_input_key());
+        $this->assertEquals('phalanx_task', $this->dispatcher->task_input_key());
     }
 
     public function testTokenizeURLSimple()
@@ -99,27 +99,27 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testGetTaskNameGET()
     {
         $this->dispatcher->T_set_request_method('GET');
-        $input = $this->dispatcher->T_TokenizeURL('/event.test/param1/value');
+        $input = $this->dispatcher->T_TokenizeURL('/task.test/param1/value');
         $this->dispatcher->T_set_url_input($input);
-        $this->assertEquals('event.test', $this->dispatcher->T_GetTaskName());
+        $this->assertEquals('task.test', $this->dispatcher->T_GetTaskName());
     }
 
     public function testGetTaskNamePOSTWithURL()
     {
         $this->dispatcher->T_set_request_method('POST');
-        $_POST[$this->dispatcher->event_input_key()] = '-invalid-';
-        $input = $this->dispatcher->T_TokenizeURL('/event.post');
+        $_POST[$this->dispatcher->task_input_key()] = '-invalid-';
+        $input = $this->dispatcher->T_TokenizeURL('/task.post');
         $this->dispatcher->T_set_url_input($input);
-        $this->assertEquals('event.post', $this->dispatcher->T_GetTaskName());
+        $this->assertEquals('task.post', $this->dispatcher->T_GetTaskName());
     }
 
     public function testGetTaskNamePOST()
     {
         $this->dispatcher->T_set_request_method('POST');
-        $_POST[$this->dispatcher->event_input_key()] = 'event.post2';
+        $_POST[$this->dispatcher->task_input_key()] = 'task.post2';
         $input = $this->dispatcher->T_TokenizeURL('/');
         $this->dispatcher->T_set_url_input($input);
-        $this->assertEquals('event.post2', $this->dispatcher->T_GetTaskName());
+        $this->assertEquals('task.post2', $this->dispatcher->T_GetTaskName());
     }
 
     public function testGetTaskNameBad()
@@ -135,7 +135,7 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $_GET['key1'] = '-invalid-';
         $this->dispatcher->T_set_request_method('GET');
-        $input = $this->dispatcher->T_TokenizeURL('/event.input/key1/foo/key2/bar/misc/baz/else/4');
+        $input = $this->dispatcher->T_TokenizeURL('/task.input/key1/foo/key2/bar/misc/baz/else/4');
         $this->dispatcher->T_set_url_input($input);
         $gathered_input = $this->dispatcher->T_GetInput(TestTask::InputList());
         $this->assertEquals(3, $gathered_input->Count());
@@ -170,7 +170,7 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testGetInputGETMissingKey()
     {
         $this->dispatcher->T_set_request_method('GET');
-        $input = $this->dispatcher->T_TokenizeURL('/event.bad/key1/foo/');
+        $input = $this->dispatcher->T_TokenizeURL('/task.bad/key1/foo/');
         $this->dispatcher->T_set_url_input($input);
         $gathered_input = $this->dispatcher->T_GetInput(TestTask::InputList());
         $this->assertEquals(2, $gathered_input->Count());

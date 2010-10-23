@@ -32,26 +32,26 @@ class FormKeyTaskTest extends \PHPUnit_Framework_TestCase
     {
         $this->pump = new \phalanx\tasks\TaskPump();
         $this->form_key = new data\FormKeyManager(new TestFormKeyManagerDelegate());
-        $this->event = new data\ValidateFormKeyTask($this->form_key);
+        $this->task = new data\ValidateFormKeyTask($this->form_key);
     }
 
     public function testCtor()
     {
-        $this->assertAttributeSame($this->form_key, 'manager', $this->event);
+        $this->assertAttributeSame($this->form_key, 'manager', $this->task);
     }
 
     public function testNoInput()
     {
-        $this->pump->QueueTask($this->event);
-        $this->assertTrue($this->event->is_cancelled());
+        $this->pump->QueueTask($this->task);
+        $this->assertTrue($this->task->is_cancelled());
     }
 
     public function testGETKey()
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_GET['phalanx_form_key'] = 'foo';
-        $this->pump->QueueTask($this->event);
-        $this->assertTrue($this->event->is_cancelled());
+        $this->pump->QueueTask($this->task);
+        $this->assertTrue($this->task->is_cancelled());
     }
 
     public function testInputList()
@@ -70,9 +70,9 @@ class FormKeyTaskTest extends \PHPUnit_Framework_TestCase
         $_POST['phalanx_form_key'] = 'foo';
 
         $this->setExpectedException('phalanx\data\FormKeyException');
-        $this->pump->QueueTask($this->event);
+        $this->pump->QueueTask($this->task);
 
-        $this->assertFalse($this->event->is_cancelled());
+        $this->assertFalse($this->task->is_cancelled());
         $this->assertTrue($this->form_key->delegate()->did_get);
     }
 
@@ -81,9 +81,9 @@ class FormKeyTaskTest extends \PHPUnit_Framework_TestCase
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['phalanx_form_key'] = $this->form_key->Generate();
 
-        $this->pump->QueueTask($this->event);
+        $this->pump->QueueTask($this->task);
 
-        $this->assertFalse($this->event->is_cancelled());
+        $this->assertFalse($this->task->is_cancelled());
         $this->assertTrue($this->form_key->delegate()->did_get);
     }
 }

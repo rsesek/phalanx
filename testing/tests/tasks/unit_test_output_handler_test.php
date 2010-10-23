@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\tasks as events;
+use \phalanx\tasks as tasks;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -27,8 +27,8 @@ class UnitTestOutputHandlerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->pump    = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
-        events\TaskPump::T_set_pump($this->pump);
-        $this->handler = new events\UnitTestOutputHandler();
+        tasks\TaskPump::T_set_pump($this->pump);
+        $this->handler = new tasks\UnitTestOutputHandler();
         $this->pump->set_output_handler($this->handler);
     }
 

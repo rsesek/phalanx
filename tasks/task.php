@@ -16,18 +16,18 @@
 
 namespace phalanx\tasks;
 
-// A base representation of an event. Tasks should not generate any output,
+// A base representation of an task. Tasks should not generate any output,
 // rather they should store data in member variables, which can then be used by
 // the view system.
 abstract class Task
 {
-    // The input passed to the event upon creation.
+    // The input passed to the task upon creation.
     protected $input = NULL;
 
-    // Whether or not the event is cancelled.
+    // Whether or not the task is cancelled.
     private $cancelled = FALSE;
 
-    // The state of the event. This should ONLY ever be changed by the pump.
+    // The state of the task. This should ONLY ever be changed by the pump.
     private $state = 0;
 
     // Creates an instance of the Task class. The PropertyBag of input is
@@ -46,7 +46,7 @@ abstract class Task
     // OutputHandler can access. NULL for no output.
     abstract static public function OutputList();
 
-    // Called before the TaskPump is preparing to Fire() the event. This is a
+    // Called before the TaskPump is preparing to Fire() the task. This is a
     // good place to put permission and general sanity checks.
     public function WillFire() {}
 
@@ -59,7 +59,7 @@ abstract class Task
     // even if the Task is preempted by another and this one does not Fire().
     public function Cleanup() {}
 
-    // Cancels the current event. Cleanup() will still be called.
+    // Cancels the current task. Cleanup() will still be called.
     final public function Cancel()
     {
         TaskPump::Pump()->Cancel($this);
@@ -69,7 +69,7 @@ abstract class Task
     // --------------------------------------------------------------------------
     public function input() { return $this->input; }
 
-    // Marks the event as cancelled. Do not overload this, but rather perform
+    // Marks the task as cancelled. Do not overload this, but rather perform
     // cleanup in end().
     final public function set_cancelled() { $this->cancelled = TRUE; }
     final public function is_cancelled() { return $this->cancelled; }

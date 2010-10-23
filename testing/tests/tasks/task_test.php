@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\tasks as events;
+use \phalanx\tasks as tasks;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -25,15 +25,15 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->event = new TestTask();
+        $this->task = new TestTask();
     }
 
     public function testInput()
     {
         $args = new \phalanx\base\PropertyBag();
         $args->test = 'foo';
-        $this->event = new TestTask($args);
-        $this->assertSame($args, $this->event->input());
+        $this->task = new TestTask($args);
+        $this->assertSame($args, $this->task->input());
     }
 
     public function testCancel()

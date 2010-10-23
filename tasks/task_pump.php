@@ -16,36 +16,36 @@
 
 namespace phalanx\tasks;
 
-// User interaction and other functions produce events, which are raised and
-// registered with the TaskPump. The pump executes events as they come in, and
-// the last non-cancelled event is usually the one whose output is rendered.
+// User interaction and other functions produce tasks, which are raised and
+// registered with the TaskPump. The pump executes tasks as they come in, and
+// the last non-cancelled task is usually the one whose output is rendered.
 class TaskPump
 {
-    // The shared event pump object.
+    // The shared task pump object.
     private static $pump;
 
     // The OutputHandler instance for the pump.
     protected $output_handler = NULL;
 
-    // Task state constants. Be aware that the state of an event is set BEFORE
-    // the specified method is called. This is used to avoid event reentrancy.
+    // Task state constants. Be aware that the state of an task is set BEFORE
+    // the specified method is called. This is used to avoid task reentrancy.
     const TASK_WILL_FIRE = 1;
     const TASK_FIRE = 2;
     const TASK_CLEANUP = 3;
     const TASK_FINISHED = 4;
 
-    // An SplQueue of the events that were registered wtih QueueTask() but are
-    // waiting for the current event to finish.
+    // An SplQueue of the tasks that were registered wtih QueueTask() but are
+    // waiting for the current task to finish.
     protected $task_queue = NULL;
 
-    // A SplStack of Task objects. The stack is a history of event state
+    // A SplStack of Task objects. The stack is a history of task state
     // changes. The actual change that happened doesn't actually matter
     // (and can be computed based on the occurrence count), but we need to
     // maintain relative ordering of the changes amongst all Tasks.
     protected $tasks = NULL;
 
-    // The event that is currently executing. Will be NULL if there is no such
-    // event.
+    // The task that is currently executing. Will be NULL if there is no such
+    // task.
     protected $current_task = NULL;
 
     // Constructor. Do not use directly. Use TaskPump::Pump().
@@ -55,12 +55,12 @@ class TaskPump
         $this->tasks      = new \SplStack();
     }
 
-    // Schedules an event to be run. If another event is currently being fired,
-    // this will wait until that event is done. If no events are currently
-    // running, the event will fire immediately.
+    // Schedules an task to be run. If another task is currently being fired,
+    // this will wait until that task is done. If no tasks are currently
+    // running, the task will fire immediately.
     public function QueueTask(Task $task)
     {
-        // There is already an event executing. Push this new event into the
+        // There is already an task executing. Push this new task into the
         // deferred worke queue.
         if ($this->current_task)
         {
@@ -73,8 +73,8 @@ class TaskPump
         $this->_DoDeferredTasks();
     }
 
-    // Preempts any currently executing event and preempts it with this event.
-    // |$task| will begin processing immediately. The other event will
+    // Preempts any currently executing task and preempts it with this task.
+    // |$task| will begin processing immediately. The other task will
     // resume afterwards.
     public function RunTask(Task $task)
     {
@@ -89,8 +89,8 @@ class TaskPump
         $this->_DoDeferredTasks();
     }
 
-    // This function does the bulk of the event processing work. This returns
-    // TRUE if the event completed successfully, FALSE if otherwise. Note that
+    // This function does the bulk of the task processing work. This returns
+    // TRUE if the task completed successfully, FALSE if otherwise. Note that
     // this will clobber the |$this->current_task|. Caller is responsible for
     // ensuring it is safe to call this function.
     protected function _ProcessTask(Task $task)
@@ -100,7 +100,7 @@ class TaskPump
         $this->tasks->Push($task);
         $task->WillFire();
 
-        // Make sure the event didn't get cancelled in WillFire().
+        // Make sure the task didn't get cancelled in WillFire().
         if ($task->is_cancelled())
         {
             $task->Cleanup();
@@ -112,7 +112,7 @@ class TaskPump
         $this->tasks->Push($task);
         $task->Fire();
 
-        // Make sure the event didn't get cancelled in Fire().
+        // Make sure the task didn't get cancelled in Fire().
         if ($task->is_cancelled())
         {
             $task->Cleanup();
@@ -120,12 +120,12 @@ class TaskPump
             return FALSE;
         }
 
-        // The event successfully executed, so add it to the event chain.
+        // The task successfully executed, so add it to the task chain.
         $task->set_state(self::TASK_CLEANUP);
         $this->tasks->Push($task);
         $task->Cleanup();
 
-        // Mark the event as done.
+        // Mark the task as done.
         $task->set_state(self::TASK_FINISHED);
         $this->tasks->Push($task);
         $this->current_task = NULL;
@@ -133,8 +133,8 @@ class TaskPump
         return TRUE;
     }
 
-    // If there are no events currently processing, this will process all the
-    // events in the deferred queue.
+    // If there are no tasks currently processing, this will process all the
+    // tasks in the deferred queue.
     protected function _DoDeferredTasks()
     {
         if ($this->current_task)
@@ -145,15 +145,15 @@ class TaskPump
     }
 
     // Cancels the given Task and will begin processing the next deferred
-    // event. If no other deferred events exist, output handling begins.
+    // task. If no other deferred tasks exist, output handling begins.
     public function Cancel(Task $task)
     {
         $task->set_cancelled();
     }
 
-    // Calling this function will prevent any events registered with
+    // Calling this function will prtask any tasks registered with
     // QueueTask() from being run. A common use for this is registering an
-    // event with RunTask() and then stopping any future work from happening
+    // task with RunTask() and then stopping any future work from happening
     // using this method.
     public function CancelDeferredTasks()
     {
@@ -161,8 +161,8 @@ class TaskPump
             $this->task_queue->Dequeue()->Cancel();
     }
 
-    // Tells the pump to stop pumping events and to begin output handling. This
-    // will call the current event's Cleanup() function.
+    // Tells the pump to stop pumping tasks and to begin output handling. This
+    // will call the current task's Cleanup() function.
     public function StopPump()
     {
         if ($this->current_task)
@@ -184,7 +184,7 @@ class TaskPump
         $this->_Exit();
     }
 
-    // Halts execution of the pump immediately without performing any event
+    // Halts execution of the pump immediately without performing any task
     // cleanup. |$message| will be displayed as output.
     public function Terminate($message)
     {
@@ -198,8 +198,8 @@ class TaskPump
         return $this->current_task;
     }
 
-    // Returns the current event's state. Will return -1 if there is no current
-    // event.
+    // Returns the current task's state. Will return -1 if there is no current
+    // task.
     public function GetCurrentTaskState()
     {
         if (!$this->current_task)
@@ -214,14 +214,14 @@ class TaskPump
         return $this->task_queue;
     }
 
-    // Returns the SplStack of events that have been fired, in the order they
+    // Returns the SplStack of tasks that have been fired, in the order they
     // fired. Note that this will NOT contain the current_task until AFTER
     // Cleanup() is called from _QueueTask().
     public function GetTaskHistory()
     {
         $chain = new \SplStack();
         $added = array();
-        // If we traverse in order, then we preserve the order that events
+        // If we traverse in order, then we preserve the order that tasks
         // made it to the TASK_FINISHED state, so long as we exclude
         // duplicates.
         foreach ($this->tasks as $task)
@@ -235,9 +235,9 @@ class TaskPump
         return $chain;
     }
 
-    // Returns |$this->tasks| as a stack. Note that events will likely appear
+    // Returns |$this->tasks| as a stack. Note that tasks will likely appear
     // multiple times in this stack. The occurrence count corresponds to which
-    // states the event has passed through.
+    // states the task has passed through.
     public function GetAllTasks()
     {
         return clone $this->tasks;

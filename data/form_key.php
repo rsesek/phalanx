@@ -112,7 +112,7 @@ interface FormKeyManagerDelegate
 }
 
 // If you want form validation to happen automatically on every POST request,
-// you can post this event in a global initializer. It will look for any POST
+// you can post this task in a global initializer. It will look for any POST
 // requests and will validate the form key. If one is not present, it will
 // throw an exception.
 class ValidateFormKeyTask extends \phalanx\tasks\Task
@@ -137,7 +137,7 @@ class ValidateFormKeyTask extends \phalanx\tasks\Task
 
     public function WillFire()
     {
-        // If we're not in a POST, then simply cancel the event.
+        // If we're not in a POST, then simply cancel the task.
         if (!isset($_SERVER['REQUEST_METHOD']) || strtoupper($_SERVER['REQUEST_METHOD']) != 'POST')
             $this->Cancel();
     }

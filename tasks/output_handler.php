@@ -16,12 +16,12 @@
 
 namespace phalanx\tasks;
 
-// The OutputHandler is invoked by the TaskPump once all events have been
-// processed. The job of this class is to take the fired events, extract their
+// The OutputHandler is invoked by the TaskPump once all tasks have been
+// processed. The job of this class is to take the fired tasks, extract their
 // output, 
 abstract class OutputHandler
 {
-    // Called by the TaskPump when all events have finished processing.
+    // Called by the TaskPump when all tasks have finished processing.
     public function Start()
     {
         $this->_DoStart();

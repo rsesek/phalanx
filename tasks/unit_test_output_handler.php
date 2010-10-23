@@ -20,12 +20,12 @@ require_once PHALANX_ROOT . '/tasks/task_pump.php';
 require_once PHALANX_ROOT . '/tasks/output_handler.php';
 
 // This OutputHandler implementation can be used by application developers to
-// test their own events. This OutputHandler does nothing but collect the
-// output from ALL events in the chain and stores it.
+// test their own tasks. This OutputHandler does nothing but collect the
+// output from ALL tasks in the chain and stores it.
 class UnitTestOutputHandler extends OutputHandler
 {
-    // The function that transforms an event name into a template name. The
-    // array is indexed by ints, with 0 being the top of the event chain stack
+    // The function that transforms an task name into a template name. The
+    // array is indexed by ints, with 0 being the top of the task chain stack
     // and N being the bottom (oldest).
     protected $task_data = array();
 
@@ -36,7 +36,7 @@ class UnitTestOutputHandler extends OutputHandler
             array_push($this->task_data, $this->GetTaskData($task));
     }
 
-    // Returns an array of all event data in the same order of events as the
-    // TaskPump's event chain. The values are base\PropertyBags.
+    // Returns an array of all task data in the same order of tasks as the
+    // TaskPump's task chain. The values are base\PropertyBags.
     public function task_data() { return $this->task_data; }
 }

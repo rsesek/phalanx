@@ -21,7 +21,7 @@ require_once PHALANX_ROOT . '/tasks/task_pump.php';
 // The Dispatcher synthesizes Task objects and puts them into the TaskPump.
 abstract class Dispatcher
 {
-    // A lambda that takes an event name and converts it to a fully qualified
+    // A lambda that takes an task name and converts it to a fully qualified
     // class name. This is then instantiated.
     protected $task_loader = NULL;
 
@@ -30,16 +30,16 @@ abstract class Dispatcher
     protected $pump = NULL;
 
     // An associative array of bypass rules. Bypass rules allow clients to
-    // specify either an event name or a closure to execute for a string key
-    // of an input event name. For example, clients will commonly want to
-    // specify an alternative event name for the empty input event name, like
-    // so (note that this is NOT an event class name, just another event name):
+    // specify either an task name or a closure to execute for a string key
+    // of an input task name. For example, clients will commonly want to
+    // specify an alternative task name for the empty input task name, like
+    // so (note that this is NOT an task class name, just another task name):
     //    '' => 'home'
     // This could alternatively be done using closuers:
     //    '' => function() { TaskPump::Pump()->QueueTask(new MyHomeTask()); }
     protected $bypass_rules = array();
 
-    // This will begin synthesizing events and sending them to the pump.
+    // This will begin synthesizing tasks and sending them to the pump.
     public function Start()
     {
         $task_name  = $this->_GetTaskName();
@@ -62,12 +62,12 @@ abstract class Dispatcher
         $this->pump()->QueueTask($task);
     }
 
-    // Extracts the event name, to be processed via |$task_loader| from the
-    // input keys. Returns the event name (not class name) as a string.
+    // Extracts the task name, to be processed via |$task_loader| from the
+    // input keys. Returns the task name (not class name) as a string.
     abstract protected function _GetTaskName();
 
     // Called by Start(). This should return a PropertyBag of input that is to
-    // be passed to the event. This function should gather input for the keys
+    // be passed to the task. This function should gather input for the keys
     // passed to it.
     abstract protected function _GetInput(Array $keys);
 

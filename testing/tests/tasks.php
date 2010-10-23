@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\tasks as events;
+use \phalanx\tasks as tasks;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -30,7 +30,7 @@ require_once PHALANX_ROOT . '/tasks/output_handler.php';
 require_once PHALANX_ROOT . '/tasks/unit_test_output_handler.php';
 require_once PHALANX_ROOT . '/tasks/view_output_handler.php';
 
-class TestTask extends events\Task
+class TestTask extends tasks\Task
 {
     public $will_fire = FALSE;
     public $fire = FALSE;
@@ -91,7 +91,7 @@ class InitOnlyTask extends TestTask
     }
 }
 
-class TestOutputHandler extends events\OutputHandler
+class TestOutputHandler extends tasks\OutputHandler
 {
     public $do_start = FALSE;
 
@@ -100,18 +100,18 @@ class TestOutputHandler extends events\OutputHandler
         $this->do_start = TRUE;
     }
 
-    public function T_GetTaskData(events\Task $task)
+    public function T_GetTaskData(tasks\Task $task)
     {
         // TODO: GetTaskData() is now public. We can remove this method.
         return $this->GetTaskData($task);
     }
 }
 
-class TestDispatcher extends events\Dispatcher
+class TestDispatcher extends tasks\Dispatcher
 {
     protected function _GetTaskName()
     {
-        return 'event.test';
+        return 'task.test';
     }
 
     protected function _GetInput(Array $input_list)
