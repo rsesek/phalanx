@@ -16,8 +16,8 @@
 
 namespace phalanx\tasks;
 
-require_once PHALANX_ROOT . '/events/event_pump.php';
-require_once PHALANX_ROOT . '/events/output_handler.php';
+require_once PHALANX_ROOT . '/tasks/task_pump.php';
+require_once PHALANX_ROOT . '/tasks/output_handler.php';
 
 // This OutputHandler implementation can be used by application developers to
 // test their own events. This OutputHandler does nothing but collect the

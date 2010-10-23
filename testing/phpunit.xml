@@ -28,7 +28,7 @@
             <directory suffix="_test.php">./tests/data/</directory>
         </testsuite>
         <testsuite name="Tasks">
-            <directory suffix="_test.php">./tests/events/</directory>
+            <directory suffix="_test.php">./tests/tasks/</directory>
         </testsuite>
         <testsuite name="Views">
             <directory suffix="_test.php">./tests/views/</directory>

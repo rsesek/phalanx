@@ -16,8 +16,8 @@
 
 namespace phalanx\tasks;
 
-require_once PHALANX_ROOT . '/events/event_pump.php';
-require_once PHALANX_ROOT . '/events/output_handler.php';
+require_once PHALANX_ROOT . '/tasks/task_pump.php';
+require_once PHALANX_ROOT . '/tasks/output_handler.php';
 
 // This implementation of OutputHandler prints messages to the console based on
 // the |message| key of an event's data. It will print any messages generated

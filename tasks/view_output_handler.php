@@ -17,8 +17,8 @@
 namespace phalanx\tasks;
 use \phalanx\views\View as View;
 
-require_once PHALANX_ROOT . '/events/event_pump.php';
-require_once PHALANX_ROOT . '/events/output_handler.php';
+require_once PHALANX_ROOT . '/tasks/task_pump.php';
+require_once PHALANX_ROOT . '/tasks/output_handler.php';
 require_once PHALANX_ROOT . '/views/view.php';
 
 // This implementation of OutputHandler uses the Views system to present

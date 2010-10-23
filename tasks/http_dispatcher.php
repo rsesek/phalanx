@@ -17,7 +17,7 @@
 namespace phalanx\tasks;
 
 require_once PHALANX_ROOT . '/base/property_bag.php';
-require_once PHALANX_ROOT . '/events/dispatcher.php';
+require_once PHALANX_ROOT . '/tasks/dispatcher.php';
 
 class HTTPDispatcher extends Dispatcher
 {
@@ -62,7 +62,7 @@ class HTTPDispatcher extends Dispatcher
         $input = new \phalanx\base\PropertyBag();
         $parts = explode('/', trim($url, '/'));
 
-        $input->Set('_event', $parts[0]);
+        $input->Set('_task', $parts[0]);
         array_shift($parts);
 
         if (count($parts) == 1)
@@ -83,9 +83,9 @@ class HTTPDispatcher extends Dispatcher
     // Gets the event name.
     protected function _GetTaskName()
     {
-        $url_event = $this->url_input->Get('_event');
-        if ($url_event != NULL)
-            return $url_event;
+        $url_task = $this->url_input->Get('_task');
+        if ($url_task != NULL)
+            return $url_task;
         if ($this->request_method == 'POST')
             if (isset($_POST[$this->event_input_key]))
                 return $_POST[$this->event_input_key];

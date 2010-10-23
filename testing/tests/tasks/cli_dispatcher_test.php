@@ -18,7 +18,7 @@ namespace phalanx\test;
 use \phalanx\tasks as events;
 
 require_once 'PHPUnit/Framework.php';
-require_once TEST_ROOT . '/tests/events.php';
+require_once TEST_ROOT . '/tests/tasks.php';
 
 class TestCLIDispatcher extends events\CLIDispatcher
 {
@@ -62,27 +62,27 @@ class CLIDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testParseNoArguments()
     {
         $params = $this->dispatcher->T_ParseArguments(_Args('test-event'));
-        $this->assertEquals('test-event', $params->_event);
+        $this->assertEquals('test-event', $params->_task);
     }
 
     public function testParseIDArgument()
     {
         $params = $this->dispatcher->T_ParseArguments(_Args('test-event', '42'));
-        $this->assertEquals('test-event', $params->_event);
+        $this->assertEquals('test-event', $params->_task);
         $this->assertEquals('42', $params->_id);
     }
 
     public function testParseWith1Pair()
     {
         $params = $this->dispatcher->T_ParseArguments(_Args('test-event', '--flag', 'value'));
-        $this->assertEquals('test-event', $params->_event);
+        $this->assertEquals('test-event', $params->_task);
         $this->assertEquals('value', $params->flag);
     }
 
     public function testParseWith2Pair()
     {
         $params = $this->dispatcher->T_ParseArguments(_Args('test', '--k1', 'v1', '--k2', 'v2'));
-        $this->assertEquals('test', $params->_event);
+        $this->assertEquals('test', $params->_task);
         $this->assertEquals('v1', $params->k1);
         $this->assertEquals('v2', $params->k2);
     }

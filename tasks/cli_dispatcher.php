@@ -17,7 +17,7 @@
 namespace phalanx\tasks;
 
 require_once PHALANX_ROOT . '/base/property_bag.php';
-require_once PHALANX_ROOT . '/events/dispatcher.php';
+require_once PHALANX_ROOT . '/tasks/dispatcher.php';
 
 // This dispatcher instance creates a command line interface for running events.
 // You can run the program and the arguments are parsed as such:
@@ -51,7 +51,7 @@ class CLIDispatcher extends Dispatcher
         array_shift($args);
 
         // Set the event name.
-        $input->Set('_event', $args[0]);
+        $input->Set('_task', $args[0]);
         array_shift($args);
 
         if (count($args) == 1)
@@ -74,7 +74,7 @@ class CLIDispatcher extends Dispatcher
     // Gets the event name.
     protected function _GetTaskName()
     {
-        return $this->cli_input->Get('_event');
+        return $this->cli_input->Get('_task');
     }
 
     // Returns the input based on the keys provided.

@@ -16,7 +16,7 @@
 
 namespace phalanx\tasks;
 
-require_once PHALANX_ROOT . '/events/event_pump.php';
+require_once PHALANX_ROOT . '/tasks/task_pump.php';
 
 // The Dispatcher synthesizes Task objects and puts them into the TaskPump.
 abstract class Dispatcher

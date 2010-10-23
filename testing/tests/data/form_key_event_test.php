@@ -19,7 +19,7 @@ use \phalanx\data as data;
 
 require_once 'PHPUnit/Framework.php';
 
-require_once PHALANX_ROOT . '/events/event.php';
+require_once PHALANX_ROOT . '/tasks/task.php';
 require_once TEST_ROOT . '/tests/data.php';
 
 class FormKeyTaskTest extends \PHPUnit_Framework_TestCase
