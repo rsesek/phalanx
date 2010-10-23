@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\events as events;
+use \phalanx\tasks as events;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -27,9 +27,9 @@ class TestHTTPDispatcher extends events\HTTPDispatcher
     {
         return $this->_TokenizeURL($url);
     }
-    public function T_GetEventName()
+    public function T_GetTaskName()
     {
-        return $this->_GetEventName();
+        return $this->_GetTaskName();
     }
     public function T_GetInput(Array $keys)
     {
@@ -54,7 +54,7 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('ename', $this->dispatcher->event_input_key());
 
         $this->dispatcher = new TestHTTPDispatcher();
-        $this->assertEquals('phalanx_event', $this->dispatcher->event_input_key());
+        $this->assertEquals('phalanx_task', $this->dispatcher->event_input_key());
     }
 
     public function testTokenizeURLSimple()
@@ -92,42 +92,42 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testTokenizeURLWithBadPair()
     {
         $url = '/test_event/k1/v1/k2/';
-        $this->setExpectedException('phalanx\events\HTTPDispatcherException');
+        $this->setExpectedException('phalanx\tasks\HTTPDispatcherException');
         $this->dispatcher->T_TokenizeURL($url);
     }
 
-    public function testGetEventNameGET()
+    public function testGetTaskNameGET()
     {
         $this->dispatcher->T_set_request_method('GET');
         $input = $this->dispatcher->T_TokenizeURL('/event.test/param1/value');
         $this->dispatcher->T_set_url_input($input);
-        $this->assertEquals('event.test', $this->dispatcher->T_GetEventName());
+        $this->assertEquals('event.test', $this->dispatcher->T_GetTaskName());
     }
 
-    public function testGetEventNamePOSTWithURL()
+    public function testGetTaskNamePOSTWithURL()
     {
         $this->dispatcher->T_set_request_method('POST');
         $_POST[$this->dispatcher->event_input_key()] = '-invalid-';
         $input = $this->dispatcher->T_TokenizeURL('/event.post');
         $this->dispatcher->T_set_url_input($input);
-        $this->assertEquals('event.post', $this->dispatcher->T_GetEventName());
+        $this->assertEquals('event.post', $this->dispatcher->T_GetTaskName());
     }
 
-    public function testGetEventNamePOST()
+    public function testGetTaskNamePOST()
     {
         $this->dispatcher->T_set_request_method('POST');
         $_POST[$this->dispatcher->event_input_key()] = 'event.post2';
         $input = $this->dispatcher->T_TokenizeURL('/');
         $this->dispatcher->T_set_url_input($input);
-        $this->assertEquals('event.post2', $this->dispatcher->T_GetEventName());
+        $this->assertEquals('event.post2', $this->dispatcher->T_GetTaskName());
     }
 
-    public function testGetEventNameBad()
+    public function testGetTaskNameBad()
     {
         $this->dispatcher->T_set_request_method('PUT');
         $input = $this->dispatcher->T_TokenizeURL('/');
         $this->dispatcher->T_set_url_input($input);
-        $this->setExpectedException('phalanx\events\DispatcherException');
+        $this->setExpectedException('phalanx\tasks\DispatcherException');
         $this->dispatcher->Start();
     }
 
@@ -137,7 +137,7 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->T_set_request_method('GET');
         $input = $this->dispatcher->T_TokenizeURL('/event.input/key1/foo/key2/bar/misc/baz/else/4');
         $this->dispatcher->T_set_url_input($input);
-        $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $gathered_input = $this->dispatcher->T_GetInput(TestTask::InputList());
         $this->assertEquals(3, $gathered_input->Count());
         $this->assertEquals('foo', $gathered_input->key1);
         $this->assertEquals('bar', $gathered_input->key2);
@@ -153,7 +153,7 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
             'else' => 4,
         );
         $this->dispatcher->T_set_request_method('POST');
-        $gathered_input= $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $gathered_input= $this->dispatcher->T_GetInput(TestTask::InputList());
         $this->assertEquals(3, $gathered_input->Count());
         $this->assertEquals('foo', $gathered_input->key1);
         $this->assertEquals('bar', $gathered_input->key2);
@@ -163,8 +163,8 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testGetInputBadRequest()
     {
         $this->dispatcher->T_set_request_method('PUT');
-        $this->setExpectedException('phalanx\events\HTTPDispatcherException');
-        $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $this->setExpectedException('phalanx\tasks\HTTPDispatcherException');
+        $this->dispatcher->T_GetInput(TestTask::InputList());
     }
 
     public function testGetInputGETMissingKey()
@@ -172,7 +172,7 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->T_set_request_method('GET');
         $input = $this->dispatcher->T_TokenizeURL('/event.bad/key1/foo/');
         $this->dispatcher->T_set_url_input($input);
-        $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $gathered_input = $this->dispatcher->T_GetInput(TestTask::InputList());
         $this->assertEquals(2, $gathered_input->Count());
         $this->assertEquals('foo', $gathered_input->key1);
         $this->assertEquals('GET', $gathered_input->_method);
@@ -183,7 +183,7 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $_POST['key1'] = 'foo';
         $this->dispatcher->T_set_request_method('POST');
-        $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $gathered_input = $this->dispatcher->T_GetInput(TestTask::InputList());
         $this->assertEquals(2, $gathered_input->Count());
         $this->assertEquals('foo', $gathered_input->key1);
         $this->assertEquals('POST', $gathered_input->_method);

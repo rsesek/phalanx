@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\events;
+namespace phalanx\tasks;
 use \phalanx\views\View as View;
 
 require_once PHALANX_ROOT . '/events/event_pump.php';
@@ -31,18 +31,18 @@ class ViewOutputHandler extends OutputHandler
 
     protected function _DoStart()
     {
-        if (EventPump::Pump()->GetEventChain()->Count() > 0)
+        if (TaskPump::Pump()->GetTaskHistory()->Count() > 0)
         {
-            $event    = EventPump::Pump()->GetEventChain()->Top();
+            $task    = TaskPump::Pump()->GetTaskHistory()->Top();
             $tpl_name = '';
-            if ($event instanceof \phalanx\views\CustomViewEvent) {
-                $tpl_name = $event->CustomTemplateName();
+            if ($task instanceof \phalanx\views\CustomViewTask) {
+                $tpl_name = $task->CustomTemplateName();
             } else {
                 $loader   = $this->template_loader;
-                $tpl_name = $loader(get_class($event));
+                $tpl_name = $loader(get_class($task));
             }
 
-            $data     = $this->GetEventData($event);
+            $data     = $this->GetTaskData($task);
             $view     = new View($tpl_name);
             $keys     = $data->AllKeys();
             foreach ($keys as $key)

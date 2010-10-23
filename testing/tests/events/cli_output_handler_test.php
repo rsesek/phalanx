@@ -15,11 +15,11 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\events as events;
+use \phalanx\tasks as events;
 
 require_once 'PHPUnit/Framework.php';
 
-class MessageEvent extends events\Event
+class MessageTask extends events\Task
 {
     public $message = null;
 
@@ -49,9 +49,9 @@ class CLIOutputHandlerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->handler = new events\CLIOutputHandler();
-        $this->pump    = $this->getMock('phalanx\events\EventPump', array('_Exit'));
+        $this->pump    = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
         $this->pump->set_output_handler($this->handler);
-        events\EventPump::T_set_pump($this->pump);
+        events\TaskPump::T_set_pump($this->pump);
     }
 
     protected function _GetOutput()
@@ -65,7 +65,7 @@ class CLIOutputHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleMessage()
     {
-        $this->pump->PostEvent(new MessageEvent('First Message!'));
+        $this->pump->QueueTask(new MessageTask('First Message!'));
 
         $expected = "First Message!\n";
         $this->assertEquals($expected, $this->_GetOutput());
@@ -73,8 +73,8 @@ class CLIOutputHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testMultipleMessages()
     {
-        $this->pump->PostEvent(new MessageEvent('Message One'));
-        $this->pump->PostEvent(new MessageEvent('Message Two'));
+        $this->pump->QueueTask(new MessageTask('Message One'));
+        $this->pump->QueueTask(new MessageTask('Message Two'));
 
         $expected = "Message Two\nMessage One\n";
         $this->assertEquals($expected, $this->_GetOutput());

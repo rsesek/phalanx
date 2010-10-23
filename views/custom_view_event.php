@@ -16,9 +16,9 @@
 
 namespace phalanx\views;
 
-// Events that implement this interface can use an arbitrary template, rather
+// Tasks that implement this interface can use an arbitrary template, rather
 // than one determined from the ViewOutputHandler::template_loader().
-interface CustomViewEvent
+interface CustomViewTask
 {
     // Returns a template name that should override the default template loader
     // in the ViewOutputHandler.

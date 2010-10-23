@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\events;
+namespace phalanx\tasks;
 
 require_once PHALANX_ROOT . '/base/property_bag.php';
 require_once PHALANX_ROOT . '/events/dispatcher.php';
@@ -22,7 +22,7 @@ require_once PHALANX_ROOT . '/events/dispatcher.php';
 class HTTPDispatcher extends Dispatcher
 {
     // The name of the input key to get the event name from.
-    protected $event_input_key;
+    protected $task_input_key;
 
     // The request method, uppercase.
     protected $request_method;
@@ -32,10 +32,10 @@ class HTTPDispatcher extends Dispatcher
 
     // Create a new HTTPDispatcher that will synthesize events based on the
     // event name specified in the HTTP input variable, keyed by
-    // |$event_input_key|.
-    public function __construct($event_input_key = 'phalanx_event')
+    // |$task_input_key|.
+    public function __construct($task_input_key = 'phalanx_task')
     {
-        $this->event_input_key = $event_input_key;
+        $this->event_input_key = $task_input_key;
     }
 
     // Override Start() in order to parse the URL.
@@ -81,7 +81,7 @@ class HTTPDispatcher extends Dispatcher
     }
 
     // Gets the event name.
-    protected function _GetEventName()
+    protected function _GetTaskName()
     {
         $url_event = $this->url_input->Get('_event');
         if ($url_event != NULL)

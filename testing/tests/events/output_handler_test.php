@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\events as events;
+use \phalanx\tasks as events;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -35,12 +35,12 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->do_start);
     }
 
-    public function testGetEventData()
+    public function testGetTaskData()
     {
         $input = new \phalanx\base\PropertyBag(array('foo' => 'bar'));
-        $event = new TestEvent($input);
-        $event->Fire();
-        $data  = $this->handler->T_GetEventData($event);
+        $task = new TestTask($input);
+        $task->Fire();
+        $data  = $this->handler->T_GetTaskData($task);
         $expected = array(
             'will_fire'  => FALSE,
             'fire'       => TRUE,
@@ -53,6 +53,6 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertType('phalanx\base\PropertyBag', $data);
         $this->assertEquals($expected, $data->ToArray());
-        $this->assertFalse($event->out2_never_true);
+        $this->assertFalse($task->out2_never_true);
     }
 }

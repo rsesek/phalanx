@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\events;
+namespace phalanx\tasks;
 
 require_once PHALANX_ROOT . '/base/property_bag.php';
 require_once PHALANX_ROOT . '/events/dispatcher.php';
@@ -72,7 +72,7 @@ class CLIDispatcher extends Dispatcher
     }
 
     // Gets the event name.
-    protected function _GetEventName()
+    protected function _GetTaskName()
     {
         return $this->cli_input->Get('_event');
     }

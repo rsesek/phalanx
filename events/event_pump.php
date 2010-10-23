@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\events;
+namespace phalanx\tasks;
 
 // User interaction and other functions produce events, which are raised and
-// registered with the EventPump. The pump executes events as they come in, and
+// registered with the TaskPump. The pump executes events as they come in, and
 // the last non-cancelled event is usually the one whose output is rendered.
-class EventPump
+class TaskPump
 {
     // The shared event pump object.
     private static $pump;
@@ -27,156 +27,156 @@ class EventPump
     // The OutputHandler instance for the pump.
     protected $output_handler = NULL;
 
-    // Event state constants. Be aware that the state of an event is set BEFORE
+    // Task state constants. Be aware that the state of an event is set BEFORE
     // the specified method is called. This is used to avoid event reentrancy.
-    const EVENT_WILL_FIRE = 1;
-    const EVENT_FIRE = 2;
-    const EVENT_CLEANUP = 3;
-    const EVENT_FINISHED = 4;
+    const TASK_WILL_FIRE = 1;
+    const TASK_FIRE = 2;
+    const TASK_CLEANUP = 3;
+    const TASK_FINISHED = 4;
 
-    // An SplQueue of the events that were registered wtih PostEvent() but are
+    // An SplQueue of the events that were registered wtih QueueTask() but are
     // waiting for the current event to finish.
-    protected $deferred_events = NULL;
+    protected $task_queue = NULL;
 
-    // A SplStack of Event objects. The stack is a history of event state
+    // A SplStack of Task objects. The stack is a history of event state
     // changes. The actual change that happened doesn't actually matter
     // (and can be computed based on the occurrence count), but we need to
-    // maintain relative ordering of the changes amongst all Events.
-    protected $events = NULL;
+    // maintain relative ordering of the changes amongst all Tasks.
+    protected $tasks = NULL;
 
     // The event that is currently executing. Will be NULL if there is no such
     // event.
-    protected $current_event = NULL;
+    protected $current_task = NULL;
 
-    // Constructor. Do not use directly. Use EventPump::Pump().
+    // Constructor. Do not use directly. Use TaskPump::Pump().
     public function __construct()
     {
-        $this->deferred_events = new \SplQueue();
-        $this->events          = new \SplStack();
+        $this->task_queue = new \SplQueue();
+        $this->tasks      = new \SplStack();
     }
 
     // Schedules an event to be run. If another event is currently being fired,
     // this will wait until that event is done. If no events are currently
     // running, the event will fire immediately.
-    public function PostEvent(Event $event)
+    public function QueueTask(Task $task)
     {
         // There is already an event executing. Push this new event into the
         // deferred worke queue.
-        if ($this->current_event)
+        if ($this->current_task)
         {
-            $this->deferred_events->Push($event);
+            $this->task_queue->Push($task);
             return;
         }
 
-        $this->_ProcessEvent($event);
+        $this->_ProcessTask($task);
 
-        $this->_DoDeferredEvents();
+        $this->_DoDeferredTasks();
     }
 
     // Preempts any currently executing event and preempts it with this event.
-    // |$event| will begin processing immediately. The other event will
+    // |$task| will begin processing immediately. The other event will
     // resume afterwards.
-    public function RaiseEvent(Event $event)
+    public function RunTask(Task $task)
     {
-        if ($this->current_event)
-            $this->deferred_events->Push($this->current_event);
+        if ($this->current_task)
+            $this->task_queue->Push($this->current_task);
 
-        $this->_ProcessEvent($event);
+        $this->_ProcessTask($task);
 
-        if ($this->deferred_events->Count())
-            $this->current_event = $this->deferred_events->Pop();
+        if ($this->task_queue->Count())
+            $this->current_task = $this->task_queue->Pop();
 
-        $this->_DoDeferredEvents();
+        $this->_DoDeferredTasks();
     }
 
     // This function does the bulk of the event processing work. This returns
     // TRUE if the event completed successfully, FALSE if otherwise. Note that
-    // this will clobber the |$this->current_event|. Caller is responsible for
+    // this will clobber the |$this->current_task|. Caller is responsible for
     // ensuring it is safe to call this function.
-    protected function _ProcessEvent(Event $event)
+    protected function _ProcessTask(Task $task)
     {
-        $this->current_event = $event;
-        $event->set_state(self::EVENT_WILL_FIRE);
-        $this->events->Push($event);
-        $event->WillFire();
+        $this->current_task = $task;
+        $task->set_state(self::TASK_WILL_FIRE);
+        $this->tasks->Push($task);
+        $task->WillFire();
 
         // Make sure the event didn't get cancelled in WillFire().
-        if ($event->is_cancelled())
+        if ($task->is_cancelled())
         {
-            $event->Cleanup();
-            $this->current_event = NULL;
+            $task->Cleanup();
+            $this->current_task = NULL;
             return FALSE;
         }
 
-        $event->set_state(self::EVENT_FIRE);
-        $this->events->Push($event);
-        $event->Fire();
+        $task->set_state(self::TASK_FIRE);
+        $this->tasks->Push($task);
+        $task->Fire();
 
         // Make sure the event didn't get cancelled in Fire().
-        if ($event->is_cancelled())
+        if ($task->is_cancelled())
         {
-            $event->Cleanup();
-            $this->current_event = NULL;
+            $task->Cleanup();
+            $this->current_task = NULL;
             return FALSE;
         }
 
         // The event successfully executed, so add it to the event chain.
-        $event->set_state(self::EVENT_CLEANUP);
-        $this->events->Push($event);
-        $event->Cleanup();
+        $task->set_state(self::TASK_CLEANUP);
+        $this->tasks->Push($task);
+        $task->Cleanup();
 
         // Mark the event as done.
-        $event->set_state(self::EVENT_FINISHED);
-        $this->events->Push($event);
-        $this->current_event = NULL;
+        $task->set_state(self::TASK_FINISHED);
+        $this->tasks->Push($task);
+        $this->current_task = NULL;
 
         return TRUE;
     }
 
     // If there are no events currently processing, this will process all the
     // events in the deferred queue.
-    protected function _DoDeferredEvents()
+    protected function _DoDeferredTasks()
     {
-        if ($this->current_event)
+        if ($this->current_task)
             return;
 
-        while ($this->deferred_events->Count() > 0)
-            $this->_ProcessEvent($this->deferred_events->Pop());
+        while ($this->task_queue->Count() > 0)
+            $this->_ProcessTask($this->task_queue->Pop());
     }
 
-    // Cancels the given Event and will begin processing the next deferred
+    // Cancels the given Task and will begin processing the next deferred
     // event. If no other deferred events exist, output handling begins.
-    public function Cancel(Event $event)
+    public function Cancel(Task $task)
     {
-        $event->set_cancelled();
+        $task->set_cancelled();
     }
 
     // Calling this function will prevent any events registered with
-    // PostEvent() from being run. A common use for this is registering an
-    // event with RaiseEvent() and then stopping any future work from happening
+    // QueueTask() from being run. A common use for this is registering an
+    // event with RunTask() and then stopping any future work from happening
     // using this method.
-    public function CancelDeferredEvents()
+    public function CancelDeferredTasks()
     {
-        while ($this->deferred_events->Count() > 0)
-            $this->deferred_events->Dequeue()->Cancel();
+        while ($this->task_queue->Count() > 0)
+            $this->task_queue->Dequeue()->Cancel();
     }
 
     // Tells the pump to stop pumping events and to begin output handling. This
     // will call the current event's Cleanup() function.
     public function StopPump()
     {
-        if ($this->current_event)
+        if ($this->current_task)
         {
-            if ($this->current_event->state() < self::EVENT_CLEANUP)
+            if ($this->current_task->state() < self::TASK_CLEANUP)
             {
-                $this->current_event->set_state(self::EVENT_CLEANUP);
-                $this->events->Push($this->current_event);
-                $this->current_event->Cleanup();
+                $this->current_task->set_state(self::TASK_CLEANUP);
+                $this->tasks->Push($this->current_task);
+                $this->current_task->Cleanup();
             }
-            else if ($this->current_event->state() < self::EVENT_FINISHED)
+            else if ($this->current_task->state() < self::TASK_FINISHED)
             {
-                $this->current_event->set_state(self::EVENT_FINISHED);
-                $this->events->Push($this->current_event);
+                $this->current_task->set_state(self::TASK_FINISHED);
+                $this->tasks->Push($this->current_task);
             }
         }
 
@@ -192,55 +192,55 @@ class EventPump
         $this->_Exit();
     }
 
-    // Gets the currently executing Event.
-    public function GetCurrentEvent()
+    // Gets the currently executing Task.
+    public function GetCurrentTask()
     {
-        return $this->current_event;
+        return $this->current_task;
     }
 
     // Returns the current event's state. Will return -1 if there is no current
     // event.
-    public function GetCurrentEventState()
+    public function GetCurrentTaskState()
     {
-        if (!$this->current_event)
+        if (!$this->current_task)
             return -1;
-        return $this->current_event->state();
+        return $this->current_task->state();
     }
 
-    // Returns the queue of Events that have been registered with PostEvent()
+    // Returns the queue of Tasks that have been registered with QueueTask()
     // and are waiting to run.
-    public function GetDeferredEvents()
+    public function GetDeferredTasks()
     {
-        return $this->deferred_events;
+        return $this->task_queue;
     }
 
     // Returns the SplStack of events that have been fired, in the order they
-    // fired. Note that this will NOT contain the current_event until AFTER
-    // Cleanup() is called from _PostEvent().
-    public function GetEventChain()
+    // fired. Note that this will NOT contain the current_task until AFTER
+    // Cleanup() is called from _QueueTask().
+    public function GetTaskHistory()
     {
         $chain = new \SplStack();
         $added = array();
         // If we traverse in order, then we preserve the order that events
-        // made it to the EVENT_FINISHED state, so long as we exclude
+        // made it to the TASK_FINISHED state, so long as we exclude
         // duplicates.
-        foreach ($this->events as $event)
+        foreach ($this->tasks as $task)
         {
-            if ($event->state() == self::EVENT_FINISHED && !in_array($event, $added))
+            if ($task->state() == self::TASK_FINISHED && !in_array($task, $added))
             {
-                $chain->Unshift($event);
-                $added[] = $event;
+                $chain->Unshift($task);
+                $added[] = $task;
             }
         }
         return $chain;
     }
 
-    // Returns |$this->events| as a stack. Note that events will likely appear
+    // Returns |$this->tasks| as a stack. Note that events will likely appear
     // multiple times in this stack. The occurrence count corresponds to which
     // states the event has passed through.
-    public function GetAllEvents()
+    public function GetAllTasks()
     {
-        return clone $this->events;
+        return clone $this->tasks;
     }
 
     // Internal wrapper around exit() that we can mock.
@@ -252,14 +252,14 @@ class EventPump
     // Getters and setters.
     // -------------------------------------------------------------------------
 
-    // Returns the shared EventPump.
+    // Returns the shared TaskPump.
     public function Pump()
     {
         if (!self::$pump)
-            self::set_pump(new EventPump());
+            self::set_pump(new TaskPump());
         return self::$pump;
     }
-    static public function set_pump(EventPump $pump) { self::$pump = $pump; }
+    static public function set_pump(TaskPump $pump) { self::$pump = $pump; }
 
     public function set_output_handler(OutputHandler $handler) { $this->output_handler = $handler; }
     public function output_handler() { return $this->output_handler; }
@@ -268,6 +268,6 @@ class EventPump
     static public function T_set_pump($pump) { self::$pump = $pump; }
 }
 
-class EventPumpException extends \Exception
+class TaskPumpException extends \Exception
 {
 }

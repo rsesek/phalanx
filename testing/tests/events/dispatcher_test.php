@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\events as events;
+use \phalanx\tasks as events;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -30,37 +30,37 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testSetLoader()
     {
-        $this->assertNull($this->dispatcher->event_loader());
+        $this->assertNull($this->dispatcher->task_loader());
 
-        $fun = function($event_name) {
-            return '\phalanx\test\TestEvent';
+        $fun = function($task_name) {
+            return '\phalanx\test\TestTask';
         };
-        $this->dispatcher->set_event_loader($fun);
-        $this->assertSame($fun, $this->dispatcher->event_loader());
+        $this->dispatcher->set_task_loader($fun);
+        $this->assertSame($fun, $this->dispatcher->task_loader());
     }
 
     public function testSetPump()
     {
         $this->assertNotNull($this->dispatcher->pump());
-        $this->assertSame(events\EventPump::Pump(), $this->dispatcher->pump());
+        $this->assertSame(events\TaskPump::Pump(), $this->dispatcher->pump());
 
-        $pump = new events\EventPump();
+        $pump = new events\TaskPump();
         $this->dispatcher->set_pump($pump);
         $this->assertSame($pump, $this->dispatcher->pump());
     }
 
     public function testStart()
     {
-        $pump = $this->getMock('phalanx\events\EventPump');
+        $pump = $this->getMock('phalanx\tasks\TaskPump');
         $this->dispatcher->set_pump($pump);
-        $pump->expects($this->once())->method('PostEvent')->with(
-            $this->isInstanceOf('phalanx\test\TestEvent')
+        $pump->expects($this->once())->method('QueueTask')->with(
+            $this->isInstanceOf('phalanx\test\TestTask')
         );
 
-        $loader = function($event_name) {
-            return '\phalanx\test\TestEvent';
+        $loader = function($task_name) {
+            return '\phalanx\test\TestTask';
         };
-        $this->dispatcher->set_event_loader($loader);
+        $this->dispatcher->set_task_loader($loader);
 
         $this->dispatcher->Start();
     }

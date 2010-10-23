@@ -14,19 +14,19 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\events;
+namespace phalanx\tasks;
 
 require_once PHALANX_ROOT . '/events/event_pump.php';
 
-// The Dispatcher synthesizes Event objects and puts them into the EventPump.
+// The Dispatcher synthesizes Task objects and puts them into the TaskPump.
 abstract class Dispatcher
 {
     // A lambda that takes an event name and converts it to a fully qualified
     // class name. This is then instantiated.
-    protected $event_loader = NULL;
+    protected $task_loader = NULL;
 
-    // The EventPump the Dispatcher will invoke methods on. If this is NULL,
-    // the Dispatcher will use EventPump::Pump() singleton.
+    // The TaskPump the Dispatcher will invoke methods on. If this is NULL,
+    // the Dispatcher will use TaskPump::Pump() singleton.
     protected $pump = NULL;
 
     // An associative array of bypass rules. Bypass rules allow clients to
@@ -36,14 +36,14 @@ abstract class Dispatcher
     // so (note that this is NOT an event class name, just another event name):
     //    '' => 'home'
     // This could alternatively be done using closuers:
-    //    '' => function() { EventPump::Pump()->PostEvent(new MyHomeEvent()); }
+    //    '' => function() { TaskPump::Pump()->QueueTask(new MyHomeTask()); }
     protected $bypass_rules = array();
 
     // This will begin synthesizing events and sending them to the pump.
     public function Start()
     {
-        $event_name  = $this->_GetEventName();
-        $bypass = $this->GetBypassRule($event_name);
+        $task_name  = $this->_GetTaskName();
+        $bypass = $this->GetBypassRule($task_name);
         if ($bypass instanceof \Closure)
         {
             $bypass();
@@ -51,20 +51,20 @@ abstract class Dispatcher
         }
         else if ($bypass)
         {
-            $event_name = $bypass;
+            $task_name = $bypass;
         }
-        if (!$event_name)
-            throw new DispatcherException('Could not determine event name');
-        $loader      = $this->event_loader;
-        $event_class = $loader($event_name);            
-        $input       = $this->_GetInput($event_class::InputList());
-        $event       = new $event_class($input);
-        $this->pump()->PostEvent($event);
+        if (!$task_name)
+            throw new DispatcherException('Could not determine task name');
+        $loader     = $this->task_loader;
+        $task_class = $loader($task_name);            
+        $input      = $this->_GetInput($task_class::InputList());
+        $task       = new $task_class($input);
+        $this->pump()->QueueTask($task);
     }
 
-    // Extracts the event name, to be processed via |$event_loader| from the
+    // Extracts the event name, to be processed via |$task_loader| from the
     // input keys. Returns the event name (not class name) as a string.
-    abstract protected function _GetEventName();
+    abstract protected function _GetTaskName();
 
     // Called by Start(). This should return a PropertyBag of input that is to
     // be passed to the event. This function should gather input for the keys
@@ -72,14 +72,14 @@ abstract class Dispatcher
     abstract protected function _GetInput(Array $keys);
 
     // Getters and setters.
-    public function set_event_loader(\Closure $loader) { $this->event_loader = $loader; }
-    public function event_loader() { return $this->event_loader; }
+    public function set_task_loader(\Closure $loader) { $this->task_loader = $loader; }
+    public function task_loader() { return $this->task_loader; }
 
-    public function set_pump(EventPump $pump) { $this->pump = $pump; }
+    public function set_pump(TaskPump $pump) { $this->pump = $pump; }
     public function pump()
     {
         if (!$this->pump)
-            return EventPump::Pump();
+            return TaskPump::Pump();
         return $this->pump;
     }
 

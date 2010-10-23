@@ -115,7 +115,7 @@ interface FormKeyManagerDelegate
 // you can post this event in a global initializer. It will look for any POST
 // requests and will validate the form key. If one is not present, it will
 // throw an exception.
-class ValidateFormKeyEvent extends \phalanx\events\Event
+class ValidateFormKeyTask extends \phalanx\tasks\Task
 {
     // The form key manager.
     protected $manager;

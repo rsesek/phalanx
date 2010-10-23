@@ -22,17 +22,17 @@ require_once 'PHPUnit/Framework.php';
 require_once PHALANX_ROOT . '/events/event.php';
 require_once TEST_ROOT . '/tests/data.php';
 
-class FormKeyEventTest extends \PHPUnit_Framework_TestCase
+class FormKeyTaskTest extends \PHPUnit_Framework_TestCase
 {
-    public $event;
+    public $task;
     public $pump;
     public $form_key;
 
     public function setUp()
     {
-        $this->pump = new \phalanx\events\EventPump();
+        $this->pump = new \phalanx\tasks\TaskPump();
         $this->form_key = new data\FormKeyManager(new TestFormKeyManagerDelegate());
-        $this->event = new data\ValidateFormKeyEvent($this->form_key);
+        $this->event = new data\ValidateFormKeyTask($this->form_key);
     }
 
     public function testCtor()
@@ -42,7 +42,7 @@ class FormKeyEventTest extends \PHPUnit_Framework_TestCase
 
     public function testNoInput()
     {
-        $this->pump->PostEvent($this->event);
+        $this->pump->QueueTask($this->event);
         $this->assertTrue($this->event->is_cancelled());
     }
 
@@ -50,18 +50,18 @@ class FormKeyEventTest extends \PHPUnit_Framework_TestCase
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_GET['phalanx_form_key'] = 'foo';
-        $this->pump->PostEvent($this->event);
+        $this->pump->QueueTask($this->event);
         $this->assertTrue($this->event->is_cancelled());
     }
 
     public function testInputList()
     {
-        $this->assertEquals(array('phalanx_form_key'), data\ValidateFormKeyEvent::InputList());
+        $this->assertEquals(array('phalanx_form_key'), data\ValidateFormKeyTask::InputList());
     }
 
     public function testOutputList()
     {
-        $this->assertNull(data\ValidateFormKeyEvent::OutputList());
+        $this->assertNull(data\ValidateFormKeyTask::OutputList());
     }
 
     public function testInvalidPOST()
@@ -70,7 +70,7 @@ class FormKeyEventTest extends \PHPUnit_Framework_TestCase
         $_POST['phalanx_form_key'] = 'foo';
 
         $this->setExpectedException('phalanx\data\FormKeyException');
-        $this->pump->PostEvent($this->event);
+        $this->pump->QueueTask($this->event);
 
         $this->assertFalse($this->event->is_cancelled());
         $this->assertTrue($this->form_key->delegate()->did_get);
@@ -81,7 +81,7 @@ class FormKeyEventTest extends \PHPUnit_Framework_TestCase
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['phalanx_form_key'] = $this->form_key->Generate();
 
-        $this->pump->PostEvent($this->event);
+        $this->pump->QueueTask($this->event);
 
         $this->assertFalse($this->event->is_cancelled());
         $this->assertTrue($this->form_key->delegate()->did_get);

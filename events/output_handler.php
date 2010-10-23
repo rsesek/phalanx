@@ -14,37 +14,37 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\events;
+namespace phalanx\tasks;
 
-// The OutputHandler is invoked by the EventPump once all events have been
+// The OutputHandler is invoked by the TaskPump once all events have been
 // processed. The job of this class is to take the fired events, extract their
 // output, 
 abstract class OutputHandler
 {
-    // Called by the EventPump when all events have finished processing.
+    // Called by the TaskPump when all events have finished processing.
     public function Start()
     {
         $this->_DoStart();
     }
 
     // Subclasses should implement this method to perform their actual output
-    // handling. The EventPump will call Start(), which sets up the object's
+    // handling. The TaskPump will call Start(), which sets up the object's
     // state before calling _DoStart().
     abstract protected function _DoStart();
 
-    // Returns a PropertyBag of data from |$event| based on its output list.
-    public function GetEventData(Event $event)
+    // Returns a PropertyBag of data from |$task| based on its output list.
+    public function GetTaskData(Task $task)
     {
         $data        = new \phalanx\base\PropertyBag();
-        $output_list = $event::OutputList();
+        $output_list = $task::OutputList();
         $output_list[] = 'input';
         foreach ($output_list as $key)
         {
-            $class = new \ReflectionClass(get_class($event));
+            $class = new \ReflectionClass(get_class($task));
             if ($class->HasProperty($key) && $class->GetProperty($key)->IsPublic())
-                $data->Set($key, $event->$key);
+                $data->Set($key, $task->$key);
             else if ($class->HasMethod($key) && $class->GetMethod($key)->IsPublic())
-                $data->Set($key, $event->$key());
+                $data->Set($key, $task->$key());
         }
         return $data;
     }

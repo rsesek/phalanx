@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\events;
+namespace phalanx\tasks;
 
 require_once PHALANX_ROOT . '/events/event_pump.php';
 require_once PHALANX_ROOT . '/events/output_handler.php';
@@ -27,16 +27,16 @@ class UnitTestOutputHandler extends OutputHandler
     // The function that transforms an event name into a template name. The
     // array is indexed by ints, with 0 being the top of the event chain stack
     // and N being the bottom (oldest).
-    protected $event_data = array();
+    protected $task_data = array();
 
     protected function _DoStart()
     {
-        $event_chain = EventPump::Pump()->GetEventChain();
-        foreach ($event_chain as $event)
-            array_push($this->event_data, $this->GetEventData($event));
+        $task_chain = TaskPump::Pump()->GetTaskHistory();
+        foreach ($task_chain as $task)
+            array_push($this->task_data, $this->GetTaskData($task));
     }
 
     // Returns an array of all event data in the same order of events as the
-    // EventPump's event chain. The values are base\PropertyBags.
-    public function event_data() { return $this->event_data; }
+    // TaskPump's event chain. The values are base\PropertyBags.
+    public function task_data() { return $this->task_data; }
 }

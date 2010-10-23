@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\events as events;
+use \phalanx\tasks as events;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -30,7 +30,7 @@ require_once PHALANX_ROOT . '/events/output_handler.php';
 require_once PHALANX_ROOT . '/events/unit_test_output_handler.php';
 require_once PHALANX_ROOT . '/events/view_output_handler.php';
 
-class TestEvent extends events\Event
+class TestTask extends events\Task
 {
     public $will_fire = FALSE;
     public $fire = FALSE;
@@ -42,7 +42,7 @@ class TestEvent extends events\Event
 
     public $id = NULL;
 
-    // The property should hide this from OutputHandler::_GetEventData().
+    // The property should hide this from OutputHandler::_GetTaskData().
     public function out2()
     {
         $this->out2_never_true = TRUE;
@@ -82,7 +82,7 @@ class TestEvent extends events\Event
     }
 }
 
-class InitOnlyEvent extends TestEvent
+class InitOnlyTask extends TestTask
 {
     public function WillFire()
     {
@@ -100,16 +100,16 @@ class TestOutputHandler extends events\OutputHandler
         $this->do_start = TRUE;
     }
 
-    public function T_GetEventData(events\Event $event)
+    public function T_GetTaskData(events\Task $task)
     {
-        // TODO: GetEventData() is now public. We can remove this method.
-        return $this->GetEventData($event);
+        // TODO: GetTaskData() is now public. We can remove this method.
+        return $this->GetTaskData($task);
     }
 }
 
 class TestDispatcher extends events\Dispatcher
 {
-    protected function _GetEventName()
+    protected function _GetTaskName()
     {
         return 'event.test';
     }

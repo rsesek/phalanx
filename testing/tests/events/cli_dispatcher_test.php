@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\events as events;
+use \phalanx\tasks as events;
 
 require_once 'PHPUnit/Framework.php';
 require_once TEST_ROOT . '/tests/events.php';
@@ -30,9 +30,9 @@ class TestCLIDispatcher extends events\CLIDispatcher
     {
         return $this->_ParseArguments($args);
     }
-    public function T_GetEventName()
+    public function T_GetTaskName()
     {
-        return $this->_GetEventName();
+        return $this->_GetTaskName();
     }
     public function T_GetInput(Array $keys)
     {
@@ -89,28 +89,28 @@ class CLIDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testParseWithBadPair()
     {
-        $this->setExpectedException('phalanx\events\CLIDispatcherException');
+        $this->setExpectedException('phalanx\tasks\CLIDispatcherException');
         $params = $this->dispatcher->T_ParseArguments(_Args('test', '--k1', 'v1', '--k2'));
     }
 
     public function testParseWithBadFlag()
     {
-      $this->setExpectedException('phalanx\events\CLIDispatcherException');
+      $this->setExpectedException('phalanx\tasks\CLIDispatcherException');
       $params = $this->dispatcher->T_ParseArguments(_Args('test', '-k1', 'v1'));
     }
 
-    public function testGetEventName()
+    public function testGetTaskName()
     {
         $input = $this->dispatcher->T_ParseArguments(_Args('test-event', '--key', 'value'));
         $this->dispatcher->T_set_cli_input($input);
-        $this->assertEquals('test-event', $this->dispatcher->T_GetEventName());
+        $this->assertEquals('test-event', $this->dispatcher->T_GetTaskName());
     }
 
     public function testGetInput()
     {
         $args = _Args('test-event', '--key1', 'value', '--flag', 'special');
         $this->dispatcher->T_set_cli_input($this->dispatcher->T_ParseArguments($args));
-        $gathered_input = $this->dispatcher->T_GetInput(TestEvent::InputList());
+        $gathered_input = $this->dispatcher->T_GetInput(TestTask::InputList());
         $this->assertEquals(1, $gathered_input->Count());
         $this->assertEquals('value', $gathered_input->key1);
         $this->assertNull($gathered_input->key2);

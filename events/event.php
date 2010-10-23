@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\events;
+namespace phalanx\tasks;
 
-// A base representation of an event. Events should not generate any output,
+// A base representation of an event. Tasks should not generate any output,
 // rather they should store data in member variables, which can then be used by
 // the view system.
-abstract class Event
+abstract class Task
 {
     // The input passed to the event upon creation.
     protected $input = NULL;
@@ -30,39 +30,39 @@ abstract class Event
     // The state of the event. This should ONLY ever be changed by the pump.
     private $state = 0;
 
-    // Creates an instance of the Event class. The PropertyBag of input is
-    // assembled for the Event by the Dispatcher. It collects input variables
-    // based on the keys the Event asks for via the InputList() method.
+    // Creates an instance of the Task class. The PropertyBag of input is
+    // assembled for the Task by the Dispatcher. It collects input variables
+    // based on the keys the Task asks for via the InputList() method.
     public function __construct(\phalanx\base\PropertyBag $input = NULL)
     {
         $this->input = $input;
     }
 
-    // Returns an array of input keys the Event requires in order to perform
-    // its work. Returning NULL means this Event requires no input.
+    // Returns an array of input keys the Task requires in order to perform
+    // its work. Returning NULL means this Task requires no input.
     abstract static public function InputList();
 
-    // Returns an array of keys that exist on this Event class that the
+    // Returns an array of keys that exist on this Task class that the
     // OutputHandler can access. NULL for no output.
     abstract static public function OutputList();
 
-    // Called before the EventPump is preparing to Fire() the event. This is a
+    // Called before the TaskPump is preparing to Fire() the event. This is a
     // good place to put permission and general sanity checks.
     public function WillFire() {}
 
-    // The actual processing work of the Event happens in Fire(). As the Event
+    // The actual processing work of the Task happens in Fire(). As the Task
     // generates output, it should put it into the properties it declared in
     // OutputList().
     abstract public function Fire();
 
-    // Called after the EventPump is done with the Event. This will be called
-    // even if the Event is preempted by another and this one does not Fire().
+    // Called after the TaskPump is done with the Task. This will be called
+    // even if the Task is preempted by another and this one does not Fire().
     public function Cleanup() {}
 
     // Cancels the current event. Cleanup() will still be called.
     final public function Cancel()
     {
-        EventPump::Pump()->Cancel($this);
+        TaskPump::Pump()->Cancel($this);
     }
 
     // Getters and setters.
@@ -75,7 +75,7 @@ abstract class Event
     final public function is_cancelled() { return $this->cancelled; }
 
     // Sets and gets the state. Setting the state is reserved for the
-    // EventPump. Changing it outside that context WILL result in unexpected
+    // TaskPump. Changing it outside that context WILL result in unexpected
     // application behavior.
     final public function set_state($state) { $this->state = $state; }
     final public function state() { return $this->state; }

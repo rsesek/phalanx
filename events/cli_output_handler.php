@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\events;
+namespace phalanx\tasks;
 
 require_once PHALANX_ROOT . '/events/event_pump.php';
 require_once PHALANX_ROOT . '/events/output_handler.php';
@@ -27,9 +27,9 @@ class CLIOutputHandler extends OutputHandler
     protected function _DoStart()
     {
         $code = 0;
-        // Events are processed in order, newest to oldest.
-        foreach (EventPump::Pump()->GetEventChain() as $event) {
-            $data = $this->GetEventData($event);
+        // Tasks are processed in order, newest to oldest.
+        foreach (TaskPump::Pump()->GetTaskHistory() as $task) {
+            $data = $this->GetTaskData($task);
             if ($data->HasKey('message')) {
                 print $data->message . "\n";
             }

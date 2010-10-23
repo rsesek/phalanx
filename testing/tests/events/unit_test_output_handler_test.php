@@ -15,7 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\events as events;
+use \phalanx\tasks as events;
 
 require_once 'PHPUnit/Framework.php';
 
@@ -26,30 +26,30 @@ class UnitTestOutputHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->pump    = $this->getMock('phalanx\events\EventPump', array('_Exit'));
-        events\EventPump::T_set_pump($this->pump);
+        $this->pump    = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
+        events\TaskPump::T_set_pump($this->pump);
         $this->handler = new events\UnitTestOutputHandler();
         $this->pump->set_output_handler($this->handler);
     }
 
     public function testDoStart()
     {
-        $event = new TestEvent();
-        $event->id = 'foo';
-        $this->pump->PostEvent($event);
+        $task = new TestTask();
+        $task->id = 'foo';
+        $this->pump->QueueTask($task);
 
-        $event = new TestEvent();
-        $event->id = 'bar';
-        $this->pump->PostEvent($event);
+        $task = new TestTask();
+        $task->id = 'bar';
+        $this->pump->QueueTask($task);
 
-        $event = new TestEvent();
-        $event->id = 'baz';
-        $this->pump->PostEvent($event);
+        $task = new TestTask();
+        $task->id = 'baz';
+        $this->pump->QueueTask($task);
 
         $this->pump->StopPump();
 
-        // Event chain is newest to oldest.
-        $data = $this->handler->event_data();
+        // Task chain is newest to oldest.
+        $data = $this->handler->task_data();
         $this->assertEquals('baz', $data[0]->id);
         $this->assertEquals('bar', $data[1]->id);
         $this->assertEquals('foo', $data[2]->id);

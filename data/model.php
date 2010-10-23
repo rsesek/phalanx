@@ -22,7 +22,7 @@ require_once PHALANX_ROOT . '/base/struct.php';
 // It inherits the strict data member policy from base\Struct and maintains
 // a condition by which it fetches and updates data. The role of the Model
 // class is not to validate data, but to persist it. Validation is the job
-// of the Controller (in phalanx, that is an Event object); the Model will
+// of the Controller (in phalanx, that is an Task object); the Model will
 // persist the data and help access related information.
 //
 // This class requires the use of a PDO object.

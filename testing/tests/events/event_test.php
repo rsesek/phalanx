@@ -15,36 +15,36 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\events as events;
+use \phalanx\tasks as events;
 
 require_once 'PHPUnit/Framework.php';
 
-class EventTest extends \PHPUnit_Framework_TestCase
+class TaskTest extends \PHPUnit_Framework_TestCase
 {
-    protected $event;
+    protected $task;
 
     public function setUp()
     {
-        $this->event = new TestEvent();
+        $this->event = new TestTask();
     }
 
     public function testInput()
     {
         $args = new \phalanx\base\PropertyBag();
         $args->test = 'foo';
-        $this->event = new TestEvent($args);
+        $this->event = new TestTask($args);
         $this->assertSame($args, $this->event->input());
     }
 
     public function testCancel()
     {
-        $event = new TestEvent();
+        $task = new TestTask();
 
-        $pump = $this->getMock('phalanx\events\EventPump');
-        $pump->expects($this->once())->method('Cancel')->with($event);
-        \phalanx\events\EventPump::T_set_pump($pump);
+        $pump = $this->getMock('phalanx\tasks\TaskPump');
+        $pump->expects($this->once())->method('Cancel')->with($task);
+        \phalanx\tasks\TaskPump::T_set_pump($pump);
 
-        $this->assertFalse($event->is_cancelled());
-        $event->Cancel();
+        $this->assertFalse($task->is_cancelled());
+        $task->Cancel();
     }
 }
