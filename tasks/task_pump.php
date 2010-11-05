@@ -253,7 +253,7 @@ class TaskPump
     // -------------------------------------------------------------------------
 
     // Returns the shared TaskPump.
-    public function Pump()
+    static public function Pump()
     {
         if (!self::$pump)
             self::set_pump(new TaskPump());
