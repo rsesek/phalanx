@@ -76,6 +76,12 @@ class Struct
     {
         return count($this->fields);
     }
+
+    // Returns the list of fields the Struct has.
+    public function GetFields()
+    {
+        return $this->fields;
+    }
 }
 
 class StructException extends \Exception
