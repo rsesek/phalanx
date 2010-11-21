@@ -53,3 +53,37 @@ class TestFormKeyManagerDelegate implements data\FormKeyManagerDelegate //,
         unset($this->key_storage[$key]);
     }
 }
+
+class TestModel extends data\Model
+{
+    protected $table = 'test_table';
+    protected $primary_key = 'id';
+    protected $condition = 'id = :id';
+
+    protected $fields = array(
+        'id',
+        'title',
+        'description',
+        'value',
+        'is_hidden',
+        'reference_id'
+    );
+
+    static public function SetUpDatabase()
+    {
+        $db = new \PDO('sqlite::memory:');
+        $db->SetAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $db->Query("
+            CREATE TABLE test_table
+            (
+                id integer PRIMARY KEY AUTOINCREMENT,
+                title varchar(100),
+                description text,
+                value text,
+                is_hidden boolean,
+                refernce_id integer
+            );
+        ");
+        return $db;
+    }
+}

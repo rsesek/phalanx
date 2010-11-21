@@ -19,22 +19,6 @@ use \phalanx\data as data;
 
 require_once 'PHPUnit/Framework.php';
 
-class TestModel extends data\Model
-{
-    protected $table = 'test_table';
-    protected $primary_key = 'id';
-    protected $condition = 'id = :id';
-
-    protected $fields = array(
-        'id',
-        'title',
-        'description',
-        'value',
-        'is_hidden',
-        'reference_id'
-    );
-}
-
 class CompoundKeyModel extends data\Model
 {
     protected $table = 'test_compound';
@@ -62,19 +46,7 @@ class ModelTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->db = new \PDO('sqlite::memory:');
-        $this->db->SetAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $this->db->Query("
-            CREATE TABLE test_table
-            (
-                id integer PRIMARY KEY AUTOINCREMENT,
-                title varchar(100),
-                description text,
-                value text,
-                is_hidden boolean,
-                refernce_id integer
-            );
-        ");
+        $this->db = TestModel::SetUpDatabase();
         $this->db->Query("
             CREATE TABLE test_compound
             (
