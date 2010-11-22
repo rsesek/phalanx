@@ -50,11 +50,11 @@ abstract class ModelValidator
     protected $errors = array();
 
     // Boolean status of validation.
-    protected $validated = TRUE;
+    protected $is_valid = TRUE;
 
     // If TRUE, the Validator will report an error for any field of the Model
     // that does not have a validation function.
-    protected $error_on_unvalidated_key = FALSE;
+    protected $error_on_unvalidated_key = TRUE;
 
     // The field that is being validated right now. NULL if not validating.
     private $current_field = NULL;
@@ -73,19 +73,18 @@ abstract class ModelValidator
     // Performs validation on the Model and dynamically dispatches methods.
     public function Validate()
     {
-        $mirror = new \ReflectionClass(get_class($this));
         foreach ($this->model->GetFields() as $name) {
             $validator = "_validate_$name";
             $value = $this->model->Get($name);
-            if ($mirror->HasMethod($name)) {
+            if (method_exists($this, $validator)) {
                 $this->current_field = $name;
-                $this->validated    &= $mirror->GetMethod($validator)->Invoke($this->model, $value);
+                $this->is_valid      = $this->$validator($value) && $this->is_valid;
                 $this->current_field = NULL;
             } else if ($this->error_on_unvalidated_key) {
                 $class = $this->model->ValidatorName();
                 throw new ModelValidatorException("The field '$name' of '$class' not have a validator.");
             } else {
-                $this->validated &= $this->_DefaultValidate($value);
+                $this->is_valid = $this->_DefaultValidate($value) && $this->is_valid;
             }
         }
     }
@@ -117,7 +116,7 @@ abstract class ModelValidator
     // Getters and setters.
     // -------------------------------------------------------------------------
     public function errors() { return $this->errors; }
-    public function is_valid() { return $this->validated; }
+    public function is_valid() { return $this->is_valid; }
 }
 
 // Exception to be used by the abstract ModelValidator, not by subclasses.

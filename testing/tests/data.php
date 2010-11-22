@@ -24,6 +24,7 @@ require_once PHALANX_ROOT . '/data/cleaner.php';
 require_once PHALANX_ROOT . '/data/form_key.php';
 require_once PHALANX_ROOT . '/data/keyed_cleaner.php';
 require_once PHALANX_ROOT . '/data/model.php';
+require_once PHALANX_ROOT . '/data/validating_model.php';
 
 class TestFormKeyManagerDelegate implements data\FormKeyManagerDelegate //,
 {
