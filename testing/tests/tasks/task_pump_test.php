@@ -324,13 +324,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testNestedStopPump()
     {
-        // This test needs to run in a separate process. When StopPump() gets
-        // called, it won't stop execution so the outer task will continue
-        // being processed, resulting in an invalid task chain.
-        $this->markTestSkipped();
-
         $this->pump = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
-        $this->pump->expects($this->once())->method('_Exit');
 
         $output_handler = $this->getMock('phalanx\test\TestOutputHandler');
         $output_handler->expects($this->once())->method('Start');
@@ -338,11 +332,17 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
         $task = new PreemptedTask();
         $task->inner_task = new StopPumpTask();
-        $this->pump->QueueTask($task);
 
-        $this->assertEquals(2, $this->pump->GetTaskHistory()->Count());
-        $this->assertSame($task, $this->pump->GetTaskHistory()->Bottom());
-        $this->assertSame($task->inner_task, $this->pump->GetTaskHistory()->Top());
+        $test = $this;
+        $this->pump->expects($this->once())
+                   ->method('_Exit')
+                   ->will($this->returnCallback(function() use ($test, $task) {
+            $test->assertEquals(0, $test->pump->GetTaskHistory()->Count());
+            $test->assertSame($task, $test->pump->GetAllTasks()->Bottom());
+            $test->assertSame($task->inner_task, $test->pump->GetAllTasks()->Top());
+        }));
+
+        $this->pump->QueueTask($task);
     }
 
     public function testTerminate()
