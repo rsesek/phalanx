@@ -16,8 +16,6 @@
 
 namespace phalanx\test;
 
-require_once 'PHPUnit/Framework.php';
-
 if (!defined('PHALANX_ROOT'))
 {
     define('PHALANX_ROOT', dirname(dirname(__FILE__)));

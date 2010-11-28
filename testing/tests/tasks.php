@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\tasks as tasks;
 
-require_once 'PHPUnit/Framework.php';
-
 // Common includes.
 require_once PHALANX_ROOT . '/tasks/cli_dispatcher.php';
 require_once PHALANX_ROOT . '/tasks/cli_output_handler.php';

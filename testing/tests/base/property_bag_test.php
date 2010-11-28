@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\base as base;
 
-require_once 'PHPUnit/Framework.php';
-
 class PropertyBagTest extends \PHPUnit_Framework_TestCase
 {
     public $bag;

@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\data as data;
 
-require_once 'PHPUnit/Framework.php';
-
 class ValidatingTestModelValidator extends data\ModelValidator
 {
     public $validate_title_return_value = TRUE;

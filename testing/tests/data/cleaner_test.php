@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\data\Cleaner as Cleaner;
 
-require_once 'PHPUnit/Framework.php';
-
 class CleanerTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()

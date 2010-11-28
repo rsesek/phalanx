@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use phalanx\views\View;
 
-require_once 'PHPUnit/Framework.php';
-
 require_once TEST_ROOT . '/tests/views.php';
 
 class ViewTest extends \PHPUnit_Framework_TestCase

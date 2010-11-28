@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\tasks as tasks;
 
-require_once 'PHPUnit/Framework.php';
-
 class TaskTest extends \PHPUnit_Framework_TestCase
 {
     protected $task;

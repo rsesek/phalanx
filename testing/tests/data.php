@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\data as data;
 
-require_once 'PHPUnit/Framework.php';
-
 // Common includes.
 require_once PHALANX_ROOT . '/data/cleaner.php';
 require_once PHALANX_ROOT . '/data/form_key.php';

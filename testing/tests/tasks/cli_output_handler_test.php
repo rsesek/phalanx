@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\tasks as tasks;
 
-require_once 'PHPUnit/Framework.php';
-
 class MessageTask extends tasks\Task
 {
     public $message = null;

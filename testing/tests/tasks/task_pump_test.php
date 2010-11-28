@@ -18,8 +18,6 @@ namespace phalanx\test;
 use \phalanx\tasks as tasks;
 use \phalanx\tasks\TaskPump;
 
-require_once 'PHPUnit/Framework.php';
-
 require_once TEST_ROOT . '/tests/tasks.php';
 
 $test = NULL;

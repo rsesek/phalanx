@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\data as data;
 
-require_once 'PHPUnit/Framework.php';
-
 require_once TEST_ROOT . '/tests/data.php';
 
 class FormKeyTest extends \PHPUnit_Framework_TestCase

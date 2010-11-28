@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\data as data;
 
-require_once 'PHPUnit/Framework.php';
-
 class KeyedCleanerTest extends \PHPUnit_Framework_TestCase
 {
     public $fixture;

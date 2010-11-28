@@ -15,6 +15,7 @@
   this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
+<!-- Tested with PHPUnit 3.5.5 -->
 <phpunit bootstrap="./bootstrap.php"
          backupGlobals="FALSE"
          backupStaticAttributes="FALSE"

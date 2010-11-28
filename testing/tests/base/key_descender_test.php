@@ -18,8 +18,6 @@ namespace phalanx\test;
 use \phalanx\base as base;
 use \phalanx\base\KeyDescender as KeyDescender;
 
-require_once 'PHPUnit/Framework.php';
-
 class KeyDescenderTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructWithRef()

@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\tasks as tasks;
 
-require_once 'PHPUnit/Framework.php';
-
 class TestHTTPDispatcher extends tasks\HTTPDispatcher
 {
     public function T_set_request_method($m) { $this->request_method = $m; }

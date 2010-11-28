@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\views as views;
 
-require_once 'PHPUnit/Framework.php';
-
 // Common includes.
 require_once PHALANX_ROOT . '/views/custom_view_task.php';
 require_once PHALANX_ROOT . '/views/view.php';

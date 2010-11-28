@@ -17,7 +17,6 @@
 namespace phalanx\test;
 use \phalanx\tasks as tasks;
 
-require_once 'PHPUnit/Framework.php';
 require_once TEST_ROOT . '/tests/views.php';
 
 class CustomViewTask extends TestTask implements \phalanx\views\CustomViewTask

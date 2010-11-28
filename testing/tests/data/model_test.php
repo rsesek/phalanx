@@ -17,8 +17,6 @@
 namespace phalanx\test;
 use \phalanx\data as data;
 
-require_once 'PHPUnit/Framework.php';
-
 class CompoundKeyModel extends data\Model
 {
     protected $table = 'test_compound';
