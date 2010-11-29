@@ -110,38 +110,38 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
             $this->_SuiteMarker(),
             $this->_DescribeSuite($suite) . ' (' . $this->_Round($delta) . ' ms total)',
             ($color_red ? self::COLOR_RED : self::COLOR_GREEN));
-        echo "\n";
+        $this->Write("\n");
 
         // If this is the main suite (the one to which all other tests/suites
         // are attached), then print the test summary.
         if ($main_suite && $color_red) {
             $count = count($this->failing);
             $tests = $this->_Plural('TEST', $count, TRUE);
-            echo $this->_Color("  YOU HAVE $count FAILING $tests:\n", self::COLOR_RED);
+            $this->Write($this->_Color("  YOU HAVE $count FAILING $tests:\n", self::COLOR_RED));
             foreach ($this->failing as $test) {
-                echo "  $test\n";
+                $this->Write("  $test\n");
             }
-            echo "\n";
+            $this->Write("\n");
         }
 
         $count = count($this->incomplete);
         if ($main_suite && $count) {
             $tests = $this->_Plural('TEST', $count, TRUE);
-            echo $this->_Color("  YOU HAVE $count INCOMPLETE $tests:\n", self::COLOR_PURPLE);
+            $this->Write($this->_Color("  YOU HAVE $count INCOMPLETE $tests:\n", self::COLOR_PURPLE));
             foreach ($this->incomplete as $test) {
-                echo "  $test\n";
+                $this->Write("  $test\n");
             }
-            echo "\n";
+            $this->Write("\n");
         }
 
         $count = count($this->skipped);
         if ($main_suite && $count) {
             $tests = $this->_Plural('TEST', $count, TRUE);
-            echo $this->_Color("  YOU HAVE $count SKIPPED $tests:\n", self::COLOR_BLUE);
+            $this->Write($this->_Color("  YOU HAVE $count SKIPPED $tests:\n", self::COLOR_BLUE));
             foreach ($this->skipped as $test) {
-                echo "  $test\n";
+                $this->Write("  $test\n");
             }
-            echo "\n";
+            $this->Write("\n");
         }
     }
 
@@ -182,7 +182,7 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
     private function _Print($column, $annotation, $color = self::COLOR_NONE)
     {
         $column = $this->_Color($column, $color);
-        echo "$column $annotation\n";
+        $this->Write("$column $annotation\n");
     }
 
     // Takes in a float from microtime() and returns it formatted to display as
