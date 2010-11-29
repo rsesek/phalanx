@@ -27,7 +27,7 @@ class TaskPump
     // The OutputHandler instance for the pump.
     protected $output_handler = NULL;
 
-    // Task state constants. Be aware that the state of an task is set BEFORE
+    // Task state constants. Be aware that the state of a task is set BEFORE
     // the specified method is called. This is used to avoid task reentrancy.
     const TASK_WILL_FIRE = 1;
     const TASK_FIRE = 2;
@@ -55,12 +55,12 @@ class TaskPump
         $this->tasks      = new \SplStack();
     }
 
-    // Schedules an task to be run. If another task is currently being fired,
+    // Schedules a task to be run. If another task is currently being fired,
     // this will wait until that task is done. If no tasks are currently
     // running, the task will fire immediately.
     public function QueueTask(Task $task)
     {
-        // There is already an task executing. Push this new task into the
+        // There is already a task executing. Push this new task into the
         // deferred worke queue.
         if ($this->current_task)
         {

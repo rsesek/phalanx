@@ -21,7 +21,7 @@ require_once PHALANX_ROOT . '/tasks/task_pump.php';
 // The Dispatcher synthesizes Task objects and puts them into the TaskPump.
 abstract class Dispatcher
 {
-    // A lambda that takes an task name and converts it to a fully qualified
+    // A lambda that takes a task name and converts it to a fully qualified
     // class name. This is then instantiated.
     protected $task_loader = NULL;
 
@@ -30,10 +30,10 @@ abstract class Dispatcher
     protected $pump = NULL;
 
     // An associative array of bypass rules. Bypass rules allow clients to
-    // specify either an task name or a closure to execute for a string key
+    // specify either a task name or a closure to execute for a string key
     // of an input task name. For example, clients will commonly want to
     // specify an alternative task name for the empty input task name, like
-    // so (note that this is NOT an task class name, just another task name):
+    // so (note that this is NOT a task class name, just another task name):
     //    '' => 'home'
     // This could alternatively be done using closuers:
     //    '' => function() { TaskPump::Pump()->QueueTask(new MyHomeTask()); }

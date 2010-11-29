@@ -378,7 +378,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($task1, $this->pump->GetTaskHistory()->Bottom());
     }
 
-    public function testCancelDeferredTasksByRaisingAnTask()
+    public function testCancelDeferredTasksByRaisingATask()
     {
         $task = new CancelDeferredTasksTester();
         $this->pump->RunTask($task);

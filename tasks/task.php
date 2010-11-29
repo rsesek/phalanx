@@ -16,7 +16,7 @@
 
 namespace phalanx\tasks;
 
-// A base representation of an task. Tasks should not generate any output,
+// A base representation of a task. Tasks should not generate any output,
 // rather they should store data in member variables, which can then be used by
 // the view system.
 abstract class Task

@@ -26,7 +26,7 @@ require_once PHALANX_ROOT . '/views/view.php';
 // processed task's name into a template name.
 class ViewOutputHandler extends OutputHandler
 {
-    // The function that transforms an task name into a template name.
+    // The function that transforms a task name into a template name.
     protected $template_loader;
 
     protected function _DoStart()

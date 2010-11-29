@@ -24,7 +24,7 @@ require_once PHALANX_ROOT . '/tasks/output_handler.php';
 // output from ALL tasks in the chain and stores it.
 class UnitTestOutputHandler extends OutputHandler
 {
-    // The function that transforms an task name into a template name. The
+    // The function that transforms a task name into a template name. The
     // array is indexed by ints, with 0 being the top of the task chain stack
     // and N being the bottom (oldest).
     protected $task_data = array();

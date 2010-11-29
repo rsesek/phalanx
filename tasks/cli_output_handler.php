@@ -20,7 +20,7 @@ require_once PHALANX_ROOT . '/tasks/task_pump.php';
 require_once PHALANX_ROOT . '/tasks/output_handler.php';
 
 // This implementation of OutputHandler prints messages to the console based on
-// the |message| key of an task's data. It will print any messages generated
+// the |message| key of a task's data. It will print any messages generated
 // by any tasks. It can also optionally set an exit code to terminate with.
 class CLIOutputHandler extends OutputHandler
 {
