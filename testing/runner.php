@@ -27,30 +27,19 @@ ini_set('memory_limit', -1);
 
 // PHPUnit 3.5.5.
 require_once 'PHPUnit/Autoload.php';
-
 require_once TEST_ROOT . '/bootstrap.php';
 require_once TEST_ROOT . '/test_listener.php';
 
-$paths = array(
-    'base/',
-    'data/',
-    'tasks/',
-    'views/'
+$collector = new PHPUnit_Runner_IncludePathTestCollector(
+    array(TEST_ROOT . '/tests/'),
+    array('_test.php')
 );
-
-$unit_tests = new PHPUnit_Framework_TestSuite('Phalanx Unit Tests');
-
-foreach ($paths as $path) {
-    $collector = new PHPUnit_Runner_IncludePathTestCollector(
-        array(TEST_ROOT . '/tests/' . $path),
-        array('_test.php')
-    );
-    $unit_tests->AddTestFiles($collector->CollectTests());
-}
+$suite = new PHPUnit_Framework_TestSuite('Phalanx Unit Tests');
+$suite->AddTestFiles($collector->CollectTests());
 
 $result = new PHPUnit_Framework_TestResult();
 $result->AddListener(new \phalanx\test\TestListener());
 
-$unit_tests->Run($result);
+$suite->Run($result);
 
 exit;
