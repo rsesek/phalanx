@@ -22,7 +22,7 @@ namespace phalanx\test;
 //
 // The format of the output is designed to mimic the Google Test (GTest)
 // <http://googletest.googlecode.com> framework output.
-class TestListener implements \PHPUnit_Framework_TestListener
+class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_TestListener
 {
     const COLOR_NONE = 0;
     const COLOR_RED = 1;

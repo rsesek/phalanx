@@ -14,32 +14,29 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace phalanx\test;
+
 if (!defined('PHALANX_ROOT')) {
     define('PHALANX_ROOT', dirname(dirname(__FILE__)));
     define('TEST_ROOT', dirname(__FILE__));
 }
 
-if (extension_loaded('xdebug')) {
-    xdebug_disable();
-}
-
-ini_set('memory_limit', -1);
-
 // PHPUnit 3.5.5.
 require_once 'PHPUnit/Autoload.php';
-require_once TEST_ROOT . '/bootstrap.php';
 require_once TEST_ROOT . '/test_listener.php';
 
-$collector = new PHPUnit_Runner_IncludePathTestCollector(
-    array(TEST_ROOT . '/tests/'),
-    array('_test.php')
-);
-$suite = new PHPUnit_Framework_TestSuite('Phalanx Unit Tests');
-$suite->AddTestFiles($collector->CollectTests());
+class CustomRunner extends \PHPUnit_TextUI_Command
+{
+    static public function Main($exit = TRUE)
+    {
+        $command = new self();
+        $command->Run($_SERVER['argv'], $exit);
+    }
 
-$result = new PHPUnit_Framework_TestResult();
-$result->AddListener(new \phalanx\test\TestListener());
+    protected function handleCustomTestSuite()
+    {
+        $this->arguments['printer'] = new TestListener();
+    }
+}
 
-$suite->Run($result);
-
-exit;
+CustomRunner::Main();
