@@ -45,6 +45,7 @@ class HTTPDispatcherTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->dispatcher = new TestHTTPDispatcher('ename');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
     }
 
     public function testCtor()
