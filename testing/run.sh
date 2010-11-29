@@ -2,5 +2,5 @@
 
 OLDPWD=$(pwd)
 cd $(dirname "$0")
-phpunit --verbose $@
+php ./runner.php --verbose $@
 cd $OLDPWD
