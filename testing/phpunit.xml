@@ -22,17 +22,8 @@
          colors="TRUE">
 
     <testsuites>
-        <testsuite name="Base">
-            <directory suffix="_test.php">./tests/base/</directory>
-        </testsuite>
-        <testsuite name="Data">
-            <directory suffix="_test.php">./tests/data/</directory>
-        </testsuite>
-        <testsuite name="Tasks">
-            <directory suffix="_test.php">./tests/tasks/</directory>
-        </testsuite>
-        <testsuite name="Views">
-            <directory suffix="_test.php">./tests/views/</directory>
+        <testsuite name="Phalanx Unit Tests">
+            <directory suffix="_test.php">./tests/</directory>
         </testsuite>
     </testsuites>
 
