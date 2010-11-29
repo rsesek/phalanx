@@ -27,6 +27,9 @@ class TestListener implements \PHPUnit_Framework_TestListener
     const COLOR_NONE = 0;
     const COLOR_RED = 1;
     const COLOR_GREEN = 2;
+    const COLOR_BLUE = 3;
+    const COLOR_PURPLE = 4;
+    const COLOR_CYAN = 5;
 
     // The start time of the test suite.
     private $suite_start_time = 0;
@@ -39,6 +42,12 @@ class TestListener implements \PHPUnit_Framework_TestListener
 
     // Array of failing tests.
     private $failing = array();
+
+    // Array of skipped tests.
+    private $skipped = array();
+
+    // Array of incomplete tests.
+    private $incomplete = array();
 
     // An error occurred.
     public function addError(\PHPUnit_Framework_Test $test,
@@ -68,7 +77,8 @@ class TestListener implements \PHPUnit_Framework_TestListener
     public function addIncompleteTest(\PHPUnit_Framework_Test $test,
                                       \Exception $e, $time)
     {
-        $this->_Print('INCOMPLETE', $test->ToString());
+        $this->incomplete[] = $test->ToString();
+        $this->_Print('INCOMPLETE', $e->GetMessage(), self::COLOR_PURPLE);
     }
 
     // Skipped test.
@@ -76,7 +86,8 @@ class TestListener implements \PHPUnit_Framework_TestListener
                                    \Exception $e,
                                    $time)
     {
-        $this->_Print('SKIPPED', $test->ToString());
+        $this->skipped[] = $test->ToString();
+        $this->_Print('SKIPPED', $e->GetMessage(), self::COLOR_BLUE);
     }
 
     // A test suite started.
@@ -105,9 +116,29 @@ class TestListener implements \PHPUnit_Framework_TestListener
         // are attached), then print the test summary.
         if ($main_suite && $color_red) {
             $count = count($this->failing);
-            $plural = ($count > 1 ? 'S' : '');
-            echo "  YOU HAVE $count FAILING TEST{$plural}:\n";
+            $tests = $this->_Plural('TEST', $count, TRUE);
+            echo $this->_Color("  YOU HAVE $count FAILING $tests:\n", self::COLOR_RED);
             foreach ($this->failing as $test) {
+                echo "  $test\n";
+            }
+            echo "\n";
+        }
+
+        $count = count($this->incomplete);
+        if ($main_suite && $count) {
+            $tests = $this->_Plural('TEST', $count, TRUE);
+            echo $this->_Color("  YOU HAVE $count INCOMPLETE $tests:\n", self::COLOR_PURPLE);
+            foreach ($this->incomplete as $test) {
+                echo "  $test\n";
+            }
+            echo "\n";
+        }
+
+        $count = count($this->skipped);
+        if ($main_suite && $count) {
+            $tests = $this->_Plural('TEST', $count, TRUE);
+            echo $this->_Color("  YOU HAVE $count SKIPPED $tests:\n", self::COLOR_BLUE);
+            foreach ($this->skipped as $test) {
                 echo "  $test\n";
             }
             echo "\n";
@@ -123,14 +154,19 @@ class TestListener implements \PHPUnit_Framework_TestListener
     // A test ended.
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
-        $this->_Print('[       OK ]', $test->ToString() . ' (' . $this->_Round($time) . ' ms)', self::COLOR_GREEN);
+        $name = $test->ToString();
+        if (in_array($name, $this->skipped) || in_array($name, $this->incomplete)) {
+            $this->_Print('[    ABORT ]', $name . ' (' . $this->_Round($time) . ' ms)', self::COLOR_CYAN);
+        } else {   
+            $this->_Print('[       OK ]', $name . ' (' . $this->_Round($time) . ' ms)', self::COLOR_GREEN);
+        }
     }
 
     // Returns the description for a test suite.
     private function _DescribeSuite(\PHPUnit_Framework_TestSuite $suite)
     {
         $count = $suite->Count();
-        return sprintf('%d test%s from %s', $count, ($count > 1 ? 's' : ''), $suite->GetName());
+        return sprintf('%d %s from %s', $count, $this->_Plural('test', $count), $suite->GetName());
     }
 
     // Returns the test suite marker.
@@ -145,14 +181,7 @@ class TestListener implements \PHPUnit_Framework_TestListener
     // Prints a line to output.
     private function _Print($column, $annotation, $color = self::COLOR_NONE)
     {
-        $color_code = '';
-        switch ($color) {
-            case self::COLOR_RED: $color_code = '0;31'; break;
-            case self::COLOR_GREEN: $color_code = '0;32'; break;
-        }
-        if ($color != self::COLOR_NONE) {
-            $column = "\x1b[{$color_code}m{$column}\x1b[0m";
-        }
+        $column = $this->_Color($column, $color);
         echo "$column $annotation\n";
     }
 
@@ -179,5 +208,30 @@ class TestListener implements \PHPUnit_Framework_TestListener
         if (!$frame)
             $frame = $trace[0];
         return $frame['file'] . ':' . $frame['line'];
+    }
+
+    // Colors |$str| to be a certain |$color|.
+    private function _Color($str, $color)
+    {
+        $color_code = '';
+        switch ($color) {
+            case self::COLOR_RED:    $color_code = '0;31'; break;
+            case self::COLOR_GREEN:  $color_code = '0;32'; break;
+            case self::COLOR_BLUE:   $color_code = '0;34'; break;
+            case self::COLOR_PURPLE: $color_code = '0;35'; break;
+            case self::COLOR_CYAN:   $color_code = '0;36'; break;
+        }
+        if ($color == self::COLOR_NONE) {
+            return $str;
+        }        
+        return "\x1b[{$color_code}m{$str}\x1b[0m";
+    }
+
+    // Returns the plural of the |$word| if |$count| is greater than one.
+    private function _Plural($word, $count, $capitalize = FALSE)
+    {
+        if ($count > 1)
+            return $word . ($capitalize ? 'S' : 's');
+        return $word;
     }
 }
