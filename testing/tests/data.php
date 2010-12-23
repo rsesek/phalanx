@@ -80,7 +80,7 @@ class TestModel extends data\Model
                 description text,
                 value text,
                 is_hidden boolean,
-                refernce_id integer
+                reference_id integer
             );
         ");
         return $db;

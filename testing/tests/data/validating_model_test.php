@@ -15,6 +15,7 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
+use \phalanx\base\Dictionary as Dictionary;
 use \phalanx\data as data;
 
 class ValidatingTestModelValidator extends data\ModelValidator
@@ -152,5 +153,82 @@ class ValidatingModelTest extends \PHPUnit_Framework_TestCase
             'is_hidden' => array('Error 1', 'Error 2')
         );
         $this->assertEquals($this->validator->errors(), $expected);
+    }
+}
+
+class ValidatingModelTaskTest extends \PHPUnit_Framework_TestCase
+{
+    public function testInvalidAction()
+    {
+        $data  = new Dictionary(array(
+            'model'  => 'test_model',
+            'action' => '__invalid__'
+        ));
+        $task = new data\ValidatingModelTask($data);
+        \phalanx\tasks\TaskPump::Pump()->RunTask($task);
+        $this->assertNotEquals(0, $task->code());
+        $this->assertEquals(1, count($task->errors()));
+    }
+
+    public function testInvalidModel()
+    {
+        $data = new Dictionary(array(
+            'model'  => '__invalid__',
+            'action' => data\ValidatingModelTask::ACTION_FETCH
+        ));
+        $task = new data\ValidatingModelTask($data);
+        \phalanx\tasks\TaskPump::Pump()->RunTask($task);
+        $this->assertNotEquals(0, $task->code());
+        $this->assertEquals(1, count($task->errors()));
+    }
+
+    public function testVaidFetch()
+    {
+        $data = new Dictionary(array(
+            'model'  => 'test_model',
+            'action' => data\ValidatingModelTask::ACTION_FETCH,
+            'data'   => NULL
+        ));
+
+        // Insert the record first.
+        $obj = new TestModel();
+        $record = array(
+            'title'        => 'foo',
+            'description'  => 'bar',
+            'value'        => 'baz',
+            'is_hidden'    => TRUE,
+            'reference_id' => 3
+        );
+        $obj->SetFrom($record);
+        $obj->Insert();
+
+        $data->data = $obj->id;
+
+        $task = new data\ValidatingModelTask($data);
+        \phalanx\tasks\TaskPump::Pump()->RunTask($task);
+
+        $this->assertEquals(0, $task->code());
+        $actual = $task->record();
+        $this->assertNotNull($actual->id);
+
+        foreach ($record as $key => $value) {
+            $this->assertNotNull($actual->$key);
+        }
+    }
+
+    public function testInvalidFetch()
+    {
+        $data = new Dictionary(array(
+            'model'  => 'test_model',
+            'action' => data\ValidatingModelTask::ACTION_FETCH,
+            'data'   => 1239823
+        ));
+
+        $task = new data\ValidatingModelTask($data);
+        \phalanx\tasks\TaskPump::Pump()->RunTask($task);
+
+        $this->assertNotEquals(0, $task->code());
+        $this->assertEquals(1, count($task->errors()));
+        $this->assertNull($task->record());
     }
 }

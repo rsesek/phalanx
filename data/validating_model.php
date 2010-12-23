@@ -155,7 +155,7 @@ class ValidatingModelTask extends \phalanx\tasks\Task
       public function code() { return $this->code; }
 
       protected $errors = NULL;
-      public function message() { return $this->errors; }
+      public function errors() { return $this->errors; }
 
       protected $record = array();
       public function record() { return $this->record; }
@@ -183,8 +183,9 @@ class ValidatingModelTask extends \phalanx\tasks\Task
     public function WillFire()
     {
         // Make sure the client is only performing an allowed action.
-        $actions = array(ACTION_FETCH, ACTION_DELETE, ACTION_VALIDATE,
-                         ACTION_INSERT, ACTION_UPDATE);
+        $actions = array(self::ACTION_FETCH, self::ACTION_DELETE,
+                         self::ACTION_VALIDATE, self::ACTION_INSERT,
+                         self::ACTION_UPDATE);
         if (!in_array($this->input->action, $actions)) {
             $this->_Error(-1, 'Action not supported');
             return;
@@ -193,7 +194,7 @@ class ValidatingModelTask extends \phalanx\tasks\Task
         // Make sure the Model exists and can be validated.
         $classes = get_declared_classes();
         foreach ($classes as $class) {
-            $mirror = new ReflectionClass($class);
+            $mirror = new \ReflectionClass($class);
             if ($mirror->ImplementsInterface('\phalanx\data\ValidatingModel')) {
                 $validator_name = $mirror->GetMethod('ValidatorName')->Invoke(NULL);
                 if ($validator_name == $this->input->model) {
@@ -224,7 +225,10 @@ class ValidatingModelTask extends \phalanx\tasks\Task
         }
 
         // Only certain actions require validation (those that alter records).
-        if (in_array($this->input->action, array(ACTION_VALIDATE, ACTION_INSERT, ACTION_UPDATE))) {
+        if (in_array($this->input->action,
+                     array(self::ACTION_VALIDATE,
+                           self::ACTION_INSERT,
+                           self::ACTION_UPDATE))) {
             if (!$this->_Validate())
                 return;
         }
@@ -232,20 +236,20 @@ class ValidatingModelTask extends \phalanx\tasks\Task
         // Perform the actual action.
         try {
             switch ($this->input->action) {
-                case ACTION_FETCH:
+                case self::ACTION_FETCH:
                     $this->record = $this->model->Fetch();
                     return;
-                case ACTION_DELETE:
+                case self::ACTION_DELETE:
                     $this->model->Delete();
                     return;
-                case ACTION_VALIDATE:
+                case self::ACTION_VALIDATE:
                     // This is taken care of with the above validation.
                     return;
-                case ACTION_INSERT:
+                case self::ACTION_INSERT:
                     $this->model->Insert();
                     $this->record = $this->model->ToArray();
                     return;
-                case ACTION_UPDATE:
+                case self::ACTION_UPDATE:
                     $this->model->Update();
                     $this->record = $this->model->ToArray();
                     return;
@@ -260,9 +264,11 @@ class ValidatingModelTask extends \phalanx\tasks\Task
     // Helper function for setting error state.
     private function _Error($code, $message)
     {
-        $this->code    = $code;
-        $this->message = array($message);
-        $this->record  = NULL;
+        if (!$this->errors)
+            $this->errors = array();
+        $this->code     = $code;
+        $this->errors[] = $message;
+        $this->record   = NULL;
         $this->Cancel();
     }
 
