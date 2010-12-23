@@ -200,7 +200,7 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
         // Find the first frame from non-PHPUnit code, which is where the error
         // should have occurred.
         foreach ($trace as $f) {
-            if (strpos($f['file'], 'PHPUnit/Framework') === FALSE) {
+            if (isset($f['file']) && strpos($f['file'], 'PHPUnit/Framework') === FALSE) {
                 $frame = $f;
                 break;
             }
