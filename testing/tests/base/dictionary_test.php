@@ -26,6 +26,19 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
         $this->bag = new base\Dictionary();
     }
 
+    public function testAraryCtor()
+    {
+        $this->bag = new base\Dictionary(array('foo' => 'bar'));
+        $this->assertEquals('bar', $this->bag->foo);
+    }
+
+    public function testVarArgsCtor()
+    {
+        $this->bag = new base\Dictionary('foo', 'bar', 'baz', 'boo');
+        $this->assertEquals('bar', $this->bag->foo);
+        $this->assertEquals('boo', $this->bag->baz);
+    }
+
     public function testCount()
     {
         $this->assertEquals(0, $this->bag->Count());
@@ -53,7 +66,7 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
         $this->bag->bar = 'hij';
 
         $keys = array('foo', 'moo', 'bar');
-        $this->assertEquals($keys, $this->bag->allKeys());
+        $this->assertEquals($keys, $this->bag->AllKeys());
     }
 
     public function testAllValues()
@@ -63,7 +76,7 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
         $this->bag->bar = 'hij';
 
         $values = array('abc', 'def', 'hij');
-        $this->assertEquals($values, $this->bag->allValues());
+        $this->assertEquals($values, $this->bag->AllValues());
     }
 
     public function testToArray()
@@ -77,7 +90,7 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
             'moo' => 'def',
             'bar' => 'hij'
         );
-        $this->assertEquals($array, $this->bag->toArray());
+        $this->assertEquals($array, $this->bag->ToArray());
     }
 
     public function testHasKey()
@@ -90,7 +103,7 @@ class DictionaryTest extends \PHPUnit_Framework_TestCase
     public function testContains()
     {
         $this->bag->foo = 'moo';
-        $this->assertTrue($this->bag->contains('moo'));
-        $this->assertFalse($this->bag->contains('foo'));
+        $this->assertTrue($this->bag->Contains('moo'));
+        $this->assertFalse($this->bag->Contains('foo'));
     }
 }

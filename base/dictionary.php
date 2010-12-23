@@ -26,12 +26,20 @@ require_once PHALANX_ROOT . '/base/key_descender.php';
 // object, the contents are copied rather than referenced.
 class Dictionary extends KeyDescender
 {
+    // A Dictionary can either be created from a descendable type, or from
+    // a varargs of key-value pairs. If the varags constructor is used,
+    // the form is |new Dictionary(key1, val1, key2, val2).
     public function __construct($properties = array())
     {
-        if (self::IsDescendable($properties))
-            $this->root = $properties;
-        else
+        $args = func_get_args();
+        if (count($args) == 1 && self::IsDescendable($args[0])) {
+            $this->root = $args[0];
+        } else {
             $this->root = array();
+            for ($i = 0; $i < count($args); $i += 2) {
+                $this->root[$args[$i]] = $args[$i + 1];
+            }
+        }
     }
 
     // Sets a key-value pair.
@@ -43,7 +51,7 @@ class Dictionary extends KeyDescender
     // Returns the value for a given key.
     public function __get($key)
     {
-        return $this->getSilent($key);
+        return $this->GetSilent($key);
     }
 
     // Returns the number of items in the Dictionary.
