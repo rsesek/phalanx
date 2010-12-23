@@ -30,10 +30,10 @@ abstract class Task
     // The state of the task. This should ONLY ever be changed by the pump.
     private $state = 0;
 
-    // Creates an instance of the Task class. The PropertyBag of input is
+    // Creates an instance of the Task class. The Dictionary of input is
     // assembled for the Task by the Dispatcher. It collects input variables
     // based on the keys the Task asks for via the InputList() method.
-    public function __construct(\phalanx\base\PropertyBag $input = NULL)
+    public function __construct(\phalanx\base\Dictionary $input = NULL)
     {
         $this->input = $input;
     }

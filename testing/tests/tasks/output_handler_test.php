@@ -35,7 +35,7 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTaskData()
     {
-        $input = new \phalanx\base\PropertyBag(array('foo' => 'bar'));
+        $input = new \phalanx\base\Dictionary(array('foo' => 'bar'));
         $task = new TestTask($input);
         $task->Fire();
         $data  = $this->handler->T_GetTaskData($task);
@@ -49,7 +49,7 @@ class OutputHandlerTest extends \PHPUnit_Framework_TestCase
             'id'         => NULL,
             'input'      => $input
         );
-        $this->assertType('phalanx\base\PropertyBag', $data);
+        $this->assertType('phalanx\base\Dictionary', $data);
         $this->assertEquals($expected, $data->ToArray());
         $this->assertFalse($task->out2_never_true);
     }

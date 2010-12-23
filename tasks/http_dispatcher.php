@@ -16,7 +16,7 @@
 
 namespace phalanx\tasks;
 
-require_once PHALANX_ROOT . '/base/property_bag.php';
+require_once PHALANX_ROOT . '/base/dictionary.php';
 require_once PHALANX_ROOT . '/tasks/dispatcher.php';
 
 class HTTPDispatcher extends Dispatcher
@@ -59,7 +59,7 @@ class HTTPDispatcher extends Dispatcher
     //   /task_name/k1/v1/k2/v2/
     protected function _TokenizeURL($url)
     {
-        $input = new \phalanx\base\PropertyBag();
+        $input = new \phalanx\base\Dictionary();
         $parts = explode('/', trim($url, '/'));
 
         $input->Set('_task', $parts[0]);
@@ -95,7 +95,7 @@ class HTTPDispatcher extends Dispatcher
     // Returns the input based on the keys provided.
     protected function _GetInput(Array $keys)
     {
-        $input = new \phalanx\base\PropertyBag();
+        $input = new \phalanx\base\Dictionary();
         $input->_method = $this->request_method;
         if ($this->request_method == 'GET')
         {

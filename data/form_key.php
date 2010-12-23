@@ -15,9 +15,9 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\data;
-use \phalanx\base\PropertyBag as PropertyBag;
+use \phalanx\base\Dictionary as Dictionary;
 
-require_once PHALANX_ROOT . '/base/property_bag.php';
+require_once PHALANX_ROOT . '/base/dictionary.php';
 require_once PHALANX_ROOT . '/data/cleaner.php';
 
 // This class is used to generate unique form keys, so that POST requests
@@ -52,7 +52,7 @@ class FormKeyManager
     // validate a given form POST.
     public function Generate()
     {
-        $form_key            = new PropertyBag();
+        $form_key            = new Dictionary();
         $form_key->key       = sha1(rand() . microtime() . rand());
         $form_key->timestamp = time();
         $this->delegate->SaveFormKey($form_key);
@@ -107,7 +107,7 @@ class FormKeyManager
 interface FormKeyManagerDelegate
 {
     public function GetFormKey($key);
-    public function SaveFormKey(PropertyBag $form_key);
+    public function SaveFormKey(Dictionary $form_key);
     public function DeleteKey($key);
 }
 

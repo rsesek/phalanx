@@ -32,10 +32,10 @@ abstract class OutputHandler
     // state before calling _DoStart().
     abstract protected function _DoStart();
 
-    // Returns a PropertyBag of data from |$task| based on its output list.
+    // Returns a Dictionary of data from |$task| based on its output list.
     public function GetTaskData(Task $task)
     {
-        $data        = new \phalanx\base\PropertyBag();
+        $data        = new \phalanx\base\Dictionary();
         $output_list = $task::OutputList();
         $output_list[] = 'input';
         foreach ($output_list as $key)

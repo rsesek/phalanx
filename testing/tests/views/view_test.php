@@ -64,7 +64,7 @@ class ViewTest extends \PHPUnit_Framework_TestCase
         $view = $this->getMock('phalanx\views\View', NULL, array('test_tpl'));
         $this->assertEquals('test_tpl', $view->template_name());
 
-        $this->assertType('phalanx\base\PropertyBag', $view->vars());
+        $this->assertType('phalanx\base\Dictionary', $view->vars());
         $this->assertEquals(0, $view->vars()->Count());
     }
 

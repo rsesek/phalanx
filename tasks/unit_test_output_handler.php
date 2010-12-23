@@ -37,6 +37,6 @@ class UnitTestOutputHandler extends OutputHandler
     }
 
     // Returns an array of all task data in the same order of tasks as the
-    // TaskPump's task chain. The values are base\PropertyBags.
+    // TaskPump's task chain. The values are base\Dictionarys.
     public function task_data() { return $this->task_data; }
 }

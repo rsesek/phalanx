@@ -66,7 +66,7 @@ abstract class Dispatcher
     // input keys. Returns the task name (not class name) as a string.
     abstract protected function _GetTaskName();
 
-    // Called by Start(). This should return a PropertyBag of input that is to
+    // Called by Start(). This should return a Dictionary of input that is to
     // be passed to the task. This function should gather input for the keys
     // passed to it.
     abstract protected function _GetInput(Array $keys);

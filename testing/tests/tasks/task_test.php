@@ -28,7 +28,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
     public function testInput()
     {
-        $args = new \phalanx\base\PropertyBag();
+        $args = new \phalanx\base\Dictionary();
         $args->test = 'foo';
         $this->task = new TestTask($args);
         $this->assertSame($args, $this->task->input());

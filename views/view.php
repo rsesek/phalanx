@@ -16,7 +16,7 @@
 
 namespace phalanx\views;
 
-require_once PHALANX_ROOT . '/base/property_bag.php';
+require_once PHALANX_ROOT . '/base/dictionary.php';
 require_once PHALANX_ROOT . '/data/keyed_cleaner.php';
 
 class View
@@ -43,7 +43,7 @@ class View
     public function __construct($name)
     {
         $this->template_name = $name;
-        $this->vars          = new \phalanx\base\PropertyBag();
+        $this->vars          = new \phalanx\base\Dictionary();
         $this->cache_prefix  = '<' . '?php require_once "' . PHALANX_ROOT . '/data/cleaner.php"; use phalanx\data\Cleaner as Cleaner; ?>';
     }
 
@@ -123,7 +123,7 @@ class View
     // Gets the name of the template.
     public function template_name() { return $this->template_name; }
 
-    // Returns the PropertyBag of variables.
+    // Returns the Dictionary of variables.
     public function vars() { return $this->vars; }
 }
 

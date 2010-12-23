@@ -18,13 +18,13 @@ namespace phalanx\base;
 
 require_once PHALANX_ROOT . '/base/key_descender.php';
 
-// A property bag can be used instead of an array to store key-value pairs in
-// an object. While \stdClass can be used for this, too, PropertyBag provides
+// A dictinoary can be used instead of an array to store key-value pairs in
+// an object. While \stdClass can be used for this, too, Dictionary provides
 // additional methods to make working with it slightly easier.
 //
-// PropertyBag is also a KeyDescender, except when it is created with an
+// Dictionary is also a KeyDescender, except when it is created with an
 // object, the contents are copied rather than referenced.
-class PropertyBag extends KeyDescender
+class Dictionary extends KeyDescender
 {
     public function __construct($properties = array())
     {
@@ -46,7 +46,7 @@ class PropertyBag extends KeyDescender
         return $this->getSilent($key);
     }
 
-    // Returns the number of items in the PropertyBag.
+    // Returns the number of items in the Dictionary.
     public function Count()
     {
         return count($this->root);

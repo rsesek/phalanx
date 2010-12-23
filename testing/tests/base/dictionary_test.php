@@ -17,13 +17,13 @@
 namespace phalanx\test;
 use \phalanx\base as base;
 
-class PropertyBagTest extends \PHPUnit_Framework_TestCase
+class DictionaryTest extends \PHPUnit_Framework_TestCase
 {
     public $bag;
 
     public function setUp()
     {
-        $this->bag = new base\PropertyBag();
+        $this->bag = new base\Dictionary();
     }
 
     public function testCount()

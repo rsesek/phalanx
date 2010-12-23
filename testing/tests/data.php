@@ -40,7 +40,7 @@ class TestFormKeyManagerDelegate implements data\FormKeyManagerDelegate //,
         return NULL;
     }
 
-    public function SaveFormKey(\phalanx\base\PropertyBag $form_key)
+    public function SaveFormKey(\phalanx\base\Dictionary $form_key)
     {
         $this->did_save = TRUE;
         $this->key_storage[$form_key->key] = $form_key;

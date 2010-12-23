@@ -20,5 +20,5 @@ use \phalanx\base as base;
 // Common includes.
 require_once PHALANX_ROOT . '/base/functions.php';
 require_once PHALANX_ROOT . '/base/key_descender.php';
-require_once PHALANX_ROOT . '/base/property_bag.php';
+require_once PHALANX_ROOT . '/base/dictionary.php';
 require_once PHALANX_ROOT . '/base/struct.php';

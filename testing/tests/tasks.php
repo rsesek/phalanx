@@ -114,7 +114,7 @@ class TestDispatcher extends tasks\Dispatcher
 
     protected function _GetInput(Array $input_list)
     {
-        $input = new \phalanx\base\PropertyBag();
+        $input = new \phalanx\base\Dictionary();
         foreach ($input_list as $key)
             $input->Set($key, 'test:' . $key);
         return $input;

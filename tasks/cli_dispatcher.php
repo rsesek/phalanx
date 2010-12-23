@@ -16,7 +16,7 @@
 
 namespace phalanx\tasks;
 
-require_once PHALANX_ROOT . '/base/property_bag.php';
+require_once PHALANX_ROOT . '/base/dictionary.php';
 require_once PHALANX_ROOT . '/tasks/dispatcher.php';
 
 // This dispatcher instance creates a command line interface for running tasks.
@@ -45,7 +45,7 @@ class CLIDispatcher extends Dispatcher
     // This splits an argument string of flags into key/value pairs.
     protected function _ParseArguments($args)
     {
-        $input = new \phalanx\base\PropertyBag();
+        $input = new \phalanx\base\Dictionary();
 
         // Remove the program's name.
         array_shift($args);
@@ -80,7 +80,7 @@ class CLIDispatcher extends Dispatcher
     // Returns the input based on the keys provided.
     protected function _GetInput(Array $keys)
     {
-        $input = new \phalanx\base\PropertyBag();
+        $input = new \phalanx\base\Dictionary();
         foreach ($keys as $key)
             if ($this->cli_input->HasKey($key))
                 $input->Set($key, $this->cli_input->Get($key));
