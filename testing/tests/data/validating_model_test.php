@@ -68,6 +68,16 @@ class ValidatingTestModelValidator extends data\ModelValidator
     {
         $this->error_on_unvalidated_key = $flag;
     }
+
+    static public $test = NULL;
+    static public $filter_return_value = TRUE;
+    public function FilterAction(data\ValidatingModelTask $task)
+    {
+        parent::FilterAction($task);  // For test coverage.
+        if (self::$test)
+            self::$test->assertNotNull($task->model());
+        return self::$filter_return_value;
+    }
 }
 
 class ValidatingTestModel extends TestModel implements data\ValidatingModel
@@ -484,5 +494,24 @@ class ValidatingModelTaskTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($record->id, $actual->id);
         $this->assertEquals($record->title, $actual->title);
         $this->assertEquals($record->description, $actual->description);
+    }
+
+    public function testFilteredAction()
+    {
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_FETCH,
+            'data', 3
+        );
+
+        ValidatingTestModelValidator::$test = $this;
+        ValidatingTestModelValidator::$filter_return_value = FALSE;
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertNotEquals(0, $task->code());
+        $this->assertEquals(1, count($task->errors()));
+        $this->assertNull($task->record());
     }
 }
