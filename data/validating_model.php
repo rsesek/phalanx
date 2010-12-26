@@ -157,7 +157,7 @@ class ValidatingModelTask extends \phalanx\tasks\Task
       protected $errors = NULL;
       public function errors() { return $this->errors; }
 
-      protected $record = array();
+      protected $record = NULL;
       public function record() { return $this->record; }
     // }}
 
@@ -198,7 +198,12 @@ class ValidatingModelTask extends \phalanx\tasks\Task
             if ($mirror->ImplementsInterface('\phalanx\data\ValidatingModel')) {
                 $validator_name = $mirror->GetMethod('ValidatorName')->Invoke(NULL);
                 if ($validator_name == $this->input->model) {
-                    $this->model = $mirror->NewInstance($this->input->data);
+                    if (is_array($this->input->data)) {
+                        $this->model = $mirror->NewInstance(NULL);
+                        $this->model->SetFrom($this->input->data);
+                    } else {
+                        $this->model = $mirror->NewInstance($this->input->data);
+                    }
                     break;
                 }
             }
@@ -247,11 +252,11 @@ class ValidatingModelTask extends \phalanx\tasks\Task
                     return;
                 case self::ACTION_INSERT:
                     $this->model->Insert();
-                    $this->record = $this->model->ToArray();
+                    $this->record = $this->model->Fetch();
                     return;
                 case self::ACTION_UPDATE:
                     $this->model->Update();
-                    $this->record = $this->model->ToArray();
+                    $this->record = $this->model->Fetch();
                     return;
                 default:
                     $this->_Error(-6, 'Unhandled action');

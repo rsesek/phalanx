@@ -15,21 +15,22 @@
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace phalanx\test;
-use \phalanx\base\Dictionary as Dictionary;
+use \phalanx\base\Dictionary;
 use \phalanx\data as data;
+use \phalanx\tasks\TaskPump;
 
 class ValidatingTestModelValidator extends data\ModelValidator
 {
-    public $validate_title_return_value = TRUE;
+    static public $validate_title_return_value = TRUE;
     protected function _validate_title($value)
     {
-        return $this->validate_title_return_value;
+        return self::$validate_title_return_value;
     }
 
-    public $validate_description_generates_error = FALSE;
+    static public $validate_description_generates_error = FALSE;
     protected function _validate_description($value)
     {
-        if (!$this->validate_description_generates_error)
+        if (!self::$validate_description_generates_error)
             return TRUE;
         $this->_ValidationError('Description error');
         return FALSE;
@@ -40,10 +41,10 @@ class ValidatingTestModelValidator extends data\ModelValidator
         return TRUE;
     }
 
-    public $validate_is_hidden_generates_errors = FALSE;
+    static public $validate_is_hidden_generates_errors = FALSE;
     protected function _validate_is_hidden($value)
     {
-        if (!$this->validate_is_hidden_generates_errors)
+        if (!self::$validate_is_hidden_generates_errors)
             return TRUE;
         $this->_ValidationError('Error 1');
         $this->_ValidationError('Error 2');
@@ -97,6 +98,10 @@ class ValidatingModelTest extends \PHPUnit_Framework_TestCase
 
         $this->model = new ValidatingTestModel();
         $this->validator = $this->model->GetValidator();
+
+        ValidatingTestModelValidator::$validate_title_return_value = TRUE;
+        ValidatingTestModelValidator::$validate_description_generates_error = FALSE;
+        ValidatingTestModelValidator::$validate_is_hidden_generates_errors = FALSE;
     }
 
     public function testErrorOnUnvalidatedKey()
@@ -115,14 +120,14 @@ class ValidatingModelTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalid()
     {
-        $this->validator->validate_title_return_value = FALSE;
+        ValidatingTestModelValidator::$validate_title_return_value = FALSE;
         $this->validator->Validate();
         $this->assertFalse($this->validator->is_valid());
     }
 
     public function testInvalidWithError()
     {
-        $this->validator->validate_description_generates_error = TRUE;
+        ValidatingTestModelValidator::$validate_description_generates_error = TRUE;
         $this->validator->Validate();
         $this->assertFalse($this->validator->is_valid());
         $expected = array(
@@ -133,7 +138,7 @@ class ValidatingModelTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidWithMultipleErrors1()
     {
-        $this->validator->validate_is_hidden_generates_errors = TRUE;
+        ValidatingTestModelValidator::$validate_is_hidden_generates_errors = TRUE;
         $this->validator->Validate();
         $this->assertFalse($this->validator->is_valid());
         $expected = array(
@@ -144,8 +149,8 @@ class ValidatingModelTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidWithMultipleErrors2()
     {
-        $this->validator->validate_description_generates_error = TRUE;
-        $this->validator->validate_is_hidden_generates_errors = TRUE;
+        ValidatingTestModelValidator::$validate_description_generates_error = TRUE;
+        ValidatingTestModelValidator::$validate_is_hidden_generates_errors = TRUE;
         $this->validator->Validate();
         $this->assertFalse($this->validator->is_valid());
         $expected = array(
@@ -158,6 +163,17 @@ class ValidatingModelTest extends \PHPUnit_Framework_TestCase
 
 class ValidatingModelTaskTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $this->db = ValidatingTestModel::SetUpDatabase();
+        ValidatingTestModel::set_db($this->db);
+        $this->assertSame($this->db, ValidatingTestModel::db());
+
+        ValidatingTestModelValidator::$validate_title_return_value = TRUE;
+        ValidatingTestModelValidator::$validate_description_generates_error = FALSE;
+        ValidatingTestModelValidator::$validate_is_hidden_generates_errors = FALSE;
+    }
+
     public function testInvalidAction()
     {
         $data  = new Dictionary(array(
@@ -165,7 +181,7 @@ class ValidatingModelTaskTest extends \PHPUnit_Framework_TestCase
             'action' => '__invalid__'
         ));
         $task = new data\ValidatingModelTask($data);
-        \phalanx\tasks\TaskPump::Pump()->RunTask($task);
+        TaskPump::Pump()->RunTask($task);
         $this->assertNotEquals(0, $task->code());
         $this->assertEquals(1, count($task->errors()));
     }
@@ -177,7 +193,7 @@ class ValidatingModelTaskTest extends \PHPUnit_Framework_TestCase
             'action' => data\ValidatingModelTask::ACTION_FETCH
         ));
         $task = new data\ValidatingModelTask($data);
-        \phalanx\tasks\TaskPump::Pump()->RunTask($task);
+        TaskPump::Pump()->RunTask($task);
         $this->assertNotEquals(0, $task->code());
         $this->assertEquals(1, count($task->errors()));
     }
@@ -205,7 +221,7 @@ class ValidatingModelTaskTest extends \PHPUnit_Framework_TestCase
         $data->data = $obj->id;
 
         $task = new data\ValidatingModelTask($data);
-        \phalanx\tasks\TaskPump::Pump()->RunTask($task);
+        TaskPump::Pump()->RunTask($task);
 
         $this->assertEquals(0, $task->code());
         $actual = $task->record();
@@ -225,10 +241,248 @@ class ValidatingModelTaskTest extends \PHPUnit_Framework_TestCase
         ));
 
         $task = new data\ValidatingModelTask($data);
-        \phalanx\tasks\TaskPump::Pump()->RunTask($task);
+        TaskPump::Pump()->RunTask($task);
 
         $this->assertNotEquals(0, $task->code());
         $this->assertEquals(1, count($task->errors()));
         $this->assertNull($task->record());
+    }
+
+    public function testDelete()
+    {
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_DELETE
+        );
+
+        $record = new TestModel();
+        $record->SetFrom(array(
+            'title' => 'foo'
+        ));
+        $record->Insert();
+
+        $data->data = $record->id;
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertEquals(0, $task->code());
+
+        try {
+            $obj = new TestModel($record->id);
+            $obj->Fetch();
+            $this->fail('Did not delete record');
+        } catch (data\ModelException $e) {
+            // Success.
+        }
+    }
+
+    public function testValidateValid()
+    {
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_VALIDATE,
+            'data', array(
+                'title'       => 'Moo',
+                'description' => 'baaa'
+            )
+        );
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertEquals(0, $task->code());
+        $this->assertEquals(0, count($task->errors()));
+        $this->assertNull($task->record());
+    }
+
+    public function testValidateInvalid1Error()
+    {
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_VALIDATE,
+            'data', array(
+                'title'       => 'Moo',
+                'description' => 'baaa'
+            )
+        );
+
+        ValidatingTestModelValidator::$validate_description_generates_error = TRUE;
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertNotEquals(0, $task->code());
+        $this->assertNull($task->record());
+
+        $errors = $task->errors();
+        $this->assertEquals(1, count($errors));        
+        $this->assertNotNull($errors['description']);
+        $this->assertEquals(1, count($errors['description']));
+    }
+
+    public function testValidateInvalid2Errors()
+    {
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_VALIDATE,
+            'data', array(
+                'title'       => 'Moo',
+                'description' => 'baaa'
+            )
+        );
+
+        ValidatingTestModelValidator::$validate_is_hidden_generates_errors = TRUE;
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertNotEquals(0, $task->code());
+        $this->assertNull($task->record());
+
+        $errors = $task->errors();
+        $this->assertEquals(1, count($errors));        
+        $this->assertNotNull($errors['is_hidden']);
+        $this->assertEquals(2, count($errors['is_hidden']));
+    }
+
+    public function testValidateInvalid2Errors2Fields()
+    {
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_VALIDATE,
+            'data', array(
+                'title'       => 'Moo',
+                'description' => 'baaa'
+            )
+        );
+
+        ValidatingTestModelValidator::$validate_description_generates_error = TRUE;
+        ValidatingTestModelValidator::$validate_is_hidden_generates_errors = TRUE;
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertNotEquals(0, $task->code());
+        $this->assertNull($task->record());
+
+        $errors = $task->errors();
+        $this->assertEquals(2, count($errors));        
+        $this->assertNotNull($errors['description']);
+        $this->assertEquals(1, count($errors['description']));
+        $this->assertNotNull($errors['is_hidden']);
+        $this->assertEquals(2, count($errors['is_hidden']));
+    }
+
+    public function testValidInsert()
+    {
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_INSERT,
+            'data', array(
+                'title'       => 'Moo',
+                'description' => 'baaa'
+            )
+        );
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertEquals(0, $task->code());
+        $this->assertEquals(0, count($task->errors()));
+
+        $record = $task->record();
+        $this->assertEquals($data->{'data.title'}, $record->title);
+        $this->assertEquals($data->{'data.description'}, $record->description);
+        $this->assertNotEquals(0, $record->id);
+    }
+
+    public function testInvalidInsert()
+    {
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_INSERT,
+            'data', array(
+                'title'       => 'Moo',
+                'description' => 'baaa'
+            )
+        );
+
+        ValidatingTestModelValidator::$validate_description_generates_error = TRUE;
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertNotEquals(0, $task->code());
+        $this->assertNull($task->record());
+        $errors = $task->errors();
+        $this->assertEquals(1, count($errors));
+        $this->assertEquals(1, count($errors['description']));
+    }
+
+    public function testValidUpdate()
+    {
+        $record = new TestModel();
+        $record->SetFrom(array(
+            'title'       => 'Moo',
+            'description' => 'foo'
+        ));
+        $record->Insert();
+
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_UPDATE,
+            'data', array(
+                'id'    => $record->id,
+                'title' => 'bar'
+            )
+        );
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertEquals(0, $task->code());
+        $this->assertEquals(0, count($task->errors()));
+
+        $actual = $task->record();
+        $this->assertEquals($record->id, $actual->id);
+        $this->assertEquals($data->{'data.title'}, $actual->title);
+        $this->assertEquals($record->description, $actual->description);
+    }
+
+    public function testInvalidUpdate()
+    {
+        $record = new TestModel();
+        $record->SetFrom(array(
+            'title'       => 'Moo',
+            'description' => 'foo'
+        ));
+        $record->Insert();
+
+        $data = new Dictionary(
+            'model', 'test_model',
+            'action', data\ValidatingModelTask::ACTION_UPDATE,
+            'data', array(
+                'id'          => $record->id,
+                'title'       => 'bar',
+                'description' => 'baz'
+            )
+        );
+
+        ValidatingTestModelValidator::$validate_description_generates_error = TRUE;
+
+        $task = new data\ValidatingModelTask($data);
+        TaskPump::Pump()->RunTask($task);
+
+        $this->assertNotEquals(0, $task->code());
+        $errors = $task->errors();
+        $this->assertEquals(1, count($errors));
+        $this->assertEquals(1, count($errors['description']));
+        $this->assertNull($task->record());
+
+        $actual = $record->Fetch();
+        $this->assertEquals($record->id, $actual->id);
+        $this->assertEquals($record->title, $actual->title);
+        $this->assertEquals($record->description, $actual->description);
     }
 }
