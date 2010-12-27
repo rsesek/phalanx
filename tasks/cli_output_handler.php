@@ -24,7 +24,7 @@ require_once PHALANX_ROOT . '/tasks/output_handler.php';
 // by any tasks. It can also optionally set an exit code to terminate with.
 class CLIOutputHandler extends OutputHandler
 {
-    protected function _DoStart()
+    public function Start()
     {
         $code = 0;
         // Tasks are processed in order, newest to oldest.

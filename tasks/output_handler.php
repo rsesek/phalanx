@@ -22,15 +22,7 @@ namespace phalanx\tasks;
 abstract class OutputHandler
 {
     // Called by the TaskPump when all tasks have finished processing.
-    public function Start()
-    {
-        $this->_DoStart();
-    }
-
-    // Subclasses should implement this method to perform their actual output
-    // handling. The TaskPump will call Start(), which sets up the object's
-    // state before calling _DoStart().
-    abstract protected function _DoStart();
+    abstract public function Start();
 
     // Returns a Dictionary of data from |$task| based on its output list.
     public function GetTaskData(Task $task)

@@ -29,7 +29,7 @@ class UnitTestOutputHandler extends OutputHandler
     // and N being the bottom (oldest).
     protected $task_data = array();
 
-    protected function _DoStart()
+    public function Start()
     {
         $task_chain = TaskPump::Pump()->GetTaskHistory();
         foreach ($task_chain as $task)

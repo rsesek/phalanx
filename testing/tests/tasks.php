@@ -93,7 +93,7 @@ class TestOutputHandler extends tasks\OutputHandler
 {
     public $do_start = FALSE;
 
-    protected function _DoStart()
+    public function Start()
     {
         $this->do_start = TRUE;
     }

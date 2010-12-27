@@ -29,7 +29,7 @@ class ViewOutputHandler extends OutputHandler
     // The function that transforms a task name into a template name.
     protected $template_loader;
 
-    protected function _DoStart()
+    public function Start()
     {
         if (TaskPump::Pump()->GetTaskHistory()->Count() > 0)
         {
