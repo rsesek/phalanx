@@ -24,8 +24,23 @@ interface Router
     // Evaluates the request input context and returns a Task object for the
     // input. If the Router cannot produce a Task for the request, it returns
     // NULL.
-    public function VendTask();
+    public function VendTask(Request $input);
 }
+
+// This following is the set of interfaces that a Router can conform to. There
+// is one interface to match every InputFilter class.
+
+// Used for standard HTTP requests.
+interface HTTPRouter extends Router
+{}
+
+// Used to route AJAX or and REST web service responses.
+interface AJAXRouter extends Router
+{}
+
+// Used to route CLI interfaces.
+interface CLIRouter extends Router
+{}
 
 class RouterException extends \Exception
 {}

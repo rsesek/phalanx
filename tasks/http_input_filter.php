@@ -16,13 +16,12 @@
 
 namespace phalanx\tasks;
 
-require_once PHALANX_ROOT . '/base/dictionary.php';
-require_once PHALANX_ROOT . '/tasks/dynamic_router.php';
+require_once PHALANX_ROOT . '/tasks/input_filter.php';
 
-class HTTPRouter extends DynamicRouter
+class HTTPInputFilter implements InputFilter
 {
     // The name of the input key to get the task name from.
-    protected $task_input_key;
+    protected $action_key;
 
     // The request method, uppercase.
     protected $request_method;
@@ -30,93 +29,81 @@ class HTTPRouter extends DynamicRouter
     // The input parsed from the URL.
     protected $url_input;
 
-    // Create a new HTTPDispatcher that will synthesize tasks based on the
-    // task name specified in the HTTP input variable, keyed by
-    // |$task_input_key|.
-    public function __construct($task_input_key = 'phalanx_task')
+    // Create a new HTTPInputFilter that will synthesize requests based on the
+    // action name specified in the HTTP input variable, keyed by
+    // |$action_key|.
+    public function __construct($action_key = 'action')
     {
-        $this->task_input_key = $task_input_key;
+        $this->action_key = $action_key;
     }
 
-    public function VendTask()
+    public function CreateRequest()
     {
         $this->request_method = strtoupper($_SERVER['REQUEST_METHOD']);
         $url = '';
         if (isset($_GET['__dispatch__']))
             $url = $_GET['__dispatch__'];
         $this->url_input = $this->_TokenizeURL($url);
-        return parent::VendTask();
+
+        $request = new Request($this);
+        $request->action = $this->_GetActionName();
+        $request->data = $this->_GetInput();
+        return $request;
     }
 
     // Getters and setters.
     // ------------------------------------------------------------------------
-    public function task_input_key() { return $this->task_input_key; }
+    public function action_key() { return $this->action_key; }
 
-    // This splits a request URL into the task name and then appropriate key
+    // This splits a request URL into the action name and then appropriate key
     // value matching. URLs can take the form:
-    //   /task_name/id
-    //   /task_name/k1/v1/k2/v2/
+    //   /action/id
+    //   /action/k1/v1/k2/v2/
     protected function _TokenizeURL($url)
     {
         $input = new \phalanx\base\Dictionary();
         $parts = explode('/', trim($url, '/'));
 
-        $input->Set('_task', $parts[0]);
+        $input->Set('_action', $parts[0]);
         array_shift($parts);
 
-        if (count($parts) == 1)
-        {
+        if (count($parts) == 1) {
             $input->Set('_id', $parts[0]);
             return $input;
         }
 
-        for ($i = 0; $i < count($parts); $i += 2)
-        {
+        for ($i = 0; $i < count($parts); $i += 2) {
             if (!isset($parts[$i]) || !isset($parts[$i+1]))
-                throw new HTTPDispatcherException("Invalid key-value pair in URL '$url'");
+                throw new HTTPInputFilterException("Invalid key-value pair in URL '$url'");
             $input->Set($parts[$i], $parts[$i+1]);
         }
         return $input;
     }
 
-    // Gets the task name.
-    protected function _GetTaskName()
+    // Gets the action name.
+    protected function _GetActionName()
     {
-        $url_task = $this->url_input->Get('_task');
+        $url_task = $this->url_input->Get('_action');
         if ($url_task != NULL)
             return $url_task;
         if ($this->request_method == 'POST')
-            if (isset($_POST[$this->task_input_key]))
-                return $_POST[$this->task_input_key];
+            if (isset($_POST[$this->action_key]))
+                return $_POST[$this->action_key];
         return '';
     }
 
     // Returns the input based on the keys provided.
-    protected function _GetInput(Array $keys)
+    protected function _GetInput()
     {
-        $input = new \phalanx\base\Dictionary();
-        $input->_method = $this->request_method;
         if ($this->request_method == 'GET')
-        {
-            foreach ($keys as $key)
-                if ($this->url_input->HasKey($key))
-                    $input->Set($key, $this->url_input->Get($key));
-            return $input;
-        }
-        else if ($this->request_method == 'POST')
-        {
-            foreach ($keys as $key)
-                if (isset($_POST[$key]))
-                    $input->Set($key, $_POST[$key]);
-            return $input;
-        }
-        else
-        {
-            throw new HTTPDispatcherException('Unknown request method "' . $this->request_method . '"');
-        }
-        return $input;
+            return $this->url_input;
+
+        if ($this->request_method == 'POST')
+            return new \phalanx\base\Dictionary($_POST);
+
+        throw new HTTPInputFilterException('Unknown request method "' . $this->request_method . '"');
     }
 }
 
-class HTTPDispatcherException extends \Exception
+class HTTPInputFilterException extends \Exception
 {}

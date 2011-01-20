@@ -20,7 +20,7 @@ require_once PHALANX_ROOT . '/tasks/router.php';
 require_once PHALANX_ROOT . '/tasks/task_pump.php';
 
 // The Dispatcher has various Routers attached in a priority queue. When the
-// Dispatcher is Start()ed, it will go down the Router chain until one of
+// Dispatcher is started, it will go down the Router chain until one of
 // the Routers vends a Task object that it can queue.
 class Dispatcher2
 {
@@ -43,12 +43,11 @@ class Dispatcher2
         $this->routers->Insert($router, $priority);
     }
 
-    // This will begin synthesizing tasks and sending them to the pump.
-    public function Start()
+    // This will begin route the Request and queue any vended tasks on the Pump.
+    public function DispatchRequest(Request $request)
     {
-        $task = NULL;
         foreach ($this->routers as $router) {
-            if ($task = $router->VendTask()) {
+            if ($task = $router->VendTask($request)) {
                 $this->pump()->QueueTask($task);
                 break;
             }
