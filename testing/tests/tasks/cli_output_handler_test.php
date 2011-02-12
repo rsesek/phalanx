@@ -36,7 +36,7 @@ class MessageTask extends tasks\Task
         $this->message = $msg;
     }
 
-    public function Fire() {}
+    public function Run() {}
 }
 
 class CLIOutputHandlerTest extends \PHPUnit_Framework_TestCase

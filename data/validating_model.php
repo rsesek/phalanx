@@ -180,7 +180,7 @@ class ValidatingModelTask extends \phalanx\tasks\Task
       const ACTION_UPDATE   = 'update';
     // }}
 
-    public function WillFire()
+    public function Run()
     {
         // Make sure the client is only performing an allowed action.
         $actions = array(self::ACTION_FETCH, self::ACTION_DELETE,
@@ -188,7 +188,7 @@ class ValidatingModelTask extends \phalanx\tasks\Task
                          self::ACTION_UPDATE);
         if (!in_array($this->input->action, $actions)) {
             $this->_Error(-1, 'Action not supported');
-            return;
+            return $this->Cancel();
         }
 
         // Make sure the Model exists and can be validated.
@@ -210,23 +210,20 @@ class ValidatingModelTask extends \phalanx\tasks\Task
         }
         if (!$this->model) {
             $this->_Error(-2, 'The model could not be created');
-            return;
+            return $this->Cancel();
         }
 
         // Make sure the validator exists.
         $this->validator = $this->model->GetValidator();
         if (!$this->validator || !$this->validator instanceof ModelValidator) {
             $this->_Error(-3, 'The validator could not be created');
-            return;
+            return $this->Cancel();
         }
-    }
 
-    public function Fire()
-    {
         // Perform access checks.
         if (!$this->validator->FilterAction($this)) {
             $this->_Error(-4, 'No permission to access this record');
-            return;
+            return $this->Cancel();
         }
 
         // Only certain actions require validation (those that alter records).
@@ -235,7 +232,7 @@ class ValidatingModelTask extends \phalanx\tasks\Task
                            self::ACTION_INSERT,
                            self::ACTION_UPDATE))) {
             if (!$this->_Validate())
-                return;
+                return $this->Cancel();
         }
 
         // Perform the actual action.
@@ -260,10 +257,14 @@ class ValidatingModelTask extends \phalanx\tasks\Task
                     return;
                 default:
                     $this->_Error(-6, 'Unhandled action');
+                    $this->Cancel();
             }
         } catch (ModelException $e) {
             $this->_Error(-7, $e->GetMessage());
         }
+
+        $this->model = NULL;
+        $this->validator = NULL;
     }
 
     // Helper function for setting error state.
@@ -277,11 +278,6 @@ class ValidatingModelTask extends \phalanx\tasks\Task
         $this->Cancel();
     }
 
-    public function CleanUp()
-    {
-        $this->model = NULL;
-        $this->validator = NULL;
-    }
 
     private function _Validate()
     {

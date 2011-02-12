@@ -135,15 +135,12 @@ class ValidateFormKeyTask extends \phalanx\tasks\Task
         return NULL;
     }
 
-    public function WillFire()
+    public function Run()
     {
         // If we're not in a POST, then simply cancel the task.
         if (!isset($_SERVER['REQUEST_METHOD']) || strtoupper($_SERVER['REQUEST_METHOD']) != 'POST')
-            $this->Cancel();
-    }
+            return $this->Cancel();
 
-    public function Fire()
-    {
         $key = Cleaner::HTML($_POST['phalanx_form_key']);
         if (!$key || !$this->manager->Validate($key))
             throw new FormKeyException('Form key "' . $key . '" did not validate.');

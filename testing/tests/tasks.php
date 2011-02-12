@@ -30,9 +30,7 @@ require_once PHALANX_ROOT . '/tasks/view_output_handler.php';
 
 class TestTask extends tasks\Task
 {
-    public $will_fire = FALSE;
-    public $fire = FALSE;
-    public $cleanup = FALSE;
+    public $did_run = FALSE;
 
     public $out1;
     public $out2;
@@ -61,31 +59,11 @@ class TestTask extends tasks\Task
         return array('will_fire', 'fire', 'cleanup', 'out1', 'out2', 'out3', 'no_out', 'id');
     }
 
-    public function WillFire()
+    public function Run()
     {
-        $this->will_fire = TRUE;
-        parent::WillFire();  // Boost code coverage. No-op.
-    }
-
-    public function Fire()
-    {
-        $this->fire = TRUE;
+        $this->did_run = TRUE;
         $this->out1 = 'foo';
         $this->out2 = 'bar';
-    }
-
-    public function Cleanup()
-    {
-        $this->cleanup = TRUE;
-    }
-}
-
-class InitOnlyTask extends TestTask
-{
-    public function WillFire()
-    {
-        parent::WillFire();
-        $this->Cancel();
     }
 }
 
