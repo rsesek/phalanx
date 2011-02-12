@@ -16,16 +16,18 @@
 
 namespace phalanx\tasks;
 
-// A Router is responsible for evaluating an input context and synthesizing
-// events. Routers are registered with the Dispatcher, which takes the tasks
-// from the various Routers and queues them on the TaskPump.
+// A Router is responsible for evaluating a Request in an input context and
+// synthesizing tasks. Routers are registered with the Dispatcher, which takes
+// the task from the Routers and queues it on the TaskPump.
 interface Router
 {
-    // Evaluates the request input context and returns a Task object for the
-    // input. If the Router cannot produce a Task for the request, it returns
-    // NULL.
+    // Evaluates the request input and returns a Task object for the input.
+    // If the Router cannot produce a Task for the request, it returns NULL.
     public function VendTask(Request $input);
 }
+
+class RouterException extends \Exception
+{}
 
 // This following is the set of interfaces that a Router can conform to. There
 // is one interface to match every InputFilter class.
@@ -40,7 +42,4 @@ interface AJAXRouter extends Router
 
 // Used to route CLI interfaces.
 interface CLIRouter extends Router
-{}
-
-class RouterException extends \Exception
 {}

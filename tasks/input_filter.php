@@ -18,7 +18,12 @@ namespace phalanx\tasks;
 
 require_once PHALANX_ROOT . '/tasks/request.php';
 
+// An InputFilter is responsible for taking an environment/request context and
+// conforming the input in that environment into a Request object. That object
+// is a context-neutral representation of the input parameters of a request, be
+// it a command line invocation, a REST web service, or a HTTP front end.
 interface InputFilter
 {
+    // Returns a \phalanx\tasks\Request for the given input context.
     public function CreateRequest();
 }

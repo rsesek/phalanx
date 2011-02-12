@@ -19,10 +19,11 @@ namespace phalanx\tasks;
 require_once PHALANX_ROOT . '/tasks/request.php';
 require_once PHALANX_ROOT . '/tasks/router.php';
 
-// A StaticRouter maps the _action input key to a Task vendor.
+// A StaticRouter maps the Request::$action to a Task vendor. All routes are
+// determined/known at creation.
 abstract class StaticRouter implements Router
 {
-    // A map of _action input keys to either a:
+    // A map of Request::$action values to either a:
     //  1. String name of a Task class to instantiate
     //  2. A Closure to run that returns an instantiated Task
     protected $action_map = array();

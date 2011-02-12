@@ -18,12 +18,15 @@ namespace phalanx\tasks;
 
 require_once PHALANX_ROOT . '/tasks/router.php';
 
-// The Dispatcher synthesizes Task objects and puts them into the TaskPump.
+// A DynamicRouter uses the Request::$action and potentially other inputs to
+// load and instantiate a Task object. Usually a DynamicRouter is used when
+// actions correspond to a specific file/directory structure that can be used
+// to dynamically load files, similar to PHP's autoload functionality.
 abstract class DynamicRouter implements Router
 {
     // A lambda that takes a task name and converts it to a fully qualified
     // class name. This is then instantiated. The signature of the function is:
-    //    function(Dictionary $input)  ->  (string|NULL)
+    //    function(Request $input)  ->  (string|NULL)
     protected $task_loader = NULL;
 
     // Constructor. Set the |$this->task_loader| to an anonymous function
@@ -36,7 +39,7 @@ abstract class DynamicRouter implements Router
     public function VendTask(Request $input)
     {
         $loader     = $this->task_loader;
-        $task_class = $loader($input->action);      
+        $task_class = $loader($input);      
         if (!$task_class)
             return NULL;
         $task       = new $task_class($input);

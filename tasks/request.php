@@ -16,6 +16,9 @@
 
 namespace phalanx\tasks;
 
+// A Request holds the data in a context-neutral container. This object is
+// passed through the Dispatcher until a Router can vend a Task to process the
+// input data.
 class Request
 {
     // The InputFilter that generated the request.

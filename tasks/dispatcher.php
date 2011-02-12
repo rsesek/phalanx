@@ -21,7 +21,7 @@ require_once PHALANX_ROOT . '/tasks/task_pump.php';
 
 // The Dispatcher has various Routers attached in a priority queue. When the
 // Dispatcher is started, it will go down the Router chain until one of
-// the Routers vends a Task object that it can queue.
+// the Routers vends a Task object that it can queue on the pump.
 class Dispatcher
 {
     // The TaskPump the Dispatcher will invoke methods on. If this is NULL,
@@ -43,7 +43,7 @@ class Dispatcher
         $this->routers->Insert($router, $priority);
     }
 
-    // This will begin route the Request and queue any vended tasks on the Pump.
+    // This will route the Request and queue any vended tasks on the Pump.
     public function DispatchRequest(Request $request)
     {
         foreach ($this->routers as $router) {
@@ -53,7 +53,7 @@ class Dispatcher
             }
         }
         if (!$task) {
-            throw new Dispatcher2Exception('The request could not be completed');
+            throw new DispatcherException('The request could not be completed');
         }
     }
 
