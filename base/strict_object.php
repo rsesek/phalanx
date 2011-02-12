@@ -1,6 +1,6 @@
 <?php
 // Phalanx
-// Copyright (c) 2009-2010 Blue Static
+// Copyright (c) 2011 Blue Static
 // 
 // This program is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the Free
@@ -14,12 +14,21 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace phalanx\test;
-use \phalanx\base as base;
+namespace phalanx\base;
 
-// Common includes.
-require_once PHALANX_ROOT . '/base/functions.php';
-require_once PHALANX_ROOT . '/base/key_descender.php';
-require_once PHALANX_ROOT . '/base/dictionary.php';
-require_once PHALANX_ROOT . '/base/strict_object.php';
-require_once PHALANX_ROOT . '/base/struct.php';
+class StrictObject
+{
+    // Gets |$key| on the object if it is an explicitly listed ivar.
+    public function __get($key)
+    {
+        throw new StrictObjectException('Cannot get ' . get_class($this) . '::' . $key);
+    }
+
+    // Sets |$key| to |$var| on the object if it is an explicitly listed ivar.
+    public function __set($key, $value)
+    {
+        throw new StrictObjectException('Cannot set ' . get_class($this) . '::' . $key);
+    }
+}
+
+class StrictObjectException extends \Exception {}
