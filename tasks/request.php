@@ -24,7 +24,7 @@ class Request
     // Action string.
     public $action = '';
 
-    // \phalanx\base\Dictionary of paramters.
+    // \phalanx\base\Dictionary of parameters.
     public $data = NULL;
 
     public function __construct(InputFilter $input_filter)

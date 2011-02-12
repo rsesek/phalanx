@@ -48,6 +48,5 @@ class AJAXInputFilter implements InputFilter
             default:
                 throw new HTTPDispatcherException('Unknown request method "' . $this->request_method . '"');
         }
-        
     }
 }

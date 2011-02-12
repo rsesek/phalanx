@@ -22,7 +22,8 @@ require_once PHALANX_ROOT . '/tasks/router.php';
 abstract class DynamicRouter implements Router
 {
     // A lambda that takes a task name and converts it to a fully qualified
-    // class name. This is then instantiated.
+    // class name. This is then instantiated. The signature of the function is:
+    //    function(Dictionary $input)  ->  (string|NULL)
     protected $task_loader = NULL;
 
     // Constructor. Set the |$this->task_loader| to an anonymous function
@@ -37,7 +38,7 @@ abstract class DynamicRouter implements Router
         $loader     = $this->task_loader;
         $task_class = $loader($input->action);      
         if (!$task_class)
-            throw new RouterException('Could not load task for action "' . $input->action . '"');
+            return NULL;
         $task       = new $task_class($input);
         return $task;
     }
