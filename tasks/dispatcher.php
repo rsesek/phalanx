@@ -22,7 +22,7 @@ require_once PHALANX_ROOT . '/tasks/task_pump.php';
 // The Dispatcher has various Routers attached in a priority queue. When the
 // Dispatcher is started, it will go down the Router chain until one of
 // the Routers vends a Task object that it can queue.
-class Dispatcher2
+class Dispatcher
 {
     // The TaskPump the Dispatcher will invoke methods on. If this is NULL,
     // the Dispatcher will use TaskPump::Pump() singleton.
@@ -66,5 +66,5 @@ class Dispatcher2
     }
 }
 
-class Dispatcher2Exception extends \Exception
+class DispatcherException extends \Exception
 {}
