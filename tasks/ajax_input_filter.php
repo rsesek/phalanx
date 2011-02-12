@@ -49,4 +49,10 @@ class AJAXInputFilter implements InputFilter
                 throw new HTTPDispatcherException('Unknown request method "' . $this->request_method . '"');
         }
     }
+
+    static public function EvaluateContext()
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+    }
 }
