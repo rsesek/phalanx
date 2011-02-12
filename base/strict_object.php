@@ -16,15 +16,17 @@
 
 namespace phalanx\base;
 
+// Objects that expose public properties without accessors |public $foo = NULL;|
+// should inherit from this class to prevent undefined property access. This
+// prevents subtle bugs caused by typos. For arbitrary key-value storage, use a
+// Dictionary.
 class StrictObject
 {
-    // Gets |$key| on the object if it is an explicitly listed ivar.
     public function __get($key)
     {
         throw new StrictObjectException('Cannot get ' . get_class($this) . '::' . $key);
     }
 
-    // Sets |$key| to |$var| on the object if it is an explicitly listed ivar.
     public function __set($key, $value)
     {
         throw new StrictObjectException('Cannot set ' . get_class($this) . '::' . $key);
