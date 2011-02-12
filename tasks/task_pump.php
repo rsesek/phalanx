@@ -16,9 +16,10 @@
 
 namespace phalanx\tasks;
 
-// User interaction and other functions produce tasks, which are raised and
-// registered with the TaskPump. The pump executes tasks as they come in, and
-// the last non-cancelled task is usually the one whose output is rendered.
+// The TaskPump is responsible for running work in the execution flow of Task-
+// based architecture. Task objects are queued for running by various
+// components, primarily the Executor. Work does not get done until the pump
+// is told to Loop. 
 class TaskPump
 {
     // The shared task pump object.
@@ -29,7 +30,7 @@ class TaskPump
 
     // An SplQueue of the tasks that were registered wtih QueueTask() but are
     // waiting for the current task to finish.
-    protected $task_queue = NULL;
+    protected $work_queue = NULL;
 
     // A SplStack of Task objects. The stack is a history of Task execution,
     // including those that got canceled.
@@ -39,45 +40,90 @@ class TaskPump
     // task.
     protected $current_task = NULL;
 
+    // The task that is scheduled to run as priority work on the next cycle of
+    // the loop.
+    protected $next_task = NULL;
+
     // Constructor. Do not use directly. Use TaskPump::Pump().
     public function __construct()
     {
-        $this->task_queue = new \SplQueue();
+        $this->work_queue = new \SplQueue();
         $this->tasks      = new \SplStack();
     }
 
-    // Schedules a task to be run. If another task is currently being fired,
-    // this will wait until that task is done. If no tasks are currently
-    // running, the task will fire immediately.
+    // Schedules a task to be run. The Task will be processed in the order it
+    // came in.
     public function QueueTask(Task $task)
     {
-        // There is already a task executing. Push this new task into the
-        // deferred worke queue.
-        if ($this->current_task)
-        {
-            $this->task_queue->Push($task);
-            return;
-        }
-
-        $this->_RunTask($task);
-
-        $this->_DoDeferredTasks();
+        $this->work_queue->Push($task);
     }
 
-    // Preempts any currently executing task and preempts it with this task.
-    // |$task| will begin processing immediately. The other task will
-    // resume afterwards.
+    // Schedules the |$task| as priority work, which executes before queued
+    // work. This method is meant to be used when a Task is running and intends
+    // to replace itself with some other work. It is unadvised to call this when
+    // the loop isn't running (use QueueTask instead).
+    // Note: The current task MUST return IF the |$task| is to run as priority:
+    //   public FooTask extends Task {
+    //     public function Run() {
+    //       // ...
+    //       if (!$condition) {
+    //         // ** RETURNING IS CRITICAL **
+    //         return TaskPump::Pump()->RunTask(new BarTask($this->request));
+    //       }
+    //     }
+    //   }
+    //
     public function RunTask(Task $task)
     {
-        if ($this->current_task)
-            $this->task_queue->Push($this->current_task);
+        // If there isn't a current_task, the loop isn't running so just
+        // schedule this at the front for when it is started (bypassing any
+        // existing work). If the loop is running but next_task is set, the
+        // caller did not return from the current task, so schedule this at the
+        // front of the queue. This in essense turns the queued priority work
+        // into a stack if this is called multiple times without the caller
+        // returning. Depending on the work, this could lead to "priority
+        // inversion."
+        if (!$this->current_task || $this->next_task)
+            $this->work_queue->Unshift($task);
 
-        $this->_RunTask($task);
+        // The loop is running with work from the work_queue. Assuming the
+        // current_task returned after calling this, next_task will get serviced
+        // immediately after control returns to the loop.
+        $this->next_task = $task;
+    }
 
-        if ($this->task_queue->Count())
-            $this->current_task = $this->task_queue->Pop();
+    // Runs the internal loop, pumping work from the queue and running it.
+    // Currently this does not have reentrancy protection; it is UNSAFE to call
+    // Loop() from within a Task that is running in the loop.
+    public function Loop($keep_running = FALSE)
+    {
+        for (;;) {
+            $did_work = FALSE;
 
-        $this->_DoDeferredTasks();
+            // If there's a next_task that preemted another Task, run it now.
+            if ($this->next_task) {
+                // Clear next_task in case |$task| makes a call to RunTask.
+                $task = $this->next_task;
+                $this->next_task = NULL;
+                $this->_RunTask($task);
+                $did_work = TRUE;
+            }
+
+            // Handle queued work once per loop iteration to ensure that
+            // priority work gets serviced.
+            if ($this->work_queue->Count() > 0) {
+                $this->_RunTask($this->work_queue->Pop());
+                $did_work = TRUE;
+            }
+
+            // If an entire iteration of the loop passed without doing any work,
+            // and the loop isn't supposed to run indefinitely, start output
+            // handling.
+            if (!$did_work && !$keep_running) {
+                $this->StopPump();
+                throw new TaskPumpException('TaskPump::StopPump has left the Loop running');
+            }
+        }
     }
 
     // This function does the bulk of the task processing work. Note that
@@ -93,40 +139,13 @@ class TaskPump
         $this->current_task = NULL;
     }
 
-    // If there are no tasks currently processing, this will process all the
-    // tasks in the deferred queue.
-    protected function _DoDeferredTasks()
-    {
-        if ($this->current_task)
-            return;
-
-        while ($this->task_queue->Count() > 0)
-            $this->_RunTask($this->task_queue->Pop());
-    }
-
     // Cancels the given Task and will begin processing the next deferred
     // task. If no other deferred tasks exist, output handling begins.
+    // When calling |$task->Cancel()|, which calls this, the task MUST return
+    // immediately. See the comment at RunTask() for example code.
     public function Cancel(Task $task)
     {
         $task->set_cancelled();
-        if ($this->current_task == $task) {
-            if ($this->task_queue->Count() == 0) {
-                $this->StopPump();
-            } else {
-                $this->current_task = NULL;
-                $this->_DoDeferredTasks();
-            }
-        }
-    }
-
-    // Calling this function will prtask any tasks registered with
-    // QueueTask() from being run. A common use for this is registering an
-    // task with RunTask() and then stopping any future work from happening
-    // using this method.
-    public function CancelDeferredTasks()
-    {
-        while ($this->task_queue->Count() > 0)
-            $this->task_queue->Dequeue()->Cancel();
     }
 
     // Tells the pump to stop pumping tasks and to begin output handling. This
@@ -155,7 +174,7 @@ class TaskPump
     // and are waiting to run.
     public function GetDeferredTasks()
     {
-        return $this->task_queue;
+        return $this->work_queue;
     }
 
     // Returns the SplStack of tasks that have been fired, in the order they
