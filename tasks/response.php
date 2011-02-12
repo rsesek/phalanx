@@ -16,13 +16,15 @@
 
 namespace phalanx\tasks;
 
+require_once PHALANX_ROOT . 'base/strict_object.php';
+
 // A Response holds data processed by Task objects. When a Request is first
 // dispatched to a Router, a Response object is created. This response is
 // passed to every Task that runs through the pump. Tasks add data members
 // to the Response. When all the Tasks have been processed, the final Response
 // is transfered to the OutputHandler, which constructs a context-appropriate
 // output.
-class Response
+class Response extends \phalanx\base\StrictObject
 {
     // The Request that corresponds to this response.
     public $request = NULL;
