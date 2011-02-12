@@ -21,4 +21,5 @@ use \phalanx\base as base;
 require_once PHALANX_ROOT . '/base/functions.php';
 require_once PHALANX_ROOT . '/base/key_descender.php';
 require_once PHALANX_ROOT . '/base/dictionary.php';
+require_once PHALANX_ROOT . '/base/strict_object.php';
 require_once PHALANX_ROOT . '/base/struct.php';

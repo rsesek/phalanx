@@ -93,17 +93,24 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
     // A test suite started.
     public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
     {
+        // Wrap the suite header.
+        ob_start();
+
         $this->_Print($this->_SuiteMarker(), $this->_DescribeSuite($suite), self::COLOR_GREEN);
         $this->suite_start_time = microtime(TRUE);
         ++$this->suite_depth;
         $this->suite_error_count = 0;
+
+        // Wrap the suite contents.
+        ob_start();
     }
 
     // A test suite ended.
     public function endTestSuite(\PHPUnit_Framework_TestSuite $suite)
     {
         $main_suite = (--$this->suite_depth == 0);
-        $color_red = (($main_suite && count($this->failing)) || $this->suite_error_count > 0);
+        $color_red  = (($main_suite && count($this->failing)) || $this->suite_error_count > 0);
+        $any_output = ob_get_length();
 
         $delta = microtime(TRUE) - $this->suite_start_time;
         $this->_Print(
@@ -125,6 +132,7 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
         }
 
         $count = count($this->incomplete);
+        $any_output |= $count > 0;
         if ($main_suite && $count) {
             $tests = $this->_Plural('TEST', $count, TRUE);
             $this->Write($this->_Color("  YOU HAVE $count INCOMPLETE $tests:\n", self::COLOR_PURPLE));
@@ -143,6 +151,15 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
             }
             $this->Write("\n");
         }
+
+        // Flush the test output.
+        ob_end_flush();
+
+        // Flush the suite header.
+        if ($main_suite || $any_output)
+            ob_end_flush();
+        else
+            ob_end_clean();
     }
 
     // A test started.
