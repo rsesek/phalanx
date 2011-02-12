@@ -25,11 +25,7 @@ class TaskPump
     // The shared task pump object.
     private static $pump;
 
-    // The OutputHandler instance for the pump.
-    protected $output_handler = NULL;
-
-    // An SplQueue of the tasks that were registered wtih QueueTask() but are
-    // waiting for the current task to finish.
+    // An SplQueue of the tasks that were registered wtih QueueTask().
     protected $work_queue = NULL;
 
     // A SplStack of Task objects. The stack is a history of Task execution,
@@ -43,6 +39,9 @@ class TaskPump
     // The task that is scheduled to run as priority work on the next cycle of
     // the loop.
     protected $next_task = NULL;
+
+    // Whether the loop was told to quit.
+    protected $should_quit = FALSE;
 
     // Constructor. Do not use directly. Use TaskPump::Pump().
     public function __construct()
@@ -97,6 +96,9 @@ class TaskPump
     // Loop() from within a Task that is running in the loop.
     public function Loop($keep_running = FALSE)
     {
+        // Allow the loop to be restarted if it was quit before.
+        $this->should_quit = FALSE;
+
         for (;;) {
             $did_work = FALSE;
 
@@ -109,6 +111,9 @@ class TaskPump
                 $did_work = TRUE;
             }
 
+            if ($this->should_quit)
+                break;
+
             // Handle queued work once per loop iteration to ensure that
             // priority work gets serviced.
             if ($this->work_queue->Count() > 0) {
@@ -116,19 +121,21 @@ class TaskPump
                 $did_work = TRUE;
             }
 
+            if ($this->should_quit)
+                break;
+
             // If an entire iteration of the loop passed without doing any work,
-            // and the loop isn't supposed to run indefinitely, start output
-            // handling.
-            if (!$did_work && !$keep_running) {
-                $this->StopPump();
-                throw new TaskPumpException('TaskPump::StopPump has left the Loop running');
-            }
+            // and the loop isn't supposed to run indefinitely, end the loop.
+            if (!$did_work && !$keep_running)
+                break;
+            else if ($keep_running)
+                ;  // TODO: call out to some function
         }
     }
 
-    // This function does the bulk of the task processing work. Note that
-    // this will clobber the |$this->current_task|. Caller is responsible for
-    // ensuring it is safe to call this function.
+    // This function does the actual task processing work. Note that this will
+    // clobber the |$this->current_task|. Caller is responsible for ensuring
+    // it is safe to call this function.
     protected function _RunTask(Task $task)
     {
         $this->current_task = $task;
@@ -139,29 +146,19 @@ class TaskPump
         $this->current_task = NULL;
     }
 
-    // Cancels the given Task and will begin processing the next deferred
-    // task. If no other deferred tasks exist, output handling begins.
-    // When calling |$task->Cancel()|, which calls this, the task MUST return
-    // immediately. See the comment at RunTask() for example code.
+    // Cancels the given Task, which will begin processing the next deferred
+    // task. When calling |$task->Cancel()|, which calls this, the task MUST
+    // return immediately. See the comment at RunTask() for example code.
     public function Cancel(Task $task)
     {
         $task->set_cancelled();
     }
 
-    // Tells the pump to stop pumping tasks and to begin output handling. This
-    // will call the current task's Cleanup() function.
-    public function StopPump()
+    // Tells the pump to stop pumping tasks. This will stop the loop from
+    // processing any and all work.
+    public function Quit()
     {
-        $this->output_handler->Start();
-        $this->_Exit();
-    }
-
-    // Halts execution of the pump immediately without performing any task
-    // cleanup. |$message| will be displayed as output.
-    public function Terminate($message)
-    {
-        echo $message;
-        $this->_Exit();
+        $this->should_quit = TRUE;
     }
 
     // Gets the currently executing Task.
@@ -201,12 +198,6 @@ class TaskPump
         return clone $this->tasks;
     }
 
-    // Internal wrapper around exit() that we can mock.
-    protected function _Exit()
-    {
-        exit;
-    }
-
     // Getters and setters.
     // -------------------------------------------------------------------------
 
@@ -219,13 +210,8 @@ class TaskPump
     }
     static public function set_pump(TaskPump $pump) { self::$pump = $pump; }
 
-    public function set_output_handler(OutputHandler $handler) { $this->output_handler = $handler; }
-    public function output_handler() { return $this->output_handler; }
-
     // Testing methods. These are not for public consumption.
     static public function T_set_pump($pump) { self::$pump = $pump; }
 }
 
-class TaskPumpException extends \Exception
-{
-}
+class TaskPumpException extends \Exception {}
