@@ -26,4 +26,9 @@ interface InputFilter
 {
     // Returns a \phalanx\tasks\Request for the given input context.
     public function CreateRequest();
+
+    // Evaluates the current execution context and determines if this is the best
+    // InputFilter to create a Request. If so, returns TRUE; otherwise, returns
+    // FALSE.
+    static public function EvaluateContext();
 }
