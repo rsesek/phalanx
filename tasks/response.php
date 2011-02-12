@@ -16,26 +16,23 @@
 
 namespace phalanx\tasks;
 
-// A Request holds the data in a context-neutral container. This object is
-// passed through the Dispatcher until a Router can vend a Task to process the
-// input data.
-class Request
+// A Response holds data processed by Task objects. When a Request is first
+// dispatched to a Router, a Response object is created. This response is
+// passed to every Task that runs through the pump. Tasks add data members
+// to the Response. When all the Tasks have been processed, the final Response
+// is transfered to the OutputHandler, which constructs a context-appropriate
+// output.
+class Response
 {
-    // The InputFilter that generated the request.
-    public $input_filter = NULL;
+    // The Request that corresponds to this response.
+    public $request = NULL;
 
-    // Action string.
-    public $action = '';
-
-    // \phalanx\base\Dictionary of parameters.
+    // \phalanx\base\Dictionary of data for output.
     public $data = NULL;
 
-    // The Response object for this Request. Will be NULL until the Request is
-    // dispatched.
-    public $response = NULL;
-
-    public function __construct(InputFilter $input_filter)
+    public function __construct(Request $request)
     {
-          $this->input_filter = $input_filter;
+          $this->request = $request;
+          $this->data    = new \phalanx\base\Dictionary();
     }
 }

@@ -46,6 +46,9 @@ class Dispatcher
     // This will route the Request and queue any vended tasks on the Pump.
     public function DispatchRequest(Request $request)
     {
+        $response = new Response($request);
+        $request->response = $response;
+
         foreach ($this->routers as $router) {
             if ($task = $router->VendTask($request)) {
                 $this->pump()->QueueTask($task);
@@ -55,6 +58,8 @@ class Dispatcher
         if (!$task) {
             throw new DispatcherException('The request could not be completed');
         }
+
+        return $response;
     }
 
     public function set_pump(TaskPump $pump) { $this->pump = $pump; }

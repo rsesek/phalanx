@@ -27,10 +27,16 @@ class Executor
     // The Dispatcher which will route the Request.
     protected $dispatcher = NULL;
 
-    // Creates a new Executor given a configured Dispatcher.
-    public function __construct(Dispatcher $dispatcher)
+    // The ExecutorDelegate instance (optional).
+    protectd $delegate = NULL;
+
+    // Creates a new Executor given a configured Dispatcher and an optional
+    // delegate.
+    public function __construct(Dispatcher $dispatcher,
+                                ExecutorDelegate $delegate)
     {
         $this->dispatcher = $dispatcher;
+        $this->delegate   = $delegate;
     }
 
     // Synthesizes a Request object from the input and context and dispatches
@@ -55,15 +61,35 @@ class Executor
             throw new ExecutorException('Could not create InputFilter for request');
         }
 
+        if ($this->delegate)
+            $this->delegate->OnSelectInputFilter($this->input_filter);
+
         // Generate a request now that the InputFilter has been selected.
         $request = $this->input_filter->CreateRequest();
         if (!$request) {
             throw new ExecutorException('Could not process the request');
         }
 
+        if ($this->delegate)
+            $this->delegate->OnCreateRequest($request);
+
         // Dispatch the Request.
-        $this->dispatcher->DispatchRequest($request);
+        $response = $this->dispatcher->DispatchRequest($request);
+
+        if ($this->delegate)
+            $this->delegate->OnCreatedResponse($response);
+
+        // TODO: invoke the output handler
     }
+}
+
+interface ExecutorDelegate
+{
+    public function OnSelectInputFilter(InputFilter $input_filter);
+
+    public function OnCreateRequest(Request $request);
+
+    public function OnCreatedResponse(Response $response);
 }
 
 class ExecutorException extends \Exception {}

@@ -28,7 +28,7 @@ class Dictionary extends KeyDescender
 {
     // A Dictionary can either be created from a descendable type, or from
     // a varargs of key-value pairs. If the varags constructor is used,
-    // the form is |new Dictionary(key1, val1, key2, val2).
+    // the form is |new Dictionary(key1, val1, key2, val2)|.
     public function __construct($properties = array())
     {
         $args = func_get_args();
