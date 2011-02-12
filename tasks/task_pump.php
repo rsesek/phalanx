@@ -27,21 +27,12 @@ class TaskPump
     // The OutputHandler instance for the pump.
     protected $output_handler = NULL;
 
-    // Task state constants. Be aware that the state of a task is set BEFORE
-    // the specified method is called. This is used to avoid task reentrancy.
-    const TASK_WILL_FIRE = 1;
-    const TASK_FIRE = 2;
-    const TASK_CLEANUP = 3;
-    const TASK_FINISHED = 4;
-
     // An SplQueue of the tasks that were registered wtih QueueTask() but are
     // waiting for the current task to finish.
     protected $task_queue = NULL;
 
-    // A SplStack of Task objects. The stack is a history of task state
-    // changes. The actual change that happened doesn't actually matter
-    // (and can be computed based on the occurrence count), but we need to
-    // maintain relative ordering of the changes amongst all Tasks.
+    // A SplStack of Task objects. The stack is a history of Task execution,
+    // including those that got canceled.
     protected $tasks = NULL;
 
     // The task that is currently executing. Will be NULL if there is no such
@@ -68,7 +59,7 @@ class TaskPump
             return;
         }
 
-        $this->_ProcessTask($task);
+        $this->_RunTask($task);
 
         $this->_DoDeferredTasks();
     }
@@ -81,7 +72,7 @@ class TaskPump
         if ($this->current_task)
             $this->task_queue->Push($this->current_task);
 
-        $this->_ProcessTask($task);
+        $this->_RunTask($task);
 
         if ($this->task_queue->Count())
             $this->current_task = $this->task_queue->Pop();
@@ -89,48 +80,17 @@ class TaskPump
         $this->_DoDeferredTasks();
     }
 
-    // This function does the bulk of the task processing work. This returns
-    // TRUE if the task completed successfully, FALSE if otherwise. Note that
+    // This function does the bulk of the task processing work. Note that
     // this will clobber the |$this->current_task|. Caller is responsible for
     // ensuring it is safe to call this function.
-    protected function _ProcessTask(Task $task)
+    protected function _RunTask(Task $task)
     {
         $this->current_task = $task;
-        $task->set_state(self::TASK_WILL_FIRE);
+
         $this->tasks->Push($task);
-        $task->WillFire();
+        $task->Run();
 
-        // Make sure the task didn't get cancelled in WillFire().
-        if ($task->is_cancelled())
-        {
-            $task->Cleanup();
-            $this->current_task = NULL;
-            return FALSE;
-        }
-
-        $task->set_state(self::TASK_FIRE);
-        $this->tasks->Push($task);
-        $task->Fire();
-
-        // Make sure the task didn't get cancelled in Fire().
-        if ($task->is_cancelled())
-        {
-            $task->Cleanup();
-            $this->current_task = NULL;
-            return FALSE;
-        }
-
-        // The task successfully executed, so add it to the task chain.
-        $task->set_state(self::TASK_CLEANUP);
-        $this->tasks->Push($task);
-        $task->Cleanup();
-
-        // Mark the task as done.
-        $task->set_state(self::TASK_FINISHED);
-        $this->tasks->Push($task);
         $this->current_task = NULL;
-
-        return TRUE;
     }
 
     // If there are no tasks currently processing, this will process all the
@@ -141,7 +101,7 @@ class TaskPump
             return;
 
         while ($this->task_queue->Count() > 0)
-            $this->_ProcessTask($this->task_queue->Pop());
+            $this->_RunTask($this->task_queue->Pop());
     }
 
     // Cancels the given Task and will begin processing the next deferred
@@ -149,6 +109,14 @@ class TaskPump
     public function Cancel(Task $task)
     {
         $task->set_cancelled();
+        if ($this->current_task == $task) {
+            if ($this->task_queue->Count() == 0) {
+                $this->StopPump();
+            } else {
+                $this->current_task = NULL;
+                $this->_DoDeferredTasks();
+            }
+        }
     }
 
     // Calling this function will prtask any tasks registered with
@@ -165,21 +133,6 @@ class TaskPump
     // will call the current task's Cleanup() function.
     public function StopPump()
     {
-        if ($this->current_task)
-        {
-            if ($this->current_task->state() < self::TASK_CLEANUP)
-            {
-                $this->current_task->set_state(self::TASK_CLEANUP);
-                $this->tasks->Push($this->current_task);
-                $this->current_task->Cleanup();
-            }
-            else if ($this->current_task->state() < self::TASK_FINISHED)
-            {
-                $this->current_task->set_state(self::TASK_FINISHED);
-                $this->tasks->Push($this->current_task);
-            }
-        }
-
         $this->output_handler->Start();
         $this->_Exit();
     }
@@ -198,15 +151,6 @@ class TaskPump
         return $this->current_task;
     }
 
-    // Returns the current task's state. Will return -1 if there is no current
-    // task.
-    public function GetCurrentTaskState()
-    {
-        if (!$this->current_task)
-            return -1;
-        return $this->current_task->state();
-    }
-
     // Returns the queue of Tasks that have been registered with QueueTask()
     // and are waiting to run.
     public function GetDeferredTasks()
@@ -220,16 +164,11 @@ class TaskPump
     public function GetTaskHistory()
     {
         $chain = new \SplStack();
-        $added = array();
         // If we traverse in order, then we preserve the order that tasks
-        // made it to the TASK_FINISHED state, so long as we exclude
-        // duplicates.
-        foreach ($this->tasks as $task)
-        {
-            if ($task->state() == self::TASK_FINISHED && !in_array($task, $added))
-            {
+        // completed successfully.
+        foreach ($this->tasks as $task) {
+            if (!$task->is_cancelled()) {
                 $chain->Unshift($task);
-                $added[] = $task;
             }
         }
         return $chain;
