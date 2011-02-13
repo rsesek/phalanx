@@ -43,8 +43,8 @@ class PreemptedTask extends TestTask
     public function Run()
     {
         global $test;
-        $test->pump->RunTask($this->inner_task);
         parent::Run();
+        $test->pump->RunTask($this->inner_task);
     }
 }
 
@@ -128,6 +128,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $task->inner_task = new CurrentTaskTester();
         $task->inner_task->name = 'inner';
         $this->pump->QueueTask($task);
+        $this->pump->Loop();
     }
 
     public function testQueueTask()
@@ -257,5 +258,23 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($task1->did_run);
         $this->assertTrue($task2->did_run);
         $this->assertFalse($task3->did_run);
+    }
+
+    public function testNestedRunTasks()
+    {
+        $task = new NestedTask();
+        $task->inner_task = new PreemptedTask();
+        $task->inner_task->inner_task = new PreemptedTask();
+        $task->inner_task->inner_task->inner_task = new TestTask();
+
+        $this->pump->QueueTask($task);
+        $this->pump->Loop();
+
+        $chain = $this->pump->GetTasks();
+        $this->assertEquals(4, $chain->Count());
+        $this->assertSame($task, $chain->Bottom());
+        $this->assertSame($task->inner_task, $chain->OffsetGet(2));
+        $this->assertSame($task->inner_task->inner_task, $chain->OffsetGet(1));
+        $this->assertSame($task->inner_task->inner_task->inner_task, $chain->Top());
     }
 }
