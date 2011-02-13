@@ -24,11 +24,14 @@ class Executor
     // The InputFilter selected for the current request.
     protected $input_fitler = NULL;
 
-    // The Dispatcher which will route the Request.
+    // The Dispatcher that will route the Request.
     protected $dispatcher = NULL;
 
+    // The OutputHandler that will generate output from a Response.
+    protected $output_handler;
+
     // The ExecutorDelegate instance (optional).
-    protectd $delegate = NULL;
+    protected $delegate = NULL;
 
     // Creates a new Executor given a configured Dispatcher and an optional
     // delegate.
@@ -82,10 +85,16 @@ class Executor
 
         TaskPump::Pump()->Loop();
 
-        if ($this->delegate)
-            $this->delegate->OnRanTaskPump();
+        if ($this->delegate) {
+            $this->delegate->OnMainLoopEnded();
+            $this->delegate->OnWillOutputResonse($response);
+        }
 
-        // TODO: invoke the output handler
+        $this->output_handler->GenerateOutputForResponse($response);
+
+        if ($this->delegate) {
+            $this->delegate->OnExecutorFinished();
+        }
     }
 }
 
@@ -97,7 +106,11 @@ interface ExecutorDelegate
 
     public function OnCreatedResponse(Response $response);
 
-    public function OnRanTaskPump();
+    public function OnMainLoopEnded();
+
+    public function OnWillOutputResponse(Response $response);
+
+    public function OnExecutorFinished();
 }
 
 class ExecutorException extends \Exception {}
