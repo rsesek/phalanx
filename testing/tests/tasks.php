@@ -30,6 +30,8 @@ require_once PHALANX_ROOT . '/tasks/view_output_handler.php';
 
 class TestTask extends tasks\Task
 {
+    protected $tracer = NULL;
+
     public $did_run = FALSE;
 
     public $out1;
@@ -37,6 +39,11 @@ class TestTask extends tasks\Task
     public $out2_never_true = FALSE;
 
     public $id = NULL;
+
+    public function __construct(TaskTracer $tracer = NULL)
+    {
+        $this->tracer = $tracer;
+    }
 
     // The property should hide this from OutputHandler::_GetTaskData().
     public function out2()
@@ -64,6 +71,77 @@ class TestTask extends tasks\Task
         $this->did_run = TRUE;
         $this->out1 = 'foo';
         $this->out2 = 'bar';
+        if ($this->tracer) {
+            $this->tracer->Emit($this);
+            $this->tracer = NULL;
+        }
+    }
+}
+
+// Add this as a fixture in the test class.
+class TaskTracer
+{
+    protected $traces;
+
+    public function Emit(TestTask $task)
+    {
+        $this->traces[] = $task;
+        print '  TRACE: ' . $this->TaskToString($task) . "\n";
+    }
+
+    public function TaskToString($task)
+    {
+        if ($task === NULL)
+            return '(null)';
+        $hash = spl_object_hash($task);
+        $hash = md5($hash);
+        return get_class($task) . ' # ' . substr($hash, strlen($hash) - 7);
+    }
+
+    public function GetTraces()
+    {
+        return $this->traces;
+    }
+}
+
+// Put one of these in each test function:
+//
+//  function testSomeThing() {
+//    $tracer = new ScopedTaskExpectations($this, $this->fixture);
+//    $task = new TestTask($this->fixture);
+//    $tracer->AddExpectation($task);
+//    $this->pump->QueueTask($task);
+//    $this->pump->Loop();
+//  }
+class ScopedTaskExpectations
+{
+    protected $test = NULL;
+    protected $tracer = NULL;
+    protected $expectations = array();
+
+    public function __construct(\PHPUnit_Framework_TestCase $test, TaskTracer $tracer)
+    {
+        $this->test   = $test;
+        $this->tracer = $tracer;
+    }
+
+    public function __destruct()
+    {
+        $actual_traces = $this->tracer->GetTraces();
+        foreach ($this->expectations as $index => $expected) {
+            $actual = isset($actual_traces[$index]) ? $actual_traces[$index] : NULL;
+            if ($expected !== $actual) {
+                print "***** TRACE MISMATCH *****\n";
+                print "@ $index: Expected: " . $this->tracer->TaskToString($expected) . "\n";
+                print "   does not match: " . $this->tracer->TaskToString($actual) . "\n";
+            }
+            $this->test->assertSame($expected, $actual);
+        }
+    }
+
+    public function AddExpectation(TestTask $task)
+    {
+        $this->expectations[] = $task;
     }
 }
 

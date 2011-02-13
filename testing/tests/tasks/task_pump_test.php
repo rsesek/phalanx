@@ -93,9 +93,27 @@ class QuitTask extends TestTask
     }
 }
 
+class RunThreeTask extends TestTask
+{
+    public $inner_task1 = NULL;
+    public $inner_task2 = NULL;
+    public $inner_task3 = NULL;
+
+    public function Run()
+    {
+        global $test;
+        parent::Run();
+        $test->pump->RunTask($this->inner_task1);
+        $test->pump->RunTask($this->inner_task2);
+        $test->pump->RunTask($this->inner_task3);
+    }
+}
+
 class TaskPumpTest extends \PHPUnit_Framework_TestCase
 {
     public $pump;
+
+    public $fixture;
 
     public function setUp()
     {
@@ -103,6 +121,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $test = $this;
         $this->pump = new TaskPump();
         $this->inner_task = NULL;
+        $this->fixture = new TaskTracer();
     }
 
     public function testSharedPump()
@@ -119,13 +138,13 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCurrentTask()
     {
-        $task = new CurrentTaskTester();
+        $task = new CurrentTaskTester($this->fixture);
         $task->name = 'first';
         $this->pump->QueueTask($task);
 
-        $task = new CurrentTaskTester();
+        $task = new CurrentTaskTester($this->fixture);
         $task->name = 'outer';
-        $task->inner_task = new CurrentTaskTester();
+        $task->inner_task = new CurrentTaskTester($this->fixture);
         $task->inner_task->name = 'inner';
         $this->pump->QueueTask($task);
         $this->pump->Loop();
@@ -133,7 +152,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testQueueTask()
     {
-        $task = new TestTask();
+        $task = new TestTask($this->fixture);
 
         $this->assertEquals(0, $this->pump->GetTasks()->Count());
 
@@ -146,7 +165,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testRunTask()
     {
-        $task = new TestTask();
+        $task = new TestTask($this->fixture);
 
         $this->assertEquals(0, $this->pump->GetTasks()->Count());
 
@@ -159,8 +178,8 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testRunTaskPreempted()
     {
-        $task       = new PreemptedTask();
-        $inner_task = new TestTask();
+        $task       = new PreemptedTask($this->fixture);
+        $inner_task = new TestTask($this->fixture);
         $task->inner_task = $inner_task;
 
         $this->assertEquals(0, $this->pump->GetTasks()->Count());
@@ -179,7 +198,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testCancel()
     {
-        $task = new CancelledTask();
+        $task = new CancelledTask($this->fixture);
 
         $this->pump->QueueTask($task);
         $this->pump->Loop();
@@ -191,8 +210,8 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testPreemptAndCancel()
     {
-        $task       = new PreemptedCancelledTask();
-        $inner_task = new TestTask();
+        $task       = new PreemptedCancelledTask($this->fixture);
+        $inner_task = new TestTask($this->fixture);
         $task->inner_task = $inner_task;
 
         $this->assertEquals(0, $this->pump->GetTasks()->Count());
@@ -209,8 +228,8 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testDeferredWork()
     {
-        $task       = new NestedTask();
-        $inner_task = new TestTask();
+        $task       = new NestedTask($this->fixture);
+        $inner_task = new TestTask($this->fixture);
         $task->inner_task = $inner_task;
 
         $this->assertEquals(0, $this->pump->GetDeferredTasks()->Count());
@@ -221,7 +240,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTasks()
     {
-        $task = new TestTask();
+        $task = new TestTask($this->fixture);
         $this->pump->QueueTask($task);
         $this->pump->Loop();
         $this->assertEquals(1, $this->pump->GetTasks()->Count());
@@ -230,9 +249,9 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLongerTaskChain()
     {
-        $task1 = new TestTask();
+        $task1 = new TestTask($this->fixture);
         $task1->name = 'first';
-        $task2 = new TestTask();
+        $task2 = new TestTask($this->fixture);
         $task2->name = 'second';
         $this->pump->QueueTask($task1);
         $this->pump->QueueTask($task2);
@@ -244,9 +263,9 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testQuitTask()
     {
-        $task1 = new TestTask();
-        $task2 = new QuitTask();
-        $task3 = new TestTask();
+        $task1 = new TestTask($this->fixture);
+        $task2 = new QuitTask($this->fixture);
+        $task3 = new TestTask($this->fixture);
 
         $this->pump->QueueTask($task1);
         $this->pump->QueueTask($task2);
@@ -262,10 +281,10 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testNestedRunTasks()
     {
-        $task = new NestedTask();
+        $task = new NestedTask($this->fixture);
         $task->inner_task = new PreemptedTask();
         $task->inner_task->inner_task = new PreemptedTask();
-        $task->inner_task->inner_task->inner_task = new TestTask();
+        $task->inner_task->inner_task->inner_task = new TestTask($this->fixture);
 
         $this->pump->QueueTask($task);
         $this->pump->Loop();
@@ -280,9 +299,14 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testDontRunCancelledTasks()
     {
-        $task1 = new TestTask();
-        $task2 = new TestTask();
-        $task3 = new TestTask();
+        $tracer = new ScopedTaskExpectations($this, $this->fixture);
+
+        $task1 = new TestTask($this->fixture);
+        $task2 = new TestTask($this->fixture);
+        $task3 = new TestTask($this->fixture);
+
+        $tracer->AddExpectation($task1);
+        $tracer->AddExpectation($task3);
 
         $this->pump->QueueTask($task1);
         $this->pump->QueueTask($task2);
@@ -300,9 +324,9 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
     public function testLoopRestart()
     {
-        $task1 = new TestTask();
-        $task2 = new QuitTask();
-        $task3 = new TestTask();
+        $task1 = new TestTask($this->fixture);
+        $task2 = new QuitTask($this->fixture);
+        $task3 = new TestTask($this->fixture);
 
         $this->pump->QueueTask($task1);
         $this->pump->QueueTask($task2);
@@ -320,5 +344,26 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $this->pump->GetTasks()->Count());
         $this->assertTrue($task3->did_run);
         $this->assertSame($task3, $this->pump->GetTasks()->Top());
+    }
+
+    public function testRunTwoTasksNested()
+    {
+        $tracer = new ScopedTaskExpectations($this, $this->fixture);
+
+        $task1 = new RunThreeTask($this->fixture);
+        $task2 = new TestTask($this->fixture);
+        $task3 = new TestTask($this->fixture);
+        $task4 = new TestTask($this->fixture);
+        $task1->inner_task1 = $task2;
+        $task1->inner_task2 = $task3;
+        $task1->inner_task3 = $task4;
+
+        $this->pump->QueueTask($task1);
+        $this->pump->Loop();
+
+        $tracer->AddExpectation($task1);
+        $tracer->AddExpectation($task2);
+        $tracer->AddExpectation($task4);
+        $tracer->AddExpectation($task3);
     }
 }
