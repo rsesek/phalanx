@@ -96,13 +96,13 @@ class TaskPump
     // Runs the internal loop, pumping work from the queue and running it.
     // Currently this does not have reentrancy protection; it is UNSAFE to call
     // Loop() from within a Task that is running in the loop.
-    public function Loop($keep_running = FALSE)
+    public function Loop($loop_indefinitely = FALSE)
     {
         // Allow the loop to be restarted if it was quit before.
         $this->should_quit = FALSE;
 
-        for (;;) {
-            $did_work = FALSE;
+        do {
+            $keep_running = FALSE;
 
             // If there's a next_task that preemted another Task, run it now.
             if ($this->next_task) {
@@ -110,7 +110,7 @@ class TaskPump
                 $task = $this->next_task;
                 $this->next_task = NULL;
                 $this->_RunTask($task);
-                $did_work = TRUE;
+                $keep_running |= TRUE;
             }
 
             if ($this->should_quit)
@@ -120,19 +120,14 @@ class TaskPump
             // priority work gets serviced.
             if ($this->work_queue->Count() > 0) {
                 $this->_RunTask($this->work_queue->Dequeue());
-                $did_work = TRUE;
+                $keep_running |= TRUE;
             }
 
             if ($this->should_quit)
                 break;
 
-            // If an entire iteration of the loop passed without doing any work,
-            // and the loop isn't supposed to run indefinitely, end the loop.
-            if (!$did_work && !$keep_running)
-                break;
-            else if ($keep_running)
-                ;  // TODO: call out to some function
-        }
+            $keep_running |= $loop_indefinitely;
+        } while ($keep_running);
     }
 
     // This function does the actual task processing work. Note that this will
