@@ -48,7 +48,13 @@ class HTTPInputFilter implements InputFilter
         $request = new Request($this);
         $request->action = $this->_GetActionName();
         $request->data = $this->_GetInput();
+        $request->data->_method = $this->request_method;
         return $request;
+    }
+
+    static public function EvaluateContext()
+    {
+        return FALSE;
     }
 
     // Getters and setters.

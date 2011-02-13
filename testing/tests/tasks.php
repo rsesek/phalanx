@@ -23,7 +23,7 @@ require_once PHALANX_ROOT . '/tasks/cli_output_handler.php';
 require_once PHALANX_ROOT . '/tasks/dispatcher.php';
 require_once PHALANX_ROOT . '/tasks/task.php';
 require_once PHALANX_ROOT . '/tasks/task_pump.php';
-require_once PHALANX_ROOT . '/tasks/http_dispatcher.php';
+require_once PHALANX_ROOT . '/tasks/http_input_filter.php';
 require_once PHALANX_ROOT . '/tasks/output_handler.php';
 require_once PHALANX_ROOT . '/tasks/unit_test_output_handler.php';
 require_once PHALANX_ROOT . '/tasks/view_output_handler.php';

@@ -16,7 +16,7 @@
 
 namespace phalanx\tasks;
 
-require_once PHALANX_ROOT . 'base/strict_object.php';
+require_once PHALANX_ROOT . '/base/strict_object.php';
 
 // A Request holds the data in a context-neutral container. This object is
 // passed through the Dispatcher until a Router can vend a Task to process the
