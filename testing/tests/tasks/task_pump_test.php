@@ -108,16 +108,6 @@ class CurrentTaskTester extends TestTask
     }
 }
 
-class CancelDeferredTasksTester extends TestTask
-{
-    public function Fire()
-    {
-        global $test;
-        $test->pump->CancelDeferredTasks();
-        parent::Fire();
-    }
-}
-
 class StopPumpTask extends TestTask
 {
     public function Fire()
@@ -165,15 +155,6 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->pump->QueueTask($task);
     }
 
-    public function testSetOutputHandler()
-    {
-        $this->assertNull($this->pump->output_handler());
-
-        $handler = new TestOutputHandler();
-        $this->pump->set_output_handler($handler);
-        $this->assertSame($handler, $this->pump->output_handler());
-    }
-
     public function testQueueTask()
     {
         $task = new TestTask();
@@ -182,9 +163,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->pump->QueueTask($task);
         $this->assertEquals(1, $this->pump->GetTaskHistory()->Count());
 
-        $this->assertTrue($task->will_fire);
-        $this->assertTrue($task->fire);
-        $this->assertTrue($task->cleanup);
+        $this->assertTrue($task->did_run);
     }
 
     public function testRunTask()
@@ -195,9 +174,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->pump->RunTask($task);
         $this->assertEquals(1, $this->pump->GetTaskHistory()->Count());
 
-        $this->assertTrue($task->will_fire);
-        $this->assertTrue($task->fire);
-        $this->assertTrue($task->cleanup);
+        $this->assertTrue($task->did_run);
     }
 
     public function testRunTaskPreempted()
@@ -210,13 +187,9 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->pump->QueueTask($task);
         $this->assertEquals(2, $this->pump->GetTaskHistory()->Count());
 
-        $this->assertTrue($task->will_fire);
-        $this->assertTrue($task->fire);
-        $this->assertTrue($task->cleanup);
+        $this->assertTrue($task->did_run);
 
-        $this->assertTrue($inner_task->will_fire);
-        $this->assertTrue($inner_task->fire);
-        $this->assertTrue($inner_task->cleanup);
+        $this->assertTrue($inner_task->did_run);
 
         $this->assertSame($task, $this->pump->GetTaskHistory()->Top());
         $this->assertSame($inner_task, $this->pump->GetTaskHistory()->Bottom());
@@ -229,9 +202,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->pump->QueueTask($task);
         $this->assertEquals(0, $this->pump->GetTaskHistory()->Count());
 
-        $this->assertTrue($task->will_fire);
-        $this->assertFalse($task->fire);
-        $this->assertTrue($task->cleanup);
+        $this->assertFalse($task->did_run);
         $this->assertTrue($task->is_cancelled());
     }
 
@@ -242,9 +213,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->pump->QueueTask($task);
         $this->assertEquals(0, $this->pump->GetTaskHistory()->Count());
 
-        $this->assertTrue($task->will_fire);
-        $this->assertFalse($task->fire);
-        $this->assertTrue($task->cleanup);
+        $this->assertFalse($task->did_run);
         $this->assertTrue($task->is_cancelled());
     }
 
@@ -258,14 +227,10 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->pump->QueueTask($task);
         $this->assertEquals(1, $this->pump->GetTaskHistory()->Count());
 
-        $this->assertTrue($task->will_fire);
-        $this->assertFalse($task->fire);
-        $this->assertTrue($task->cleanup);
+        $this->assertFalse($task->did_run);
         $this->assertTrue($task->is_cancelled());
 
-        $this->assertTrue($inner_task->will_fire);
-        $this->assertTrue($inner_task->fire);
-        $this->assertTrue($inner_task->cleanup);
+        $this->assertTrue($inner_task->did_run);
         $this->assertFalse($inner_task->is_cancelled());
     }
 
@@ -278,83 +243,6 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $this->pump->GetDeferredTasks()->Count());
         $this->pump->QueueTask($task);
         $this->assertEquals(0, $this->pump->GetDeferredTasks()->Count());
-    }
-
-    public function testCancelDeferredTasks()
-    {
-        $this->pump->GetDeferredTasks()->Push(new TestTask());
-        $this->pump->GetDeferredTasks()->Push(new TestTask());
-        $this->pump->GetDeferredTasks()->Push(new TestTask());
-
-        $this->assertEquals(3, $this->pump->GetDeferredTasks()->Count());
-        $this->pump->CancelDeferredTasks();
-        $this->assertEquals(0, $this->pump->GetDeferredTasks()->Count());
-    }
-
-    public function testStopPump()
-    {
-        $this->pump = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
-        $this->pump->expects($this->once())->method('_Exit');
-
-        $output_handler = $this->getMock('phalanx\test\TestOutputHandler');
-        $output_handler->expects($this->once())->method('Start');
-        $this->pump->set_output_handler($output_handler);
-
-        $task = new StopPumpTask();
-        $this->pump->QueueTask($task);
-
-        $this->assertTrue($task->will_fire);
-        $this->assertTrue($task->fire);
-        $this->assertTrue($task->cleanup);
-    }
-
-    public function testStopPumpNoCurrentTask()
-    {
-        $this->pump = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
-        $this->pump->expects($this->once())->method('_Exit');
-
-        $output_handler = $this->getMock('phalanx\test\TestOutputHandler');
-        $output_handler->expects($this->once())->method('Start');
-        $this->pump->set_output_handler($output_handler);
-
-        $this->pump->StopPump();
-    }
-
-    public function testNestedStopPump()
-    {
-        $this->pump = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
-
-        $output_handler = $this->getMock('phalanx\test\TestOutputHandler');
-        $output_handler->expects($this->once())->method('Start');
-        $this->pump->set_output_handler($output_handler);
-
-        $task = new PreemptedTask();
-        $task->inner_task = new StopPumpTask();
-
-        $test = $this;
-        $this->pump->expects($this->once())
-                   ->method('_Exit')
-                   ->will($this->returnCallback(function() use ($test, $task) {
-            $test->assertEquals(0, $test->pump->GetTaskHistory()->Count());
-            $test->assertSame($task, $test->pump->GetAllTasks()->Bottom());
-            $test->assertSame($task->inner_task, $test->pump->GetAllTasks()->Top());
-        }));
-
-        $this->pump->QueueTask($task);
-    }
-
-    public function testTerminate()
-    {
-        $this->pump = $this->getMock('phalanx\tasks\TaskPump', array('_Exit'));
-        $msg = 'testing 1 2 3';
-
-        ob_start();
-        $this->pump->expects($this->once())->method('_Exit');
-        $this->pump->Terminate($msg);
-        $result = ob_get_contents();
-        ob_end_clean();
-
-        $this->assertEquals($msg, $result);
     }
 
     public function testGetTaskHistory()
@@ -376,11 +264,5 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $this->pump->GetTaskHistory()->Count());
         $this->assertSame($task2, $this->pump->GetTaskHistory()->Top());
         $this->assertSame($task1, $this->pump->GetTaskHistory()->Bottom());
-    }
-
-    public function testCancelDeferredTasksByRaisingATask()
-    {
-        $task = new CancelDeferredTasksTester();
-        $this->pump->RunTask($task);
     }
 }
