@@ -73,11 +73,17 @@ class Executor
         if ($this->delegate)
             $this->delegate->OnCreateRequest($request);
 
-        // Dispatch the Request.
+        // Dispatch the Request. Note that |$response| is not filled out until
+        // the pump runs the task.
         $response = $this->dispatcher->DispatchRequest($request);
 
         if ($this->delegate)
             $this->delegate->OnCreatedResponse($response);
+
+        TaskPump::Pump()->Loop();
+
+        if ($this->delegate)
+            $this->delegate->OnRanTaskPump();
 
         // TODO: invoke the output handler
     }
@@ -90,6 +96,8 @@ interface ExecutorDelegate
     public function OnCreateRequest(Request $request);
 
     public function OnCreatedResponse(Response $response);
+
+    public function OnRanTaskPump();
 }
 
 class ExecutorException extends \Exception {}
