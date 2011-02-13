@@ -236,8 +236,6 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->pump->QueueTask($task1);
         $this->pump->QueueTask($task2);
         $this->pump->Loop();
-        print_r($this->pump->GetTaskHistory());
-        print_r($this->pump->GetAllTasks());
         $this->assertEquals(2, $this->pump->GetTaskHistory()->Count());
         $this->assertSame($task2, $this->pump->GetTaskHistory()->Top());
         $this->assertSame($task1, $this->pump->GetTaskHistory()->Bottom());

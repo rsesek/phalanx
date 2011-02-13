@@ -54,7 +54,7 @@ class TaskPump
     // came in.
     public function QueueTask(Task $task)
     {
-        $this->work_queue->Push($task);
+        $this->work_queue->Enqueue($task);
     }
 
     // Schedules the |$task| as priority work, which executes before queued
@@ -119,7 +119,7 @@ class TaskPump
             // Handle queued work once per loop iteration to ensure that
             // priority work gets serviced.
             if ($this->work_queue->Count() > 0) {
-                $this->_RunTask($this->work_queue->Pop());
+                $this->_RunTask($this->work_queue->Dequeue());
                 $did_work = TRUE;
             }
 
