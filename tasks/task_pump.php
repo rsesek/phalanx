@@ -82,8 +82,10 @@ class TaskPump
         // into a stack if this is called multiple times without the caller
         // returning. Depending on the work, this could lead to "priority
         // inversion."
-        if (!$this->current_task || $this->next_task)
+        if (!$this->current_task || $this->next_task) {
             $this->work_queue->Unshift($task);
+            return;
+        }
 
         // The loop is running with work from the work_queue. Assuming the
         // current_task returned after calling this, next_task will get serviced

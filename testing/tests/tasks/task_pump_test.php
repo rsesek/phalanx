@@ -26,13 +26,13 @@ class NestedTask extends TestTask
 {
     public $inner_task;
 
-    public function Fire()
+    public function Run()
     {
         global $test;
         $count = $test->pump->GetDeferredTasks()->Count();
         $test->pump->QueueTask($this->inner_task);
         $test->assertEquals($count+1, $test->pump->GetDeferredTasks()->Count());
-        parent::Fire();
+        parent::Run();
     }
 }
 
@@ -40,17 +40,17 @@ class PreemptedTask extends TestTask
 {
     public $inner_task;
 
-    public function Fire()
+    public function Run()
     {
         global $test;
         $test->pump->RunTask($this->inner_task);
-        parent::Fire();
+        parent::Run();
     }
 }
 
 class CancelledTask extends TestTask
 {
-    public function Fire()
+    public function Run()
     {
         global $test;
         $test->pump->Cancel($this);
@@ -59,10 +59,10 @@ class CancelledTask extends TestTask
 
 class CancelledWillFireTask extends TestTask
 {
-    public function WillFire()
+    public function WillRun()
     {
         global $test;
-        parent::WillFire();
+        parent::WillRun();
         $test->pump->Cancel($this);
     }
 }
@@ -71,11 +71,11 @@ class PreemptedCancelledTask extends CancelledTask
 {
     public $inner_task;
 
-    public function Fire()
+    public function Run()
     {
         global $test;
         $test->pump->RunTask($this->inner_task);
-        parent::Fire();
+        parent::Run();
     }
 }
 
@@ -83,17 +83,17 @@ class CurrentTaskTester extends TestTask
 {
     public $inner_task;
 
-    public function WillFire()
+    public function WillRun()
     {
         global $test;
-        parent::WillFire();
+        parent::WillRun();
         $test->assertSame($this, $test->pump->GetCurrentTask());
         $test->assertEquals(TaskPump::TASK_WILL_FIRE, $test->pump->GetCurrentTaskState());
     }
-    public function Fire()
+    public function Run()
     {
         global $test;
-        parent::Fire();
+        parent::Run();
         $test->assertSame($this, $test->pump->GetCurrentTask());
         $test->assertEquals(TaskPump::TASK_FIRE, $test->pump->GetCurrentTaskState());
         if ($this->inner_task)
@@ -110,10 +110,10 @@ class CurrentTaskTester extends TestTask
 
 class StopPumpTask extends TestTask
 {
-    public function Fire()
+    public function Run()
     {
         global $test;
-        parent::Fire();
+        parent::Run();
         $test->pump->StopPump();
     }
 }
@@ -160,9 +160,11 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $task = new TestTask();
 
         $this->assertEquals(0, $this->pump->GetTaskHistory()->Count());
-        $this->pump->QueueTask($task);
-        $this->assertEquals(1, $this->pump->GetTaskHistory()->Count());
 
+        $this->pump->QueueTask($task);
+        $this->pump->Loop();
+
+        $this->assertEquals(1, $this->pump->GetTaskHistory()->Count());
         $this->assertTrue($task->did_run);
     }
 
@@ -171,9 +173,11 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $task = new TestTask();
 
         $this->assertEquals(0, $this->pump->GetTaskHistory()->Count());
-        $this->pump->RunTask($task);
-        $this->assertEquals(1, $this->pump->GetTaskHistory()->Count());
 
+        $this->pump->RunTask($task);
+        $this->pump->Loop();
+
+        $this->assertEquals(1, $this->pump->GetTaskHistory()->Count());
         $this->assertTrue($task->did_run);
     }
 
@@ -184,11 +188,13 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $task->inner_task = $inner_task;
 
         $this->assertEquals(0, $this->pump->GetTaskHistory()->Count());
+
         $this->pump->QueueTask($task);
+        $this->pump->Loop();
+
         $this->assertEquals(2, $this->pump->GetTaskHistory()->Count());
 
         $this->assertTrue($task->did_run);
-
         $this->assertTrue($inner_task->did_run);
 
         $this->assertSame($task, $this->pump->GetTaskHistory()->Top());
@@ -200,17 +206,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $task = new CancelledTask();
 
         $this->pump->QueueTask($task);
-        $this->assertEquals(0, $this->pump->GetTaskHistory()->Count());
-
-        $this->assertFalse($task->did_run);
-        $this->assertTrue($task->is_cancelled());
-    }
-
-    public function testCancelInWillFire()
-    {
-        $task = new CancelledWillFireTask();
-
-        $this->pump->QueueTask($task);
+        $this->pump->Loop();
         $this->assertEquals(0, $this->pump->GetTaskHistory()->Count());
 
         $this->assertFalse($task->did_run);
@@ -225,6 +221,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(0, $this->pump->GetTaskHistory()->Count());
         $this->pump->QueueTask($task);
+        $this->pump->Loop();
         $this->assertEquals(1, $this->pump->GetTaskHistory()->Count());
 
         $this->assertFalse($task->did_run);
@@ -242,6 +239,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(0, $this->pump->GetDeferredTasks()->Count());
         $this->pump->QueueTask($task);
+        $this->pump->Loop();
         $this->assertEquals(0, $this->pump->GetDeferredTasks()->Count());
     }
 
@@ -249,6 +247,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
     {
         $task = new TestTask();
         $this->pump->QueueTask($task);
+        $this->pump->Loop();
         $this->assertEquals(1, $this->pump->GetTaskHistory()->Count());
         $this->assertSame($task, $this->pump->GetTaskHistory()->Top());
     }
@@ -261,6 +260,7 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $task2->name = 'second';
         $this->pump->QueueTask($task1);
         $this->pump->QueueTask($task2);
+        $this->pump->Loop();
         $this->assertEquals(2, $this->pump->GetTaskHistory()->Count());
         $this->assertSame($task2, $this->pump->GetTaskHistory()->Top());
         $this->assertSame($task1, $this->pump->GetTaskHistory()->Bottom());
