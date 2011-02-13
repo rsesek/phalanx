@@ -176,9 +176,8 @@ class TaskPump
         return $this->work_queue;
     }
 
-    // Returns the SplStack of tasks that have been fired, in the order they
-    // fired. Note that this will NOT contain the current_task until AFTER
-    // Cleanup() is called from _QueueTask().
+    // Returns the SplStack of tasks that have been run, in the order they
+    // ran.
     public function GetTaskHistory()
     {
         $chain = new \SplStack();

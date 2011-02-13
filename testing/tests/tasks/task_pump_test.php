@@ -57,16 +57,6 @@ class CancelledTask extends TestTask
     }
 }
 
-class CancelledWillFireTask extends TestTask
-{
-    public function WillRun()
-    {
-        global $test;
-        parent::WillRun();
-        $test->pump->Cancel($this);
-    }
-}
-
 class PreemptedCancelledTask extends CancelledTask
 {
     public $inner_task;
@@ -74,8 +64,8 @@ class PreemptedCancelledTask extends CancelledTask
     public function Run()
     {
         global $test;
-        $test->pump->RunTask($this->inner_task);
         parent::Run();
+        $test->pump->RunTask($this->inner_task);
     }
 }
 
@@ -83,28 +73,13 @@ class CurrentTaskTester extends TestTask
 {
     public $inner_task;
 
-    public function WillRun()
-    {
-        global $test;
-        parent::WillRun();
-        $test->assertSame($this, $test->pump->GetCurrentTask());
-        $test->assertEquals(TaskPump::TASK_WILL_FIRE, $test->pump->GetCurrentTaskState());
-    }
     public function Run()
     {
         global $test;
         parent::Run();
         $test->assertSame($this, $test->pump->GetCurrentTask());
-        $test->assertEquals(TaskPump::TASK_FIRE, $test->pump->GetCurrentTaskState());
         if ($this->inner_task)
             $test->pump->RunTask($this->inner_task);
-    }
-    public function Cleanup()
-    {
-        global $test;
-        parent::CleanUp();
-        $test->assertSame($this, $test->pump->GetCurrentTask());
-        $test->assertEquals(TaskPump::TASK_CLEANUP, $test->pump->GetCurrentTaskState());
     }
 }
 
@@ -197,8 +172,8 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($task->did_run);
         $this->assertTrue($inner_task->did_run);
 
-        $this->assertSame($task, $this->pump->GetTaskHistory()->Top());
-        $this->assertSame($inner_task, $this->pump->GetTaskHistory()->Bottom());
+        $this->assertSame($inner_task, $this->pump->GetTaskHistory()->Top());
+        $this->assertSame($task, $this->pump->GetTaskHistory()->Bottom());
     }
 
     public function testCancel()
@@ -261,6 +236,8 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->pump->QueueTask($task1);
         $this->pump->QueueTask($task2);
         $this->pump->Loop();
+        print_r($this->pump->GetTaskHistory());
+        print_r($this->pump->GetAllTasks());
         $this->assertEquals(2, $this->pump->GetTaskHistory()->Count());
         $this->assertSame($task2, $this->pump->GetTaskHistory()->Top());
         $this->assertSame($task1, $this->pump->GetTaskHistory()->Bottom());
