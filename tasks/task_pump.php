@@ -171,25 +171,8 @@ class TaskPump
         return $this->work_queue;
     }
 
-    // Returns the SplStack of tasks that have been run, in the order they
-    // ran.
-    public function GetTaskHistory()
-    {
-        $chain = new \SplStack();
-        // If we traverse in order, then we preserve the order that tasks
-        // completed successfully.
-        foreach ($this->tasks as $task) {
-            if (!$task->is_cancelled()) {
-                $chain->Unshift($task);
-            }
-        }
-        return $chain;
-    }
-
-    // Returns |$this->tasks| as a stack. Note that tasks will likely appear
-    // multiple times in this stack. The occurrence count corresponds to which
-    // states the task has passed through.
-    public function GetAllTasks()
+    // Returns |$this->tasks| as a stack.
+    public function GetTasks()
     {
         return clone $this->tasks;
     }
