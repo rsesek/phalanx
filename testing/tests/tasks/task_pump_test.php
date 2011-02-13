@@ -277,4 +277,24 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($task->inner_task->inner_task, $chain->OffsetGet(1));
         $this->assertSame($task->inner_task->inner_task->inner_task, $chain->Top());
     }
+
+    public function testDontRunCancelledTasks()
+    {
+        $task1 = new TestTask();
+        $task2 = new TestTask();
+        $task3 = new TestTask();
+
+        $this->pump->QueueTask($task1);
+        $this->pump->QueueTask($task2);
+        $this->pump->QueueTask($task3);
+
+        $task2->Cancel();
+
+        $this->pump->Loop();
+
+        $this->assertEquals(2, $this->pump->GetTasks()->Count());
+        $this->assertTrue($task1->did_run);
+        $this->assertFalse($task2->did_run);
+        $this->assertTrue($task3->did_run);
+    }
 }

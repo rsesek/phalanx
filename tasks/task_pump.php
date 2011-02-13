@@ -137,8 +137,10 @@ class TaskPump
     {
         $this->current_task = $task;
 
-        $this->tasks->Push($task);
-        $task->Run();
+        if (!$task->is_cancelled()) {
+            $this->tasks->Push($task);
+            $task->Run();
+        }
 
         $this->current_task = NULL;
     }
