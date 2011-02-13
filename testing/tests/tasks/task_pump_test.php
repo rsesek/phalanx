@@ -297,4 +297,28 @@ class TaskPumpTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($task2->did_run);
         $this->assertTrue($task3->did_run);
     }
+
+    public function testLoopRestart()
+    {
+        $task1 = new TestTask();
+        $task2 = new QuitTask();
+        $task3 = new TestTask();
+
+        $this->pump->QueueTask($task1);
+        $this->pump->QueueTask($task2);
+        $this->pump->QueueTask($task3);
+
+        $this->pump->Loop();  // Pump tasks 1 and 2.
+
+        $this->assertEquals(2, $this->pump->GetTasks()->Count());
+        $this->assertTrue($task1->did_run);
+        $this->assertTrue($task2->did_run);
+        $this->assertFalse($task3->did_run);
+
+        $this->pump->Loop();  // Pump task 3.
+
+        $this->assertEquals(3, $this->pump->GetTasks()->Count());
+        $this->assertTrue($task3->did_run);
+        $this->assertSame($task3, $this->pump->GetTasks()->Top());
+    }
 }
